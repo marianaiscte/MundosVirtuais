@@ -13,11 +13,11 @@ public enum PieceType
 [System.Serializable]
 public class Piece
 {
-    public int id;
-    public Player owner;
-    public PieceType type;
-    public int x;
-    public int y;
+    public int id { get; private set; }
+    public Player owner { get; private set; }
+    public PieceType type { get; private set; }
+    public int x { get; private set; }
+    public int y { get; private set; }
 
     public Piece(int pieceId, Player pieceOwner, PieceType pieceType, int posX, int posY)
     {
