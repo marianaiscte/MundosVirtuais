@@ -5,24 +5,18 @@ using UnityEngine.UI;
 
 public class DeskScript : MonoBehaviour
 {
-    // Start is called before the first frame update
+    public Button XMLLoader; // Reference to the button you want to activate
+
     void Start()
     {
         XMLLoader.gameObject.SetActive(false);
     }
 
-
-    public Button XMLLoader; // Referência para o botão que queres ativar
-
     void OnMouseDown()
     {
-        // Ativa o botão quando o objeto é clicado
+        // Activate the first button when the object is clicked
         XMLLoader.gameObject.SetActive(true);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }
+
