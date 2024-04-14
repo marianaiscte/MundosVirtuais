@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class Game{
 
-    public string name;
-    public Board board;
-    public Player[] roles;
+    public string name { get;}
+    public Board board { get;}
+    public Player[] roles { get;}
 
     public List<Unit[]> turns = new List<Unit[]>();
     

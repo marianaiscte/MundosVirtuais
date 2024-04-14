@@ -3,26 +3,29 @@ using System;
 using System.Xml;
 using System.Collections.Generic;
 
-
 public class XMLReader : MonoBehaviour
 {
-   // public string xmlFilePath; // Caminho do ficheiro XML
+    //public string xmlFilePath; // Caminho do ficheiro XML
 
-    public void LoadXMLToRead(string xmlFilePath){
-        // Carrega o ficheiro XML da pasta Resources (mudar isto)
+    public Game LoadXMLToRead(string xmlFilePath){
+        XmlReader xmlr = XmlReader.Create(xmlFilePath);
+        return ReadXML(xmlr);
+        /* Carrega o ficheiro XML da pasta Resources (mudar isto)
         TextAsset xmlAsset = Resources.Load<TextAsset>(xmlFilePath);
 
         if (xmlAsset != null){
             // Cria um novo leitor XML
             XmlReader xmlr = XmlReader.Create(new System.IO.StringReader(xmlAsset.text));
-
+        
             // Chama uma função para processar o XML
-            ReadXML(xmlr);
-        }else
+            return ReadXML(xmlr);
+        }else {
             Debug.LogError("Ficheiro XML não encontrado: " + xmlFilePath);
+            return null;
+            }*/
     }
 
-    void ReadXML(XmlReader xmlr){
+    Game ReadXML(XmlReader xmlr){
         //coisas para checkar DTD
 
         string game_name = ""; // Declare outside the switch statement
@@ -56,6 +59,7 @@ public class XMLReader : MonoBehaviour
 
         }
         Game game = new Game(board, roles, allTurns, game_name); 
+        return game;
     }
 
     string DealWithGame(XmlReader xmlr){
@@ -75,7 +79,43 @@ public class XMLReader : MonoBehaviour
     Board DealWithBoard(XmlReader xmlr){
         int width = int.Parse(xmlr.GetAttribute("width"));
         int height = int.Parse(xmlr.GetAttribute("height"));
-        Board board = new Board(width, height);
+        Tile[,] tiles = new Tile[width, height];
+        int x = 0;
+        int y = 0;
+        while (xmlr.Read()){
+            switch (xmlr.Name){
+                case "village": 
+                    tiles[x, y] = new Tile(TileType.Village);
+                    break;
+
+                case "forest": 
+                    tiles[x, y] = new Tile(TileType.Forest);
+                    break;
+                
+                case "plain": 
+                    tiles[x, y] = new Tile(TileType.Plain);
+                    break;
+                
+                case "sea": 
+                    tiles[x, y] = new Tile(TileType.Sea);
+                    break;
+                
+                case "desert": 
+                    tiles[x, y] = new Tile(TileType.Desert);
+                    break;
+
+                case "mountain": 
+                    tiles[x, y] = new Tile(TileType.Mountain);
+                    break;
+            }
+            x++;
+            if(x >= width){
+                x = 0;
+                y++;
+            }
+        }
+
+        Board board = new Board(width, height, tiles);
 
         return board;
         
@@ -110,3 +150,4 @@ public class XMLReader : MonoBehaviour
     }
 
 }
+

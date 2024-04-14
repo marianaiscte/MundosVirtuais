@@ -6,18 +6,14 @@ public class Board
 {
     public int Width { get; private set; }
     public int Height { get; private set; }
-    public Tile[,] boardDisplay;
+    public Tile[,] BoardDisplay;
 
 
-    public Board(int width, int height)
+    public Board(int width, int height, Tile[,] boardDisplay)
     {
         Width = width;
         Height = height;
-        boardDisplay = new Tile[Width, Height];
+        BoardDisplay = boardDisplay;
     }
-
-    //public void setTile(int X, int Y, Tile tile){}
-
-    //public Tile getTile(int X, int Y){}
 
 }

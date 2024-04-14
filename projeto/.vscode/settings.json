@@ -51,5 +51,6 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "projeto.sln"
+    "dotnet.defaultSolution": "projeto.sln",
+    "cmake.sourceDirectory": "C:/Users/inesc/OneDrive/Documentos/GitHub/MundosVirtuais/projeto/Library/PackageCache/com.unity.ide.visualstudio@2.0.22/Editor/COMIntegration/COMIntegration~"
 }
