@@ -16,7 +16,7 @@ public class XMLReader : MonoBehaviour
             XmlReader xmlReader = XmlReader.Create(new System.IO.StringReader(xmlAsset.text));
 
             // Chama uma função para processar o XML
-            ProcessXML(xmlReader);
+            ReadXML(xmlReader);
         }
         else
         {
@@ -24,11 +24,54 @@ public class XMLReader : MonoBehaviour
         }
     }
 
-    void ProcessXML(XmlReader xmlReader)
+    void ReadXML(XmlReader xmlReader)
     {
-        // Aqui podes implementar a lógica para ler e processar o XML
-        // Por exemplo, podes percorrer os nós XML, ler os atributos, etc.
-        // Podes usar xmlReader.Read(), xmlReader.GetAttribute(), etc.
-        // para aceder aos elementos do XML.
+        //coisas para checkar DTD
+
+        while(xmlReader.Read()){
+            //switch case para escolher o que fazer com cada tag?? Se calhar ter uma função para cada tipo de tag, senão aqui fica too much
+            //todos eles vão ter de entrar dentro dos seus child -> pôr mais um loop nessas funções para percorrer filhos?
+
+            if (xmlReader.NodeType == XmlNodeType.Element){
+                switch (xmlReader.Name){
+                    case "game": 
+                        string game_name = DealWithGame(xmlReader, game) break;
+
+                    case "roles": 
+                        Player[] roles = DealWithRoles(xmlReader, game) break;
+                    
+                    case "board": 
+                        Board board = DealWithBoard(xmlReader, game) break;
+                    
+                    case "turns": 
+                        Unit[][] turns = DealWithTurns(xmlReader, game) break;
+                }
+            }
+
+        }
+        Game game = new Game(board, roles, ??, game_name); 
     }
+
+    string DealWithGame(XMLReader xmlr){
+        return xmlr.GetAttribute("name");
+    }
+
+    Player[] DealWithRoles(XMLReader xmlr){
+        List<Player> rolesList = new List<Player>();
+        while (xmlReader.Read()){
+            string p_name = xmlr.GetAttribute("name");
+            Player p = new Player(p_name);
+            rolesList.Add(player); 
+        }
+        return Player[] rolesArray = rolesList.ToArray();
+    }
+
+    void DealWithBoard(XMLReader xmlr){
+        
+    }
+
+    void DealWithTurns(XMLReader xmlr){
+        //se calhar aqui é o único que faz sentido ter um "loop" para ler logo uma turn, as units todas
+    }
+
 }
