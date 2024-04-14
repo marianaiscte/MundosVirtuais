@@ -5,7 +5,16 @@ using System.Collections.Generic;
 
 public class XMLReader : MonoBehaviour
 {
-    //public string xmlFilePath; // Caminho do ficheiro XML
+    public string xmlFilePath; // Caminho do ficheiro XML
+    public GameObject boardGameObject; // Referência para o GameObject do tabuleiro no Unity Editor
+    public GameObject villageTilePrefab; // Prefab do tile da vila
+    public GameObject forestTilePrefab;
+    public GameObject  plainTilePrefab;
+    public GameObject desertTilePrefab;
+    public GameObject seaTilePrefab;
+    public GameObject mountainTilePrefab;
+
+
 
     public Game LoadXMLToRead(string xmlFilePath){
         XmlReader xmlr = XmlReader.Create(xmlFilePath);
@@ -85,27 +94,27 @@ public class XMLReader : MonoBehaviour
         while (xmlr.Read()){
             switch (xmlr.Name){
                 case "village": 
-                    tiles[x, y] = new Tile(TileType.Village);
+                    tiles[x, y] = InstantiateTile(villageTilePrefab, x, y);
                     break;
 
                 case "forest": 
-                    tiles[x, y] = new Tile(TileType.Forest);
+                    tiles[x, y] = InstantiateTile(forestTilePrefab, x, y);
                     break;
                 
                 case "plain": 
-                    tiles[x, y] = new Tile(TileType.Plain);
+                    tiles[x, y] = InstantiateTile(plainTilePrefab, x, y);
                     break;
                 
                 case "sea": 
-                    tiles[x, y] = new Tile(TileType.Sea);
+                    tiles[x, y] = InstantiateTile(seaTilePrefab, x, y);
                     break;
                 
                 case "desert": 
-                    tiles[x, y] = new Tile(TileType.Desert);
+                    tiles[x, y] = InstantiateTile(desertTilePrefab, x, y);
                     break;
 
                 case "mountain": 
-                    tiles[x, y] = new Tile(TileType.Mountain);
+                    tiles[x, y] = InstantiateTile(mountainTilePrefab, x, y);
                     break;
             }
             x++;
@@ -120,6 +129,16 @@ public class XMLReader : MonoBehaviour
         return board;
         
     }
+
+    
+    Tile InstantiateTile(GameObject prefab, int x, int y)
+    {
+        Vector3 position = new Vector3(x, 0, y); //posiçao ainda incorreta
+        GameObject tileObject = Instantiate(prefab, position, Quaternion.identity);
+        tileObject.transform.parent = boardGameObject.transform; // Define o tabuleiro como pai do tile
+        return tileObject.GetComponent<Tile>(); // Adiciona o componente Tile e retorna
+    }
+    
 
     List<Unit[]> DealWithTurns(XmlReader xmlr){
 
