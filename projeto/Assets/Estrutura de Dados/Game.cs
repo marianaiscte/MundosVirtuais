@@ -7,16 +7,17 @@ public class Game{
     public string name;
     public Board board;
     public Player[] roles;
-    //public List<Unit[]> turns = new List<Unit[]>();
-    public Unit[][] turns;
+
+    public List<Unit[]> turns = new List<Unit[]>();
+    
     public int nTurns;
 
-    public Game(Board gameboard, Player[] gameroles, int numberTurns, string name){
+    public Game(Board gameboard, Player[] gameroles, List<Unit[]> turnlist, string givenName){
         board = gameboard;
         roles = gameroles;
-        nTurns = numberTurns;
-        turns = new Unit[nTurns][];
-        name = name;
+        turns = turnlist;
+        nTurns = turns.Count;
+        name = givenName;
     }
 
 }
