@@ -1,11 +1,12 @@
 using UnityEngine;
+using UnityEngine.UI;
 using System;
 using System.Xml;
 using System.Collections.Generic;
 
 public class XMLReader : MonoBehaviour
 {
-    public string xmlFilePath; // Caminho do ficheiro XML
+    public InputField xmlFilePath; // Caminho do ficheiro XML
     public GameObject boardGameObject; // Referência para o GameObject do tabuleiro no Unity Editor
     public GameObject villageTilePrefab; // Prefab do tile da vila
     public GameObject forestTilePrefab;
@@ -77,13 +78,21 @@ public class XMLReader : MonoBehaviour
 
     Player[] DealWithRoles(XmlReader xmlr){
         List<Player> rolesList = new List<Player>();
-        while (xmlr.Read()){
-            string p_name = xmlr.GetAttribute("name");
-            Player p = new Player(p_name);
-            rolesList.Add(p); 
+        
+        // Move o leitor para o primeiro elemento <role> dentro de <roles>
+        if (xmlr.ReadToDescendant("role")) {
+            do {
+                // Processa o elemento <role> atual
+                string p_name = xmlr.GetAttribute("name");
+                Player p = new Player(p_name);
+                rolesList.Add(p);
+            } while (xmlr.ReadToNextSibling("role")); // Move para o próximo irmão <role>, se houver
+            
         }
+        
         return rolesList.ToArray();
     }
+
 
     Board DealWithBoard(XmlReader xmlr){
         int width = int.Parse(xmlr.GetAttribute("width"));
@@ -91,6 +100,7 @@ public class XMLReader : MonoBehaviour
         Tile[,] tiles = new Tile[width, height];
         int x = 0;
         int y = 0;
+        /*
         while (xmlr.Read()){
             switch (xmlr.Name){
                 case "village": 
@@ -122,13 +132,56 @@ public class XMLReader : MonoBehaviour
                 x = 0;
                 y++;
             }
-        }
+         
+
+        }*/
 
         Board board = new Board(width, height, tiles);
 
         return board;
         
     }
+
+
+/*
+    Board DealWithBoard(XmlReader xmlr){
+    int width = int.Parse(xmlr.GetAttribute("width"));
+    int height = int.Parse(xmlr.GetAttribute("height"));
+    Tile[,] tiles = new Tile[width, height];
+    int x = 0;
+    int y = 0;
+
+    while (xmlr.Read()){
+        if (xmlr.NodeType == XmlNodeType.Element && xmlr.Name != "board"){
+            GameObject tilePrefab = GetTilePrefab(xmlr.Name);
+            if (tilePrefab != null) {
+                tiles[x, y] = InstantiateTile(tilePrefab, x, y);
+            }
+            x++;
+            if(x >= width){
+                x = 0;
+                y++;
+            }
+        }
+    }
+
+    Board board = new Board(width, height, tiles);
+    return board;
+}
+
+GameObject GetTilePrefab(string tileName) {
+    switch (tileName) {
+        case "village": return villageTilePrefab;
+        case "forest": return forestTilePrefab;
+        case "plain": return plainTilePrefab;
+        case "sea": return seaTilePrefab;
+        case "desert": return desertTilePrefab;
+        case "mountain": return mountainTilePrefab;
+        default: return null;
+    }
+}
+
+*/
 
     
     Tile InstantiateTile(GameObject prefab, int x, int y)
