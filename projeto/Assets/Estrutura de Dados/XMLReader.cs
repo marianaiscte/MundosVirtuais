@@ -3,11 +3,14 @@ using UnityEngine.UI;
 using System;
 using System.Xml;
 using System.Collections.Generic;
+using System.Numerics;
+using Vector3 = UnityEngine.Vector3;
+using Quaternion = UnityEngine.Quaternion;
 
 public class XMLReader : MonoBehaviour
 {
     public InputField xmlFilePath; // Caminho do ficheiro XML
-    public GameObject boardGameObject; // Referência para o GameObject do tabuleiro no Unity Editor
+    //public GameObject boardGameObject; // Referência para o GameObject do tabuleiro no Unity Editor
     public GameObject villageTilePrefab; // Prefab do tile da vila
     public GameObject forestTilePrefab;
     public GameObject  plainTilePrefab;
@@ -17,10 +20,9 @@ public class XMLReader : MonoBehaviour
 
 
 
-    public Game LoadXMLToRead(string xmlFilePath){
+public Game LoadXMLToRead(string xmlFilePath, GameObject boardGameObject){        
         XmlReader xmlr = XmlReader.Create(xmlFilePath);
-        return ReadXML(xmlr);
-        /* Carrega o ficheiro XML da pasta Resources (mudar isto)
+        return ReadXML(xmlr, boardGameObject);        /* Carrega o ficheiro XML da pasta Resources (mudar isto)
         TextAsset xmlAsset = Resources.Load<TextAsset>(xmlFilePath);
 
         if (xmlAsset != null){
@@ -35,7 +37,7 @@ public class XMLReader : MonoBehaviour
             }*/
     }
 
-    Game ReadXML(XmlReader xmlr){
+    Game ReadXML(XmlReader xmlr, GameObject boardGameObject){
         //coisas para checkar DTD
 
         string game_name = ""; // Declare outside the switch statement
@@ -58,7 +60,7 @@ public class XMLReader : MonoBehaviour
                         break;
                     
                     case "board": 
-                        board = DealWithBoard(xmlr);
+                        board = DealWithBoard(xmlr, boardGameObject);
                         break;
                     
                     case "turns": 
@@ -94,104 +96,133 @@ public class XMLReader : MonoBehaviour
     }
 
 
-    Board DealWithBoard(XmlReader xmlr){
+    Board DealWithBoard(XmlReader xmlr, GameObject boardGameObject){
         int width = int.Parse(xmlr.GetAttribute("width"));
         int height = int.Parse(xmlr.GetAttribute("height"));
         Tile[,] tiles = new Tile[width, height];
         int x = 0;
         int y = 0;
-        /*
-        while (xmlr.Read()){
-            switch (xmlr.Name){
-                case "village": 
-                    tiles[x, y] = InstantiateTile(villageTilePrefab, x, y);
-                    break;
+        //Pôr tudo a partir daqui mais bonito e compreensível pq isto é maioritariamente do chat e está hardcoded
 
-                case "forest": 
-                    tiles[x, y] = InstantiateTile(forestTilePrefab, x, y);
-                    break;
-                
-                case "plain": 
-                    tiles[x, y] = InstantiateTile(plainTilePrefab, x, y);
-                    break;
-                
-                case "sea": 
-                    tiles[x, y] = InstantiateTile(seaTilePrefab, x, y);
-                    break;
-                
-                case "desert": 
-                    tiles[x, y] = InstantiateTile(desertTilePrefab, x, y);
-                    break;
+        //ele estava a ler mal as tags, lia coisas vaizas potanto com isto só lê o que é suposto
+        List<string> expectedTags = new List<string> { "village", "forest", "plain", "sea", "desert", "mountain" };
 
-                case "mountain": 
-                    tiles[x, y] = InstantiateTile(mountainTilePrefab, x, y);
-                    break;
-            }
-            x++;
-            if(x >= width){
-                x = 0;
-                y++;
-            }
-         
-
-        }*/
-
-        Board board = new Board(width, height, tiles);
-
-        return board;
-        
-    }
-
-
-/*
-    Board DealWithBoard(XmlReader xmlr){
-    int width = int.Parse(xmlr.GetAttribute("width"));
-    int height = int.Parse(xmlr.GetAttribute("height"));
-    Tile[,] tiles = new Tile[width, height];
-    int x = 0;
-    int y = 0;
-
-    while (xmlr.Read()){
-        if (xmlr.NodeType == XmlNodeType.Element && xmlr.Name != "board"){
-            GameObject tilePrefab = GetTilePrefab(xmlr.Name);
-            if (tilePrefab != null) {
-                tiles[x, y] = InstantiateTile(tilePrefab, x, y);
-            }
-            x++;
-            if(x >= width){
-                x = 0;
-                y++;
+        while (xmlr.Read()) {
+            if (xmlr.NodeType == XmlNodeType.Element) {
+                Debug.Log("Entrei");
+                Debug.Log(xmlr.Name);
+                // Verifica se a tag atual está na lista de tags esperadas
+                if (expectedTags.Contains(xmlr.Name)) {
+            switch (xmlr.Name) {
+                    case "village":
+                        tiles[x, y] = new Tile(TileType.Village);
+                        break;
+                    case "forest":
+                        tiles[x, y] = new Tile(TileType.Forest);
+                        break;
+                    case "plain":
+                        tiles[x, y] = new Tile(TileType.Plain);
+                        break;
+                    case "sea":
+                        tiles[x, y] = new Tile(TileType.Sea);
+                        break;
+                    case "desert":
+                        tiles[x, y] = new Tile(TileType.Desert);
+                        break;
+                    case "mountain":
+                        tiles[x, y] = new Tile(TileType.Mountain);
+                        break;
+                }
+                x++;
+                if (x >= width) {
+                    x = 0;
+                    y++;
+                }
+                if (y >= height) {
+                    break; // Termina o loop quando todos os elementos da matriz foram preenchidos
+                }
+                }
             }
         }
+            Debug.Log("Conteúdo da matriz tiles:");
+
+            for (int i = 0; i < width; i++)
+            {
+                for (int j = 0; j < height; j++)
+                {
+                    Debug.Log("tiles[" + i + ", " + j + "]: " + tiles[i, j]);
+                }
+            }
+            Board board = new Board(width, height, tiles);
+            InitializeTiles(board, boardGameObject);
+            return board;
+        }
+
+        void InitializeTiles(Board board, GameObject boardGameObject){
+        
+        Vector3 posicaoTabuleiro = boardGameObject.transform.position;
+        Quaternion rotacaoTabuleiro = boardGameObject.transform.rotation;
+        Vector3 tamanhoTabuleiro = boardGameObject.GetComponent<Renderer>().bounds.size;
+
+        float escalaX = tamanhoTabuleiro.x / board.Width;
+        float escalaZ = tamanhoTabuleiro.z / board.Height;
+
+        GameObject tilesParent = new GameObject("CubosParent");
+        //criei para tentar fazer a rotaçao de todos os cubos no final, em vez de fazer um a um que envolvia mais
+        //calculos
+
+
+        // Loop pelos tiles do tabuleiro
+        for (int x = 0; x < board.Width; x++)
+        {
+            for (int y = 0; y < board.Height; y++)
+            {
+                // Obtém o tile na posição (x, y)
+                Tile tile = board.BoardDisplay[x, y];    
+
+                // calcula a posiçao tendo em conta os "espaços entre cubos" se nao tivesse isto da escala os cubos
+                //isto ficavam cubos a flutuar e nao juntinhos
+                Vector3 posicaoCubo = posicaoTabuleiro + new Vector3(x * escalaX, 0, y * escalaZ); 
+
+                GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+
+                cube.transform.localScale = new Vector3(escalaX, (float)0.25, escalaZ);
+                
+                // Define a posição do cubo com base na posição do tile no tabuleiro
+                cube.transform.position = posicaoCubo; 
+
+                cube.transform.parent = tilesParent.transform;
+                
+                //Meti primeiro os cubos com cores pra ser mais facil
+                Renderer renderer = cube.GetComponent<Renderer>();
+                switch (tile.type)
+                {
+                    case TileType.Village:
+                        renderer.material.color = Color.black;
+                        break;
+                    case TileType.Forest:
+                        renderer.material.color = Color.green;
+                        break;
+                    case TileType.Plain:
+                        renderer.material.color = Color.yellow;
+                        break;
+                    case TileType.Sea:
+                        renderer.material.color = Color.blue;
+                        break;
+                    case TileType.Desert:
+                        renderer.material.color = Color.yellow;
+                        break;
+                    case TileType.Mountain:
+                        renderer.material.color = Color.gray;
+                        break;
+                }
+            }
+        }
+        //roda o tilesparent de modo a conseguir rodar todos os cubos
+        tilesParent.transform.rotation = Quaternion.Inverse(rotacaoTabuleiro);
+
     }
 
-    Board board = new Board(width, height, tiles);
-    return board;
-}
-
-GameObject GetTilePrefab(string tileName) {
-    switch (tileName) {
-        case "village": return villageTilePrefab;
-        case "forest": return forestTilePrefab;
-        case "plain": return plainTilePrefab;
-        case "sea": return seaTilePrefab;
-        case "desert": return desertTilePrefab;
-        case "mountain": return mountainTilePrefab;
-        default: return null;
-    }
-}
-
-*/
-
-    
-    Tile InstantiateTile(GameObject prefab, int x, int y)
-    {
-        Vector3 position = new Vector3(x, 0, y); //posiçao ainda incorreta
-        GameObject tileObject = Instantiate(prefab, position, Quaternion.identity);
-        tileObject.transform.parent = boardGameObject.transform; // Define o tabuleiro como pai do tile
-        return tileObject.GetComponent<Tile>(); // Adiciona o componente Tile e retorna
-    }
-    
 
     List<Unit[]> DealWithTurns(XmlReader xmlr){
 

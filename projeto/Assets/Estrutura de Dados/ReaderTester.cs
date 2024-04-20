@@ -4,13 +4,14 @@ using System;
 public class ReaderTester : MonoBehaviour
 {
     private XMLReader xmlReader;
+    public GameObject boardGameObject;
     void Start()
     {
         // Crie uma instância da classe XMLReader
         XMLReader xmlReader = new XMLReader();
 
         // Carregue e leia o arquivo XML
-        Game game = xmlReader.LoadXMLToRead(@"C:\Users\maria\Desktop\xmlTestMundos.txt");
+        Game game = xmlReader.LoadXMLToRead(@"C:\Users\maria\Desktop\xmlTestMundos.txt", boardGameObject);
         
         // Exiba o nome do jogo
         Debug.Log("Nome do jogo: " + game.name);
