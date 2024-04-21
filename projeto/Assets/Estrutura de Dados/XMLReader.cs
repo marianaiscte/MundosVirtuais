@@ -162,15 +162,22 @@ public Game LoadXMLToRead(string xmlFilePath, GameObject boardGameObject){
         
         Vector3 posicaoTabuleiro = boardGameObject.transform.position;
         Quaternion rotacaoTabuleiro = boardGameObject.transform.rotation;
-        Vector3 tamanhoTabuleiro = boardGameObject.GetComponent<Renderer>().bounds.size;
+        Vector3 scale = boardGameObject.transform.localScale;
+        Vector3 tamanhoLocalTabuleiro = boardGameObject.GetComponent<Renderer>().bounds.size;
 
-        float escalaX = tamanhoTabuleiro.x / board.Width;
-        float escalaZ = tamanhoTabuleiro.z / board.Height;
-
+        float escalaX = scale.x / board.Height;
+        float escalaZ = scale.z / board.Width;
+        Debug.Log(escalaX + ", " + escalaZ);
         GameObject tilesParent = new GameObject("CubosParent");
+
         //criei para tentar fazer a rotaçao de todos os cubos no final, em vez de fazer um a um que envolvia mais
         //calculos
+        Debug.Log(tamanhoLocalTabuleiro);
+         // Calcula o deslocamento necessário para posicionar o tilesParent no centro do boardGameObject
+        Vector3 deslocamentoCentro = new Vector3(tamanhoLocalTabuleiro.x / 2 - scale.z/2, 0, tamanhoLocalTabuleiro.z / 2 - scale.x/2) ;
+        tilesParent.transform.position = deslocamentoCentro;
 
+        //Debug.Log(deslocamentoCentro);
 
         // Loop pelos tiles do tabuleiro
         for (int x = 0; x < board.Width; x++)
@@ -182,16 +189,17 @@ public Game LoadXMLToRead(string xmlFilePath, GameObject boardGameObject){
 
                 // calcula a posiçao tendo em conta os "espaços entre cubos" se nao tivesse isto da escala os cubos
                 //isto ficavam cubos a flutuar e nao juntinhos
-                Vector3 posicaoCubo = posicaoTabuleiro + new Vector3(x * escalaX, 0, y * escalaZ); 
-
+                Vector3 posicaoCubo = new Vector3(y * escalaZ, 0, x * escalaX) - deslocamentoCentro; 
+                Debug.Log("PosCubo:" + posicaoCubo);
                 GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-
-                cube.transform.localScale = new Vector3(escalaX, (float)0.25, escalaZ);
-                
+                                
+                cube.transform.localScale = new Vector3(escalaZ, (float)0.05, escalaX);
+    
                 // Define a posição do cubo com base na posição do tile no tabuleiro
                 cube.transform.position = posicaoCubo; 
 
                 cube.transform.parent = tilesParent.transform;
+                
                 
                 //Meti primeiro os cubos com cores pra ser mais facil
                 Renderer renderer = cube.GetComponent<Renderer>();
@@ -219,8 +227,10 @@ public Game LoadXMLToRead(string xmlFilePath, GameObject boardGameObject){
             }
         }
         //roda o tilesparent de modo a conseguir rodar todos os cubos
-        tilesParent.transform.rotation = Quaternion.Inverse(rotacaoTabuleiro);
-
+        //tilesParent.transform.rotation = Quaternion.Inverse(rotacaoTabuleiro);
+        tilesParent.transform.position = posicaoTabuleiro;
+        tilesParent.transform.rotation = rotacaoTabuleiro;
+        
     }
 
 

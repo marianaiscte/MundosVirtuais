@@ -11,7 +11,9 @@ public class ReaderTester : MonoBehaviour
         XMLReader xmlReader = new XMLReader();
 
         // Carregue e leia o arquivo XML
-        Game game = xmlReader.LoadXMLToRead(@"C:\Users\maria\Desktop\xmlTestMundos.txt", boardGameObject);
+        //Game game = xmlReader.LoadXMLToRead(@"C:\Users\maria\Desktop\xmlTestMundos.txt", boardGameObject);
+        Game game = xmlReader.LoadXMLToRead(@"C:\Users\inesc\OneDrive\Ambiente de trabalho\xmlTestMundos.txt", boardGameObject);
+
         
         // Exiba o nome do jogo
         Debug.Log("Nome do jogo: " + game.name);
