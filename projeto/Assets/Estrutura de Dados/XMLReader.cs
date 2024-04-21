@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using Vector3 = UnityEngine.Vector3;
 using Quaternion = UnityEngine.Quaternion;
+using System.Diagnostics;
 
 public class XMLReader : MonoBehaviour
 {
@@ -109,8 +110,8 @@ public Game LoadXMLToRead(string xmlFilePath, GameObject boardGameObject){
 
         while (xmlr.Read()) {
             if (xmlr.NodeType == XmlNodeType.Element) {
-                Debug.Log("Entrei");
-                Debug.Log(xmlr.Name);
+                //Debug.Log("Entrei");
+                //Debug.Log(xmlr.Name);
                 // Verifica se a tag atual está na lista de tags esperadas
                 if (expectedTags.Contains(xmlr.Name)) {
             switch (xmlr.Name) {
@@ -144,13 +145,13 @@ public Game LoadXMLToRead(string xmlFilePath, GameObject boardGameObject){
                 }
             }
         }
-            Debug.Log("Conteúdo da matriz tiles:");
+            //Debug.Log("Conteúdo da matriz tiles:");
 
             for (int i = 0; i < width; i++)
             {
                 for (int j = 0; j < height; j++)
                 {
-                    Debug.Log("tiles[" + i + ", " + j + "]: " + tiles[i, j]);
+                    //Debug.Log("tiles[" + i + ", " + j + "]: " + tiles[i, j]);
                 }
             }
             Board board = new Board(width, height, tiles);
@@ -162,22 +163,25 @@ public Game LoadXMLToRead(string xmlFilePath, GameObject boardGameObject){
         
         Vector3 posicaoTabuleiro = boardGameObject.transform.position;
         Quaternion rotacaoTabuleiro = boardGameObject.transform.rotation;
-        Vector3 scale = boardGameObject.transform.localScale;
-        Vector3 tamanhoLocalTabuleiro = boardGameObject.GetComponent<Renderer>().bounds.size;
+        
+        Vector3 tamanhoExato = boardGameObject.GetComponent<Renderer>().bounds.size;
+        //Debug.Log(tamanhoExato);
 
-        float escalaX = scale.x / board.Height;
-        float escalaZ = scale.z / board.Width;
-        Debug.Log(escalaX + ", " + escalaZ);
+        // Obtém a escala local do objeto
+        Vector3 escala = boardGameObject.transform.localScale;
+
+        //tamanho de cada cubo
+        float xC = escala.x / board.Height;
+        float zC = escala.z / board.Width;
+
+        //Debug.Log(xC + ", " + zC);
+
         GameObject tilesParent = new GameObject("CubosParent");
 
-        //criei para tentar fazer a rotaçao de todos os cubos no final, em vez de fazer um a um que envolvia mais
-        //calculos
-        Debug.Log(tamanhoLocalTabuleiro);
-         // Calcula o deslocamento necessário para posicionar o tilesParent no centro do boardGameObject
-        Vector3 deslocamentoCentro = new Vector3(tamanhoLocalTabuleiro.x / 2 - scale.z/2, 0, tamanhoLocalTabuleiro.z / 2 - scale.x/2) ;
-        tilesParent.transform.position = deslocamentoCentro;
+        tilesParent.transform.SetParent(boardGameObject.transform);
+        tilesParent.transform.position = boardGameObject.transform.localPosition;
 
-        //Debug.Log(deslocamentoCentro);
+        Bounds bordas = boardGameObject.GetComponent<Renderer>().bounds;
 
         // Loop pelos tiles do tabuleiro
         for (int x = 0; x < board.Width; x++)
@@ -187,22 +191,19 @@ public Game LoadXMLToRead(string xmlFilePath, GameObject boardGameObject){
                 // Obtém o tile na posição (x, y)
                 Tile tile = board.BoardDisplay[x, y];    
 
-                // calcula a posiçao tendo em conta os "espaços entre cubos" se nao tivesse isto da escala os cubos
-                //isto ficavam cubos a flutuar e nao juntinhos
-                Vector3 posicaoCubo = new Vector3(y * escalaZ, 0, x * escalaX) - deslocamentoCentro; 
-                Debug.Log("PosCubo:" + posicaoCubo);
-                GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                                
-                cube.transform.localScale = new Vector3(escalaZ, (float)0.05, escalaX);
-    
-                // Define a posição do cubo com base na posição do tile no tabuleiro
-                cube.transform.position = posicaoCubo; 
+                   Vector3 posicaoCubo = new Vector3(
+                    posicaoTabuleiro.x - escala.x/2f + (xC/2f) + y * xC, 
+                    posicaoTabuleiro.y,
+                    posicaoTabuleiro.z - escala.z/2f + (zC/2f) + x * zC
+                    ) ;
+            // Cria o cubo
+            GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            cube.transform.localScale = new Vector3(xC, 0.05f, zC); 
+            cube.transform.SetParent(tilesParent.transform); 
+            cube.transform.position = posicaoCubo; 
 
-                cube.transform.parent = tilesParent.transform;
-                
-                
-                //Meti primeiro os cubos com cores pra ser mais facil
-                Renderer renderer = cube.GetComponent<Renderer>();
+            // Define a cor do cubo com base no tipo de tile
+            Renderer renderer = cube.GetComponent<Renderer>();
                 switch (tile.type)
                 {
                     case TileType.Village:
@@ -226,8 +227,6 @@ public Game LoadXMLToRead(string xmlFilePath, GameObject boardGameObject){
                 }
             }
         }
-        //roda o tilesparent de modo a conseguir rodar todos os cubos
-        //tilesParent.transform.rotation = Quaternion.Inverse(rotacaoTabuleiro);
         tilesParent.transform.position = posicaoTabuleiro;
         tilesParent.transform.rotation = rotacaoTabuleiro;
         
