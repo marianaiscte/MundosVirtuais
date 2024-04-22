@@ -42,5 +42,6 @@ public class ReaderTester : MonoBehaviour
                 Debug.Log("Tipo: " + unit.piece + ", Ação: " + unit.action);
             }
         }
+
     }
 }

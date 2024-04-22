@@ -7,6 +7,7 @@ using System.Numerics;
 using Vector3 = UnityEngine.Vector3;
 using Quaternion = UnityEngine.Quaternion;
 using System.Diagnostics;
+using Debug = UnityEngine.Debug;
 
 public class XMLReader : MonoBehaviour
 {
@@ -257,7 +258,9 @@ public Game LoadXMLToRead(string xmlFilePath, GameObject boardGameObject){
                 }
                 turnsList.Add(unitsInTurn.ToArray());
             }
+            //chamar aqui o turnsmanager
             return turnsList;
+            
     }
 
 }
