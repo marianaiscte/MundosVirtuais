@@ -103,7 +103,6 @@ public Game LoadXMLToRead(string xmlFilePath, GameObject boardGameObject){
         Tile[,] tiles = new Tile[width, height];
         int x = 0;
         int y = 0;
-        //Pôr tudo a partir daqui mais bonito e compreensível pq isto é maioritariamente do chat e está hardcoded
 
         //ele estava a ler mal as tags, lia coisas vaizas potanto com isto só lê o que é suposto
         List<string> expectedTags = new List<string> { "village", "forest", "plain", "sea", "desert", "mountain" };
