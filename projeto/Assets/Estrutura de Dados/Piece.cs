@@ -18,6 +18,7 @@ public class Piece
     public PieceType type { get; private set; }
     public int x { get; private set; }
     public int y { get; private set; }
+    public GameObject gameO;
 
     public Piece(int pieceId, Player pieceOwner, PieceType pieceType, int posX, int posY)
     {
@@ -26,6 +27,14 @@ public class Piece
         type = pieceType;
         x = posX;
         y = posY;
+    }
+
+    public void associateObj(GameObject obj){
+        gameO = obj;
+    }
+
+    public GameObject getGameO(){
+        return gameO;
     }
 }
 

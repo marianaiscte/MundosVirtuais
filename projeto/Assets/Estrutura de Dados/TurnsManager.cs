@@ -31,7 +31,7 @@ public class TurnsManager : MonoBehaviour
                     break;
 
                     case "move_to":
-                    units[i].moveTo();
+                    units[i].moveTo(board);
                     break;
 
                     case "hold":

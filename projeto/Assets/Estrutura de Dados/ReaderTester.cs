@@ -39,7 +39,7 @@ public class ReaderTester : MonoBehaviour
             Unit[] unitsInTurn = game.turns[i];
             foreach (Unit unit in unitsInTurn)
             {
-                Debug.Log("Tipo: " + unit.piece + ", Ação: " + unit.action);
+                Debug.Log("Tipo: " + unit.piece + ", Ação: " + unit.action + ", Peça:" + unit.piece.type);
             }
         }
 

@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public enum ActionType
 {
@@ -35,8 +37,6 @@ public class Unit
 
         Tile tile = board.BoardDisplay[x, y];
 
-        Debug.Log("AAAAAAAAAAAAAAAAAAAAAA ");
-
         GameObject cyl = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
         Renderer renderer = cyl.GetComponent<Renderer>();
 
@@ -44,6 +44,9 @@ public class Unit
         
         cyl.transform.position = gameTile.transform.position;
         cyl.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+
+        piece.associateObj(cyl);
+        Debug.Log(piece.getGameO());
 
         switch(this.piece.type.ToString()){
             
@@ -67,8 +70,27 @@ public class Unit
 
     }
 
-    public void moveTo(){
+    public void moveTo(Board board){
 
+        int x = this.posFocoX - 1;
+        int y = this.posFocoY - 1;
+
+        Tile tile = board.BoardDisplay[x, y];
+
+        GameObject mover = piece.getGameO();
+        Debug.Log(mover);
+
+        GameObject gameTile = tile.getGameO();
+        Debug.Log(gameTile);
+
+
+
+        Vector3 targetPos = gameTile.transform.position;
+
+        mover.transform.position = Vector3.MoveTowards(mover.transform.position, targetPos, 4 * Time.deltaTime);
+
+        //mover.transform.position = targetPos;
+        
     }
 
     public void hold(){
