@@ -16,9 +16,18 @@ public enum TileType
 public class Tile
 {
     public TileType type;
+    public GameObject gameO;
 
     public Tile(TileType tileType)
     {
         type = tileType;
+    }
+
+    public void associateCube(GameObject cube){
+        gameO = cube;
+    }
+
+    public GameObject getGameO(){
+        return gameO;
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class TurnsManager : MonoBehaviour
@@ -11,15 +12,39 @@ public class TurnsManager : MonoBehaviour
 
     public Boolean paused = false;
 
-    public void StartGame( List<Unit[]> turnsList)
+    public Board board;
+
+    public void StartGame( Game game)
     {
-        this.turnsList = turnsList;
+        this.turnsList = game.turns;
+        this.board = game.board;
         MakeTurn(turnsList[0]); // faz o primeiro turno
     }
 
-    private void MakeTurn(Unit[] units)
-    {
-        //logica por implementar de como e que as coisas mexem etc
+    private void MakeTurn(Unit[] units){
+
+        for(int i = 0; i < units.Length; i++){
+
+            switch (units[i].action.ToString()) {
+                    case "spawn":
+                    units[i].spawn(board);
+                    break;
+
+                    case "move_to":
+                    units[i].moveTo();
+                    break;
+
+                    case "hold":
+                    units[i].hold();
+                    break;
+
+                    case "attack":
+                    units[i].attack();
+                    break;
+
+            }
+        }
+        NextTurn();
     }
 
     //funcao a ser chamada no botao para proxima jogada

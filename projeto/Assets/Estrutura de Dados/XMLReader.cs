@@ -39,7 +39,7 @@ public Game LoadXMLToRead(string xmlFilePath, GameObject boardGameObject){
             }*/
     }
 
-    Game ReadXML(XmlReader xmlr, GameObject boardGameObject){
+    public Game ReadXML(XmlReader xmlr, GameObject boardGameObject){
         //coisas para checkar DTD
 
         string game_name = ""; // Declare outside the switch statement
@@ -66,13 +66,15 @@ public Game LoadXMLToRead(string xmlFilePath, GameObject boardGameObject){
                         break;
                     
                     case "turns": 
-                        allTurns = DealWithTurns(xmlr);
+                        allTurns = DealWithTurns(xmlr,board);
                         break;
                 }
             }
 
         }
         Game game = new Game(board, roles, allTurns, game_name); 
+        TurnsManager turnsManager = new TurnsManager();
+        turnsManager.StartGame(game);
         return game;
     }
 
@@ -202,6 +204,8 @@ public Game LoadXMLToRead(string xmlFilePath, GameObject boardGameObject){
             cube.transform.SetParent(tilesParent.transform); 
             cube.transform.position = posicaoCubo; 
 
+            tile.associateCube(cube);
+
             // Define a cor do cubo com base no tipo de tile
             Renderer renderer = cube.GetComponent<Renderer>();
                 switch (tile.type)
@@ -233,7 +237,7 @@ public Game LoadXMLToRead(string xmlFilePath, GameObject boardGameObject){
     }
 
 
-    List<Unit[]> DealWithTurns(XmlReader xmlr){
+    List<Unit[]> DealWithTurns(XmlReader xmlr,Board board){
 
         List<Unit[]> turnsList = new List<Unit[]>();
 
@@ -258,7 +262,6 @@ public Game LoadXMLToRead(string xmlFilePath, GameObject boardGameObject){
                 }
                 turnsList.Add(unitsInTurn.ToArray());
             }
-            //chamar aqui o turnsmanager
             return turnsList;
             
     }
