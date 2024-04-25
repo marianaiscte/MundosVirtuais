@@ -14,6 +14,8 @@ public class TurnsManager : MonoBehaviour
 
     public Board board;
 
+    
+
     public void StartGame( Game game)
     {
         this.turnsList = game.turns;
@@ -27,11 +29,11 @@ public class TurnsManager : MonoBehaviour
 
             switch (units[i].action.ToString()) {
                     case "spawn":
-                    units[i].spawn(board);
+                    spawn(board,units[i]);
                     break;
 
                     case "move_to":
-                    units[i].moveTo(board);
+                    moveTo(board,units[i]);
                     break;
 
                     case "hold":
@@ -47,6 +49,72 @@ public class TurnsManager : MonoBehaviour
         NextTurn();
     }
 
+    public void spawn(Board board, Unit unit){
+
+        int x = unit.posFocoX - 1;
+        int y = unit.posFocoY - 1;
+
+        //Debug.Log(x + " " + y);
+
+        Tile tile = board.BoardDisplay[x, y];
+
+        GameObject cyl = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        Renderer renderer = cyl.GetComponent<Renderer>();
+
+        GameObject gameTile = tile.getGameO();
+        
+        cyl.transform.position = gameTile.transform.position;
+        cyl.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+
+        unit.piece.associateObj(cyl);
+        //Debug.Log(unit.piece.getGameO());
+
+        switch(unit.piece.type.ToString()){
+            
+            case "Soldier":
+            renderer.material.color = Color.black;
+            break;
+
+            case"Archer":
+            renderer.material.color = Color.green;
+            break;
+
+            case "Mage":
+            renderer.material.color = Color.cyan;
+            break;
+
+            case"Catapult":
+            renderer.material.color = Color.gray;
+            break;
+
+        }
+
+    }
+
+    public void moveTo(Board board, Unit unit){
+
+        int x = unit.posFocoX - 1;
+        int y = unit.posFocoY - 1;
+
+        Tile tile = board.BoardDisplay[x, y];
+
+        GameObject mover = unit.piece.getGameO();
+        //Debug.Log(mover);
+
+        GameObject gameTile = tile.getGameO();
+        //Debug.Log(gameTile);
+
+
+
+        Vector3 targetPos = gameTile.transform.position;
+
+        //mover.transform.position = Vector3.MoveTowards(mover.transform.position, targetPos, 4 * Time.deltaTime);
+        //este nao funciona, acho que e porque nao temos um update() so que nao sei o que fazer, isso nao implica mudar o codigo todo?
+
+        mover.transform.position = targetPos;
+        
+    }
+   
     //funcao a ser chamada no botao para proxima jogada
     public void NextTurn(){
         if (currentTurn < turnsList.Count - 1)

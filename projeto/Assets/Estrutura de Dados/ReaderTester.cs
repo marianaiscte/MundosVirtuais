@@ -16,30 +16,30 @@ public class ReaderTester : MonoBehaviour
 
         
         // Exiba o nome do jogo
-        Debug.Log("Nome do jogo: " + game.name);
+        //Debug.Log("Nome do jogo: " + game.name);
 
 
         // Exiba detalhes dos papéis dos jogadores
-        Debug.Log("Papéis dos jogadores:");
+        //Debug.Log("Papéis dos jogadores:");
         foreach (Player role in game.roles)
         {
-            Debug.Log(role.name);
+            //Debug.Log(role.name);
         }
 
                 // Exiba detalhes do tabuleiro
-        Debug.Log("Detalhes do tabuleiro:");
-        Debug.Log("Largura do tabuleiro: " + game.board.Width);
-        Debug.Log("Altura do tabuleiro: " + game.board.Height);
+        //Debug.Log("Detalhes do tabuleiro:");
+        //Debug.Log("Largura do tabuleiro: " + game.board.Width);
+        //Debug.Log("Altura do tabuleiro: " + game.board.Height);
 
         // Exiba detalhes dos turnos
-        Debug.Log("Número de turnos: " + game.nTurns);
+        //Debug.Log("Número de turnos: " + game.nTurns);
         for (int i = 0; i < game.turns.Count; i++)
         {
-            Debug.Log("Turno " + (i + 1) + ":");
+            //Debug.Log("Turno " + (i + 1) + ":");
             Unit[] unitsInTurn = game.turns[i];
             foreach (Unit unit in unitsInTurn)
             {
-                Debug.Log("Tipo: " + unit.piece + ", Ação: " + unit.action + ", Peça:" + unit.piece.type);
+                //Debug.Log("Tipo: " + unit.piece + ", Ação: " + unit.action + ", Peça:" + unit.piece.type);
             }
         }
 

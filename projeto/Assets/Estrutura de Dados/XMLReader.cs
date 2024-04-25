@@ -19,7 +19,9 @@ public class XMLReader : MonoBehaviour
     public GameObject desertTilePrefab;
     public GameObject seaTilePrefab;
     public GameObject mountainTilePrefab;
+    public event Action<Game> OnGameLoaded;
 
+    Dictionary<int, Piece> pieceDictionary = new Dictionary<int, Piece>();
 
 
 public Game LoadXMLToRead(string xmlFilePath, GameObject boardGameObject){        
@@ -253,10 +255,16 @@ public Game LoadXMLToRead(string xmlFilePath, GameObject boardGameObject){
                         int x = int.Parse(xmlr.GetAttribute("x"));
                         int y = int.Parse(xmlr.GetAttribute("y"));
 
-                        Piece piece = new Piece(id, new Player(role), type, x, y);
+                        Piece piece;
+                        
+                        if (pieceDictionary.ContainsKey(id)) {
+                            piece = pieceDictionary[id];
+                        } else {
+                            piece = new Piece(id, new Player(role), type, x, y);
+                            pieceDictionary.Add(id, piece);
+                        }
 
                         Unit unit = new Unit(action, piece, x, y);
-
                         unitsInTurn.Add(unit);
                     } while (xmlr.ReadToNextSibling("unit"));
                 }
