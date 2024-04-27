@@ -36,4 +36,8 @@ public class Unit
     public void attack(){
 
     }
+
+    public string getUnit(){
+        return "Tipo: " + this.piece + ", Ação: " + this.action + ", Peça:" + this.piece.type;
+    }
 }

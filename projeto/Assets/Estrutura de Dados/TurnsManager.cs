@@ -99,19 +99,19 @@ public class TurnsManager : MonoBehaviour
         Tile tile = board.BoardDisplay[x, y];
 
         GameObject mover = unit.piece.getGameO();
-        //Debug.Log(mover);
+        mover.AddComponent<ObjectMover>();
 
         GameObject gameTile = tile.getGameO();
         //Debug.Log(gameTile);
 
-
-
         Vector3 targetPos = gameTile.transform.position;
 
+        ObjectMover objm = mover.GetComponent<ObjectMover>();
+        objm.StartMoving(mover, targetPos);
         //mover.transform.position = Vector3.MoveTowards(mover.transform.position, targetPos, 4 * Time.deltaTime);
         //este nao funciona, acho que e porque nao temos um update() so que nao sei o que fazer, isso nao implica mudar o codigo todo?
 
-        mover.transform.position = targetPos;
+        //mover.transform.position = targetPos;
         
     }
    

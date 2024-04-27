@@ -11,8 +11,8 @@ public class ReaderTester : MonoBehaviour
         XMLReader xmlReader = new XMLReader();
 
         // Carregue e leia o arquivo XML
-        Game game = xmlReader.LoadXMLToRead(@"C:\Users\maria\Desktop\xmlTestMundos.txt", boardGameObject);
-        //Game game = xmlReader.LoadXMLToRead(@"C:\Users\inesc\OneDrive\Ambiente de trabalho\xmlTestMundos.txt", boardGameObject);
+        //Game game = xmlReader.LoadXMLToRead(@"C:\Users\maria\Desktop\xmlTestMundos.txt", boardGameObject);
+        Game game = xmlReader.LoadXMLToRead(@"C:\Users\inesc\OneDrive\Ambiente de trabalho\xmlTestMundos.txt", boardGameObject);
 
         
         // Exiba o nome do jogo
@@ -37,6 +37,7 @@ public class ReaderTester : MonoBehaviour
         {
             //Debug.Log("Turno " + (i + 1) + ":");
             Unit[] unitsInTurn = game.turns[i];
+            Debug.Log(unitsInTurn);
             foreach (Unit unit in unitsInTurn)
             {
                 //Debug.Log("Tipo: " + unit.piece + ", Ação: " + unit.action + ", Peça:" + unit.piece.type);
