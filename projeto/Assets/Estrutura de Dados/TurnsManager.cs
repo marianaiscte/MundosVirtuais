@@ -57,23 +57,28 @@ public class TurnsManager : MonoBehaviour
 
     public void handleDeaths(List<int []> coordenadasAtacadas){
 
+        List<Piece> piecesToRemove = new List<Piece>();
+
         foreach(int[] coord in coordenadasAtacadas){
             int x = coord[0];
             int y = coord[1];
 
             foreach (Piece p in game.pieces){
                 if(p.x == x && p.y == y){
-                    pieceDeath(p);
-                    
+                    piecesToRemove.Add(p);
                 }
             }
-
         }
 
+        foreach (Piece p in piecesToRemove){
+            pieceDeath(p);
+        }
     }
 
-    public void pieceDeath(Piece p){
 
+    public void pieceDeath(Piece p){
+    
+        Debug.Log("Peça "+ p.id + " vai morrer!");
         game.pieces.Remove(p);
         GameObject peca = p.getGameO();
         Destroy(peca);
@@ -158,6 +163,8 @@ public class TurnsManager : MonoBehaviour
         {
             currentTurn++;
             MakeTurn(turnsList[currentTurn]);
+        }else{
+            Debug.Log("O jogo acabou!");
         }
     }
 
