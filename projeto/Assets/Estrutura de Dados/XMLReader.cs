@@ -69,7 +69,7 @@ public Game LoadXMLToRead(string xmlFilePath, GameObject boardGameObject){
                     
                     case "turns": 
                         allTurns = DealWithTurns(xmlr,board);
-                        Debug.Log(allTurns);
+                        //Debug.Log(allTurns);
                         break;
                 }
             }

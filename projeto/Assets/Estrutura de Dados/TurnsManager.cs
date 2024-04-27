@@ -14,16 +14,21 @@ public class TurnsManager : MonoBehaviour
 
     public Board board;
 
+    public Game game;
+
     
 
-    public void StartGame( Game game)
+    public void StartGame(Game games)
     {
+        this.game = games;
         this.turnsList = game.turns;
         this.board = game.board;
         MakeTurn(turnsList[0]); // faz o primeiro turno
     }
 
     private void MakeTurn(Unit[] units){
+
+      List<int []> coordenadasAtacadas = new List<int[]>();
 
         for(int i = 0; i < units.Length; i++){
 
@@ -41,12 +46,37 @@ public class TurnsManager : MonoBehaviour
                     break;
 
                     case "attack":
-                    units[i].attack();
+                    coordenadasAtacadas.Add(units[i].attack());
                     break;
 
             }
         }
+        handleDeaths(coordenadasAtacadas);
         NextTurn();
+    }
+
+    public void handleDeaths(List<int []> coordenadasAtacadas){
+
+        foreach(int[] coord in coordenadasAtacadas){
+            int x = coord[0];
+            int y = coord[1];
+
+            foreach (Piece p in game.pieces){
+                if(p.x == x && p.y == y){
+                    pieceDeath(p);
+                    
+                }
+            }
+
+        }
+
+    }
+
+    public void pieceDeath(Piece p){
+
+        game.pieces.Remove(p);
+        GameObject peca = p.getGameO();
+        Destroy(peca);
     }
 
     public void spawn(Board board, Unit unit){
@@ -68,6 +98,12 @@ public class TurnsManager : MonoBehaviour
 
         unit.piece.associateObj(cyl);
         //Debug.Log(unit.piece.getGameO());
+
+        Piece p = unit.piece;
+        Debug.Log("Peça "+ p.id + " inicializada em x = "+p.x+ " e y =" +p.y);
+        game.addPiece(p);
+
+        
 
         switch(unit.piece.type.ToString()){
             
@@ -108,10 +144,11 @@ public class TurnsManager : MonoBehaviour
 
         ObjectMover objm = mover.GetComponent<ObjectMover>();
         objm.StartMoving(mover, targetPos);
-        //mover.transform.position = Vector3.MoveTowards(mover.transform.position, targetPos, 4 * Time.deltaTime);
-        //este nao funciona, acho que e porque nao temos um update() so que nao sei o que fazer, isso nao implica mudar o codigo todo?
 
-        //mover.transform.position = targetPos;
+        Piece p = unit.piece;
+        Debug.Log("Peça "+ p.id + " tem de se mover para x = "+unit.posFocoX+ " e y =" +unit.posFocoY);
+        game.UpdatePosPiece(p,unit.posFocoX,unit.posFocoY);
+        
         
     }
    

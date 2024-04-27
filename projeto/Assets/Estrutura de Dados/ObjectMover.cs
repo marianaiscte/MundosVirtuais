@@ -13,8 +13,8 @@ public class ObjectMover : MonoBehaviour
     {
         this.movingObject = movingObject;
         this.targetPos = targetPos;
-        Debug.Log("posição" + targetPos);
-        Debug.Log("obj" + movingObject);
+        //Debug.Log("posição" + targetPos);
+        //Debug.Log("obj" + movingObject);
     }
 
     // Update is called once per frame
