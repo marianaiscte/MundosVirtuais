@@ -1,22 +1,17 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class TurnsManager : MonoBehaviour
 {
     public List<Unit[]> turnsList;
-    
     public int currentTurn = 0; 
+    public Board board;
+    public Game game;
+    private bool isPaused = false;
 
     public Boolean paused = false;
-
-    public Board board;
-
-    public Game game;
-
-    
 
     public void StartGame(Game games)
     {
@@ -26,31 +21,42 @@ public class TurnsManager : MonoBehaviour
         MakeTurn(turnsList[0]); // faz o primeiro turno
     }
 
-    private void MakeTurn(Unit[] units){
+    private void MakeTurn(Unit[] units)
+    {
+        StartCoroutine(ExecuteTurn(units));
+    }
 
-      List<int []> coordenadasAtacadas = new List<int[]>();
+    private IEnumerator ExecuteTurn(Unit[] units)
+    {
 
-        for(int i = 0; i < units.Length; i++){
-
-            switch (units[i].action.ToString()) {
-                    case "spawn":
-                    spawn(board,units[i]);
+        List<int []> coordenadasAtacadas = new List<int[]>();
+        foreach (Unit unit in units)
+        {
+            // Execute as ações para cada unidade do turno
+            // Por exemplo:
+            switch (unit.action.ToString())
+            {
+                case "spawn":
+                    spawn(board, unit);
                     break;
 
-                    case "move_to":
-                    moveTo(board,units[i]);
+                case "move_to":
+                    moveTo(board, unit);
                     break;
 
-                    case "hold":
-                    units[i].hold();
+                case "hold":
+                    unit.hold();
                     break;
 
-                    case "attack":
-                    coordenadasAtacadas.Add(units[i].attack());
+                case "attack":
+                    coordenadasAtacadas.Add(unit.attack());
                     break;
-
             }
+            yield return new WaitForSecondsRealtime(5f); 
+
         }
+        yield return new WaitForSecondsRealtime(5f); 
+
         handleDeaths(coordenadasAtacadas);
         NextTurn();
     }
@@ -78,7 +84,7 @@ public class TurnsManager : MonoBehaviour
 
     public void pieceDeath(Piece p){
     
-        Debug.Log("Peça "+ p.id + " vai morrer!");
+        UnityEngine.Debug.Log("Peça "+ p.id + " vai morrer!");
         game.pieces.Remove(p);
         GameObject peca = p.getGameO();
         Destroy(peca);
@@ -105,7 +111,7 @@ public class TurnsManager : MonoBehaviour
         //Debug.Log(unit.piece.getGameO());
 
         Piece p = unit.piece;
-        Debug.Log("Peça "+ p.id + " inicializada em x = "+p.x+ " e y =" +p.y);
+        UnityEngine.Debug.Log("Peça "+ p.id + " inicializada em x = "+p.x+ " e y =" +p.y);
         game.addPiece(p);
 
         
@@ -151,7 +157,7 @@ public class TurnsManager : MonoBehaviour
         objm.StartMoving(mover, targetPos);
 
         Piece p = unit.piece;
-        Debug.Log("Peça "+ p.id + " tem de se mover para x = "+unit.posFocoX+ " e y =" +unit.posFocoY);
+        UnityEngine.Debug.Log("Peça "+ p.id + " tem de se mover para x = "+unit.posFocoX+ " e y =" +unit.posFocoY);
         game.UpdatePosPiece(p,unit.posFocoX,unit.posFocoY);
         
         
@@ -159,12 +165,11 @@ public class TurnsManager : MonoBehaviour
    
     //funcao a ser chamada no botao para proxima jogada
     public void NextTurn(){
-        if (currentTurn < turnsList.Count - 1)
-        {
+        if (currentTurn < turnsList.Count - 1){
             currentTurn++;
             MakeTurn(turnsList[currentTurn]);
         }else{
-            Debug.Log("O jogo acabou!");
+            UnityEngine.Debug.Log("O jogo acabou!");
         }
     }
 

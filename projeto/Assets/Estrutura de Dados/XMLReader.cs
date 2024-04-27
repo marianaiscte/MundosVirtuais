@@ -76,7 +76,8 @@ public Game LoadXMLToRead(string xmlFilePath, GameObject boardGameObject){
 
         }
         Game game = new Game(board, roles, allTurns, game_name); 
-        TurnsManager turnsManager = new TurnsManager();
+        boardGameObject.AddComponent<TurnsManager>();
+        TurnsManager turnsManager = boardGameObject.GetComponent<TurnsManager>();
         turnsManager.StartGame(game);
         return game;
     }
