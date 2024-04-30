@@ -94,34 +94,40 @@ public class Board
         tilesParent.transform.rotation = rotacaoTabuleiro;
     }
 
-    public void BorderMaker(Vector3 escala, String wallType, Vector3 posicaoTabuleiro, GameObject tilesParent){
-        GameObject wallLR = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        GameObject wallUD = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        wallLR.transform.localScale = new Vector3(escala.x + 0.1f, 0.07f, 0.05f); // Define o tamanho da borda esquerda
-        wallUD.transform.localScale = new Vector3(0.05f, 0.07f, escala.z); // Define o tamanho da borda esquerda
-        switch (wallType){
-            case "left":
-                wallLR.transform.position = new Vector3(posicaoTabuleiro.x, posicaoTabuleiro.y, posicaoTabuleiro.z + escala.z/2f + 0.025f); 
-                break;
-            case "right":
-                wallLR.transform.position = new Vector3(posicaoTabuleiro.x, posicaoTabuleiro.y, posicaoTabuleiro.z - escala.z/2f - 0.025f); // Posiciona a borda direita à direita do tabuleiro
-                break;
-            case "up":
-                wallUD.transform.position = new Vector3(posicaoTabuleiro.x - escala.x/2f - 0.025f, posicaoTabuleiro.y, posicaoTabuleiro.z); // Posiciona a borda superior acima do tabuleiro
-                break;
-            case "down":
-                wallUD.transform.position = new Vector3(posicaoTabuleiro.x + escala.x/2f + 0.025f, posicaoTabuleiro.y, posicaoTabuleiro.z); // Posiciona a borda inferior abaixo do tabuleiro
-                break;
-        }
-        wallUD.transform.SetParent(tilesParent.transform); 
-        wallLR.transform.SetParent(tilesParent.transform); 
-
-        Renderer LRRenderer = wallLR.GetComponent<Renderer>();
-        LRRenderer.material.color = Color.white;
-
-        Renderer UDRenderer = wallUD.GetComponent<Renderer>();
-        UDRenderer.material.color = Color.white;
+    public void BorderMaker(Vector3 scale, string wallType, Vector3 boardPosition, GameObject tilesParent) {
+    GameObject wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
+    Vector3 wallScale;
+    Vector3 wallPositionOffset;
+    
+    switch (wallType) {
+        case "left":
+            wallScale = new Vector3(scale.x + 0.1f, 0.07f, 0.05f);
+            wallPositionOffset = new Vector3(0f, 0f, scale.z / 2f + 0.025f);
+            break;
+        case "right":
+            wallScale = new Vector3(scale.x + 0.1f, 0.07f, 0.05f);
+            wallPositionOffset = new Vector3(0f, 0f, -scale.z / 2f - 0.025f);
+            break;
+        case "up":
+            wallScale = new Vector3(0.05f, 0.07f, scale.z);
+            wallPositionOffset = new Vector3(-scale.x / 2f - 0.025f, 0f, 0f);
+            break;
+        case "down":
+            wallScale = new Vector3(0.05f, 0.07f, scale.z);
+            wallPositionOffset = new Vector3(scale.x / 2f + 0.025f, 0f, 0f);
+            break;
+        default:
+            return; // Não faz nada se o tipo de parede não for reconhecido
     }
+    
+    wall.transform.localScale = wallScale;
+    wall.transform.position = boardPosition + wallPositionOffset;
+    wall.transform.SetParent(tilesParent.transform);
+    
+    Renderer wallRenderer = wall.GetComponent<Renderer>();
+    wallRenderer.material.color = Color.white;
+}
+
 
 
 }
