@@ -6,32 +6,36 @@ using UnityEngine;
 public class TurnsManager : MonoBehaviour
 {
     public List<Unit[]> turnsList;
-    public int currentTurn = 0; 
     public Board board;
     public Game game;
     private bool isPaused = false;
-
-    public Boolean paused = false;
+    private bool paused = false;
+    public Coroutine unitCoroutine;
+    public GameState state;
 
     public void StartGame(Game games)
     {
         this.game = games;
         this.turnsList = game.turns;
         this.board = game.board;
+        state.currentTurn = 0;
+        state.currentUnit = 0;
         MakeTurn(turnsList[0]); // faz o primeiro turno
+        Debug.Log("começou");
+
     }
 
     private void MakeTurn(Unit[] units)
     {
-        StartCoroutine(ExecuteTurn(units));
+        unitCoroutine = StartCoroutine(ExecuteTurn(units));
     }
 
     private IEnumerator ExecuteTurn(Unit[] units)
     {
-
         List<int []> coordenadasAtacadas = new List<int[]>();
-        foreach (Unit unit in units)
-        {
+        for (int i = state.currentUnit; i < units.Length; i++){
+            Unit unit = units[state.currentUnit];
+            Debug.Log(unit);
             // Execute as ações para cada unidade do turno
             // Por exemplo:
             switch (unit.action.ToString())
@@ -52,12 +56,13 @@ public class TurnsManager : MonoBehaviour
                     coordenadasAtacadas.Add(unit.attack());
                     break;
             }
+            state.currentUnit++;
             yield return new WaitForSecondsRealtime(5f); 
-
         }
-        yield return new WaitForSecondsRealtime(5f); 
+          yield return new WaitForSecondsRealtime(5f); 
 
         handleDeaths(coordenadasAtacadas);
+        state.currentUnit = 0;
         NextTurn();
     }
 
@@ -165,9 +170,10 @@ public class TurnsManager : MonoBehaviour
    
     //funcao a ser chamada no botao para proxima jogada
     public void NextTurn(){
-        if (currentTurn < turnsList.Count - 1){
-            currentTurn++;
-            MakeTurn(turnsList[currentTurn]);
+        if (state.currentTurn < turnsList.Count - 1){
+            state.currentTurn++; 
+            MakeTurn(turnsList[state.currentTurn]);
+            Debug.Log(turnsList[state.currentTurn]);
         }else{
             UnityEngine.Debug.Log("O jogo acabou!");
         }
@@ -176,10 +182,10 @@ public class TurnsManager : MonoBehaviour
     // funcao a ser chamada no botao para a jogada anterior
     public void PreviousTurn()
     {
-        if (currentTurn > 0)
+        if (state.currentTurn > 0)
         {
-            currentTurn--;
-             MakeTurn(turnsList[currentTurn]);
+            state.currentTurn--;
+            MakeTurn(turnsList[state.currentTurn]);
         }
     }
 
@@ -187,15 +193,37 @@ public class TurnsManager : MonoBehaviour
     public void Pause()
     {
         paused = true;
+        if (unitCoroutine != null)
+        {
+            StopCoroutine(unitCoroutine);
+            Debug.Log("devia parar");
+            unitCoroutine = null; // Atualiza a variável turnCoroutine para null
+            Time.timeScale = 0f;
+        }
+        Debug.Log("Pausado");
     }
 
-    // funcao que mete play  
-    public void play()
+    public void Play()
     {
         paused = false;
+        Debug.Log(unitCoroutine);
+
+        if (unitCoroutine == null) 
+        {
+            Time.timeScale = 1f;
+            MakeTurn(turnsList[state.currentTurn]); 
+        }
     }
+
 
     //ambas as de cima tem de ter mais logica por detras com as animaçoes, tipo o pause temos que garantir que faz com que as cenas parem e 
     //guardem o estado delas (acho eu) e o play tem de ter em consideraçao o estado atual e completar o turn se necessario
     
+}
+
+//guardar estado do jogo
+public struct GameState
+{
+    public int currentTurn;
+    public int currentUnit;
 }

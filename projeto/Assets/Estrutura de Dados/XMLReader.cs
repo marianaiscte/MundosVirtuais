@@ -12,7 +12,7 @@ using Debug = UnityEngine.Debug;
 public class XMLReader : MonoBehaviour
 {
     public InputField xmlFilePath; // Caminho do ficheiro XML
-    //public GameObject boardGameObject; // Referência para o GameObject do tabuleiro no Unity Editor
+    public GameObject BoardGameObject; // Referência para o GameObject do tabuleiro no Unity Editor
     public GameObject villageTilePrefab; // Prefab do tile da vila
     public GameObject forestTilePrefab;
     public GameObject  plainTilePrefab;
@@ -23,9 +23,9 @@ public class XMLReader : MonoBehaviour
 
     Dictionary<int, Piece> pieceDictionary = new Dictionary<int, Piece>();
 
-
 public Game LoadXMLToRead(string xmlFilePath, GameObject boardGameObject){        
         XmlReader xmlr = XmlReader.Create(xmlFilePath);
+        BoardGameObject = boardGameObject;
         return ReadXML(xmlr, boardGameObject);        /* Carrega o ficheiro XML da pasta Resources (mudar isto)
         TextAsset xmlAsset = Resources.Load<TextAsset>(xmlFilePath);
 
@@ -76,9 +76,6 @@ public Game LoadXMLToRead(string xmlFilePath, GameObject boardGameObject){
 
         }
         Game game = new Game(board, roles, allTurns, game_name); 
-        boardGameObject.AddComponent<TurnsManager>();
-        TurnsManager turnsManager = boardGameObject.GetComponent<TurnsManager>();
-        turnsManager.StartGame(game);
         return game;
     }
 
