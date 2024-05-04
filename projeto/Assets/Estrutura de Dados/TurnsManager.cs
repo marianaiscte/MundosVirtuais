@@ -1,8 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Numerics;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class TurnsManager : MonoBehaviour
@@ -55,14 +53,16 @@ public class TurnsManager : MonoBehaviour
                     break;
 
                 case "attack":
+                    Animator animate = unit.piece.getGameO().GetComponent<Animator>();
+                    animate.SetBool("attack",true);
                     coordenadasAtacadas.Add(unit.attack());
+                    yield return new WaitForSeconds(animate.GetCurrentAnimatorClipInfo(0)[0].clip.length);
+                    animate.SetBool("attack", false);
                     break;
             }
+            yield return new WaitForSecondsRealtime(2f); 
             state.currentUnit++;
-            yield return new WaitForSecondsRealtime(3f); 
         }
-          yield return new WaitForSecondsRealtime(3f); 
-
         handleDeaths(coordenadasAtacadas);
         state.currentUnit = 0;
         NextTurn();
@@ -84,110 +84,118 @@ public class TurnsManager : MonoBehaviour
         }
 
         foreach (Piece p in piecesToRemove){
-            pieceDeath(p);
+           StartCoroutine(pieceDeath(p));
         }
     }
 
-    public void pieceDeath(Piece p){
+
+    public IEnumerator pieceDeath(Piece p){
         UnityEngine.Debug.Log("Peça "+ p.id + " vai morrer!");
+
+        // Aciona a animação de "morte"
+        Animator animate = p.getGameO().GetComponent<Animator>();
+        animate.SetBool("died", true);
+
+        // Espere pela duração da animação de "morte"
+        float deathAnimationDuration = animate.GetCurrentAnimatorClipInfo(0)[0].clip.length;
+        yield return new WaitForSeconds(deathAnimationDuration);
+
+        // Destrua o objeto da peça
         game.pieces.Remove(p);
         GameObject peca = p.getGameO();
         Destroy(peca);
-    }
+}
 
-    public GameObject[] placePieces(int x, int y, GameObject gameTile){
+public UnityEngine.Vector3[] placePieces(int x, int y, GameObject gameTile){
         int numberOfpieces = game.CountPiecesInTile(x, y);
-        GameObject[] objects = game.getObjectsInTile(x, y);
         UnityEngine.Vector3 gameTilePos = gameTile.transform.position;
-        //UnityEngine.Vector3[] positions = new UnityEngine.Vector3[numberOfpieces];
+        UnityEngine.Vector3[] positions = new UnityEngine.Vector3[numberOfpieces];
         float offset = 0.2f; // Distância de offset do centro
         Debug.Log(numberOfpieces);
         switch(numberOfpieces){
             case 1:
                // objects[0] = cyl;
-                objects[0].transform.position = gameTilePos;
+                positions[0] = gameTilePos;
                 Debug.Log("criei um cilindro: " + gameTilePos);
                 break;
             case 2:
-                objects[0].transform.position = gameTilePos + new UnityEngine.Vector3(-offset, 0, 0); 
-                Debug.Log(objects[0].transform.position);
+                positions[0] = gameTilePos + new UnityEngine.Vector3(-offset, 0, 0); 
                 //objects[1] = cyl;
-                objects[1].transform.position = gameTilePos + new UnityEngine.Vector3(offset, 0, 0); 
-                Debug.Log(objects[1].transform.position);
+                positions[1] = gameTilePos + new UnityEngine.Vector3(offset, 0, 0); 
                 Debug.Log("estão dois cilindro: " + gameTilePos);
                 break;
              case 3:
-                objects[0].transform.position = gameTilePos + new UnityEngine.Vector3(-offset, 0, 0); 
-                objects[1].transform.position = gameTilePos + new UnityEngine.Vector3(offset, 0, 0);
+                positions[0] = gameTilePos + new UnityEngine.Vector3(-offset, 0, 0); 
+                positions[1] = gameTilePos + new UnityEngine.Vector3(offset, 0, 0);
                 //objects[2] = cyl;
-                objects[2].transform.position = gameTilePos + new UnityEngine.Vector3(0, 0, offset); 
+                positions[2] = gameTilePos + new UnityEngine.Vector3(0, 0, offset); 
                 break;
             case 4:
-                objects[0].transform.position = gameTilePos + new UnityEngine.Vector3(-offset, 0, -offset); 
-                objects[1].transform.position = gameTilePos + new UnityEngine.Vector3(offset, 0, -offset);
-                objects[2].transform.position = gameTilePos + new UnityEngine.Vector3(-offset, 0, offset); 
+                positions[0] = gameTilePos + new UnityEngine.Vector3(-offset, 0, -offset); 
+                positions[1] = gameTilePos + new UnityEngine.Vector3(offset, 0, -offset);
+                positions[2] = gameTilePos + new UnityEngine.Vector3(-offset, 0, offset); 
                 //objects[3] = cyl;
-                objects[3].transform.position = gameTilePos + new UnityEngine.Vector3(offset, 0, offset); 
+                positions[3] = gameTilePos + new UnityEngine.Vector3(offset, 0, offset); 
                 break;
         }
-        return objects;
+        return positions;
     }
 
-    public void resize(GameObject[] objects){
-        foreach(GameObject obj in objects){
-            obj.transform.localScale = new UnityEngine.Vector3(0.1f, 0.1f, 0.1f);
-            Debug.Log("resize: " + obj.transform.localScale);
-        }
-    }
 
-    public void spawn(Board board, Unit unit){
-
+    public void spawn(Board board, Unit unit)
+    {
         int x = unit.posFocoX - 1;
         int y = unit.posFocoY - 1;
 
-        //Debug.Log(x + " " + y);
-
         Tile tile = board.BoardDisplay[x, y];
-
-        GameObject cyl = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-        Renderer renderer = cyl.GetComponent<Renderer>();
-
         GameObject gameTile = tile.getGameO();
+        
+        GameObject prefabToSpawn = null;
 
-        unit.piece.associateObj(cyl);
-        //Debug.Log(unit.piece.getGameO());
-
-        Piece p = unit.piece;
-        UnityEngine.Debug.Log("Peça "+ p.id + " inicializada em x = "+p.x+ " e y =" +p.y);
-        game.addPiece(p);
-
-        //cyl.transform.position = gameTile.transform.position; // Posiciona a peça no centro do tile
-        //cyl.transform.localScale = new UnityEngine.Vector3(0.1f, 0.1f, 0.1f); // Define a escala da peça
-
-        switch(unit.piece.type.ToString()){
-            
+        switch(unit.piece.type.ToString())
+        {
             case "Soldier":
-            renderer.material.color = Color.black;
-            break;
-
-            case"Archer":
-            renderer.material.color = Color.green;
-            break;
-
+                prefabToSpawn = Resources.Load<GameObject>("Pieces/soldier");
+                break;
+            case "Archer":
+                prefabToSpawn = Resources.Load<GameObject>("Pieces/arqueiro");
+                break;
             case "Mage":
-            renderer.material.color = Color.cyan;
-            break;
-
-            case"Catapult":
-            renderer.material.color = Color.gray;
-            break;
-
+                prefabToSpawn = Resources.Load<GameObject>("Pieces/mage");
+                break;
+            case "Catapult":
+                prefabToSpawn = Resources.Load<GameObject>("Pieces/catapult");
+                break;
+            default:
+                Debug.LogWarning("Prefab não encontrado para o tipo de peça: " + unit.piece.type.ToString());
+                break;
         }
-        Debug.Log("vou tratar de tudo");
-        resize(placePieces(unit.posFocoX, unit.posFocoY, gameTile));
 
+        if (prefabToSpawn != null)
+        {
+            Piece p = unit.piece;
+            Debug.Log("Peça "+ p.id + " inicializada em x = "+p.x+ " e y =" +p.y);
+            game.addPiece(p);
+            GameObject pieceObject = Instantiate(prefabToSpawn);
+            pieceObject.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+
+            unit.piece.associateObj(pieceObject);
+
+            UnityEngine.Vector3[] positions = placePieces(unit.posFocoX, unit.posFocoY, gameTile);
+            GameObject[] objects = game.getObjectsInTile(unit.posFocoX, unit.posFocoY);
+            int i = 0;
+            foreach(GameObject obj in objects){
+                obj.transform.position = positions[i];
+                i++;
+            }
+        }
+        else
+        {
+            Debug.LogError("Falha ao carregar prefab para o tipo de peça: " + unit.piece.type.ToString());
+        }
     }
 
+       
     public void moveTo(Board board, Unit unit){
 
         int x = unit.posFocoX - 1;
@@ -200,19 +208,28 @@ public class TurnsManager : MonoBehaviour
 
         GameObject gameTile = tile.getGameO();
         //Debug.Log(gameTile);
-
-        UnityEngine.Vector3 targetPos = gameTile.transform.position;
-        
-        ObjectMover objm = mover.GetComponent<ObjectMover>();
-        objm.StartMoving(mover, targetPos);
-
         Piece p = unit.piece;
         UnityEngine.Debug.Log("Peça "+ p.id + " tem de se mover para x = "+unit.posFocoX+ " e y =" +unit.posFocoY);
         game.UpdatePosPiece(p,unit.posFocoX,unit.posFocoY);
-        
-        int numberOfpieces = game.CountPiecesInTile(unit.posFocoX, unit.posFocoY);
-        Debug.Log("MOVENDO: " + numberOfpieces);
-        placePieces(unit.posFocoX, unit.posFocoY, gameTile);
+
+        UnityEngine.Vector3 targetPos = new UnityEngine.Vector3();
+
+        UnityEngine.Vector3[] positions = placePieces(unit.posFocoX,unit.posFocoY, gameTile);
+        GameObject[] objects = game.getObjectsInTile(unit.posFocoX, unit.posFocoY);
+        int i = 0;
+        foreach(GameObject obj in objects){
+            if(mover.Equals(obj)){
+                targetPos = positions[i];
+            }
+            else{
+                obj.transform.position = positions[i];
+                i++;
+            }
+        }
+
+        ObjectMover objm = mover.GetComponent<ObjectMover>();
+        objm.StartMoving(mover, targetPos);
+
     }
    
     //funcao a ser chamada no botao para proxima jogada
@@ -243,19 +260,21 @@ public class TurnsManager : MonoBehaviour
         if (unitCoroutine != null)
         {
             StopCoroutine(unitCoroutine);
-            Debug.Log("Parou");
+            Debug.Log("devia parar");
             unitCoroutine = null; // Atualiza a variável turnCoroutine para null
             Time.timeScale = 0f;
         }
+        Debug.Log("Pausado");
     }
 
     public void Play()
     {
         paused = false;
+        Debug.Log(unitCoroutine);
+
         if (unitCoroutine == null) 
         {
             Time.timeScale = 1f;
-            Debug.Log("Voltou a andar");
             MakeTurn(turnsList[state.currentTurn]); 
         }
     }
