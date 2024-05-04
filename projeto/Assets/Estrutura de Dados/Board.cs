@@ -17,82 +17,85 @@ public class Board
         BoardDisplay = boardDisplay;
     }
 
-    public void InitializeTiles(GameObject boardGameObject){
+public void InitializeTiles(GameObject boardGameObject){
         
-        Vector3 posicaoTabuleiro = boardGameObject.transform.position;
-        Quaternion rotacaoTabuleiro = boardGameObject.transform.rotation;
+    Vector3 posicaoTabuleiro = boardGameObject.transform.position;
+    Quaternion rotacaoTabuleiro = boardGameObject.transform.rotation;
         
-        Vector3 tamanhoExato = boardGameObject.GetComponent<Renderer>().bounds.size;
-        //Debug.Log(tamanhoExato);
+    // Obtém a escala local do objeto
+    Vector3 escala = boardGameObject.transform.localScale;
 
-        // Obtém a escala local do objeto
-        Vector3 escala = boardGameObject.transform.localScale;
+    // Tamanho de cada cubo
+    float xC = escala.x / this.Height;
+    float zC = escala.z / this.Width;
 
-        //tamanho de cada cubo
-        float xC = escala.x / this.Height;
-        float zC = escala.z / this.Width;
+    // Cria um objeto pai para os cubos
+    GameObject tilesParent = new GameObject("CubosParent");
+    // Define o objeto pai como filho do tabuleiro
+    tilesParent.transform.SetParent(boardGameObject.transform);
+    // Ajusta a posição local do objeto pai
+    tilesParent.transform.localPosition = Vector3.zero;
 
-        //Debug.Log(xC + ", " + zC);
-
-        GameObject tilesParent = new GameObject("CubosParent");
-
-        tilesParent.transform.SetParent(boardGameObject.transform);
-        tilesParent.transform.position = boardGameObject.transform.localPosition;
-
-        // Loop pelos tiles do tabuleiro
-        for (int x = 0; x < this.Width; x++)
+    // Loop pelos tiles do tabuleiro
+    for (int x = 0; x < this.Width; x++)
+    {
+        for (int y = 0; y < this.Height; y++)
         {
-            for (int y = 0; y < this.Height; y++)
-            {
-                // Obtém o tile na posição (x, y)
-                Tile tile = this.BoardDisplay[x, y];    
+            // Obtém o tile na posição (x, y)
+            Tile tile = this.BoardDisplay[x, y];    
 
-                   Vector3 posicaoCubo = new Vector3(
-                    posicaoTabuleiro.x - escala.x/2f + (xC/2f) + y * xC, 
-                    posicaoTabuleiro.y,
-                    posicaoTabuleiro.z - escala.z/2f + (zC/2f) + x * zC
-                    ) ;
+            // Calcula a posição do cubo em relação ao tabuleiro
+            Vector3 posicaoCubo = new Vector3(
+                -escala.x / 2f + (xC / 2f) + y * xC, 
+                0,
+                -escala.z / 2f + (zC / 2f) + x * zC
+            ) ;
+
             // Cria o cubo
             GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
             cube.transform.localScale = new Vector3(xC, 0.05f, zC); 
             cube.transform.SetParent(tilesParent.transform); 
-            cube.transform.position = posicaoCubo; 
+            // Define a posição local do cubo em relação ao objeto pai
+            cube.transform.localPosition = posicaoCubo; 
 
             tile.associateCube(cube);
 
             // Define a cor do cubo com base no tipo de tile
             Renderer renderer = cube.GetComponent<Renderer>();
             switch (tile.type)
-                {
-                    case TileType.Village:
-                        renderer.material.color = Color.black;
-                        break;
-                    case TileType.Forest:
-                        renderer.material.color = Color.green;
-                        break;
-                    case TileType.Plain:
-                        renderer.material.color = Color.yellow;
-                        break;
-                    case TileType.Sea:
-                        renderer.material.color = Color.blue;
-                        break;
-                    case TileType.Desert:
-                        renderer.material.color = Color.yellow;
-                        break;
-                    case TileType.Mountain:
-                        renderer.material.color = Color.gray;
-                        break;
-                }
+            {
+                case TileType.Village:
+                    renderer.material.color = Color.black;
+                    break;
+                case TileType.Forest:
+                    renderer.material.color = Color.green;
+                    break;
+                case TileType.Plain:
+                    renderer.material.color = Color.yellow;
+                    break;
+                case TileType.Sea:
+                    renderer.material.color = Color.blue;
+                    break;
+                case TileType.Desert:
+                    renderer.material.color = Color.yellow;
+                    break;
+                case TileType.Mountain:
+                    renderer.material.color = Color.gray;
+                    break;
             }
         }
-
-        BorderMaker(escala, "left", posicaoTabuleiro, tilesParent);
-        BorderMaker(escala, "right", posicaoTabuleiro, tilesParent);
-        BorderMaker(escala, "up", posicaoTabuleiro, tilesParent);
-        BorderMaker(escala, "down", posicaoTabuleiro, tilesParent);
-        tilesParent.transform.position = posicaoTabuleiro;
-        tilesParent.transform.rotation = rotacaoTabuleiro;
     }
+
+    // Chama a função BorderMaker
+    BorderMaker(escala, "left", posicaoTabuleiro, tilesParent);
+    BorderMaker(escala, "right", posicaoTabuleiro, tilesParent);
+    BorderMaker(escala, "up", posicaoTabuleiro, tilesParent);
+    BorderMaker(escala, "down", posicaoTabuleiro, tilesParent);
+
+    // Ajusta a posição e rotação do objeto pai
+    tilesParent.transform.position = posicaoTabuleiro;
+    tilesParent.transform.rotation = rotacaoTabuleiro;
+}
 
     public void BorderMaker(Vector3 scale, string wallType, Vector3 boardPosition, GameObject tilesParent) {
     GameObject wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
