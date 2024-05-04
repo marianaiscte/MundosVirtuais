@@ -8,18 +8,26 @@ public class ObjectMover : MonoBehaviour
 
     Vector3 targetPos;
 
+    Animator animate;
+
+
     // Start is called before the first frame update
     public void StartMoving(GameObject movingObject, Vector3 targetPos)
     {
         this.movingObject = movingObject;
         this.targetPos = targetPos;
-        //Debug.Log("posição" + targetPos);
-        //Debug.Log("obj" + movingObject);
+        animate = movingObject.GetComponent<Animator>();
+        animate.SetBool("moving",true);
+        
     }
 
     // Update is called once per frame
     public void FixedUpdate()
     {
-        movingObject.transform.position = Vector3.MoveTowards(movingObject.transform.position, targetPos, 10 * Time.deltaTime);
+        movingObject.transform.position = Vector3.MoveTowards(movingObject.transform.position, targetPos, 1 * Time.deltaTime);
+           if (movingObject.transform.position == targetPos)
+        {
+            animate.SetBool("moving", false);
+        }
     }
 }
