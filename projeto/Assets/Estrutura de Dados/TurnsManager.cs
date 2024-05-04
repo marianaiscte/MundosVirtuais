@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class TurnsManager : MonoBehaviour
@@ -57,9 +59,9 @@ public class TurnsManager : MonoBehaviour
                     break;
             }
             state.currentUnit++;
-            yield return new WaitForSecondsRealtime(5f); 
+            yield return new WaitForSecondsRealtime(3f); 
         }
-          yield return new WaitForSecondsRealtime(5f); 
+          yield return new WaitForSecondsRealtime(3f); 
 
         handleDeaths(coordenadasAtacadas);
         state.currentUnit = 0;
@@ -86,13 +88,56 @@ public class TurnsManager : MonoBehaviour
         }
     }
 
-
     public void pieceDeath(Piece p){
-    
         UnityEngine.Debug.Log("Peça "+ p.id + " vai morrer!");
         game.pieces.Remove(p);
         GameObject peca = p.getGameO();
         Destroy(peca);
+    }
+
+    public GameObject[] placePieces(int x, int y, GameObject gameTile){
+        int numberOfpieces = game.CountPiecesInTile(x, y);
+        GameObject[] objects = game.getObjectsInTile(x, y);
+        UnityEngine.Vector3 gameTilePos = gameTile.transform.position;
+        //UnityEngine.Vector3[] positions = new UnityEngine.Vector3[numberOfpieces];
+        float offset = 0.2f; // Distância de offset do centro
+        Debug.Log(numberOfpieces);
+        switch(numberOfpieces){
+            case 1:
+               // objects[0] = cyl;
+                objects[0].transform.position = gameTilePos;
+                Debug.Log("criei um cilindro: " + gameTilePos);
+                break;
+            case 2:
+                objects[0].transform.position = gameTilePos + new UnityEngine.Vector3(-offset, 0, 0); 
+                Debug.Log(objects[0].transform.position);
+                //objects[1] = cyl;
+                objects[1].transform.position = gameTilePos + new UnityEngine.Vector3(offset, 0, 0); 
+                Debug.Log(objects[1].transform.position);
+                Debug.Log("estão dois cilindro: " + gameTilePos);
+                break;
+             case 3:
+                objects[0].transform.position = gameTilePos + new UnityEngine.Vector3(-offset, 0, 0); 
+                objects[1].transform.position = gameTilePos + new UnityEngine.Vector3(offset, 0, 0);
+                //objects[2] = cyl;
+                objects[2].transform.position = gameTilePos + new UnityEngine.Vector3(0, 0, offset); 
+                break;
+            case 4:
+                objects[0].transform.position = gameTilePos + new UnityEngine.Vector3(-offset, 0, -offset); 
+                objects[1].transform.position = gameTilePos + new UnityEngine.Vector3(offset, 0, -offset);
+                objects[2].transform.position = gameTilePos + new UnityEngine.Vector3(-offset, 0, offset); 
+                //objects[3] = cyl;
+                objects[3].transform.position = gameTilePos + new UnityEngine.Vector3(offset, 0, offset); 
+                break;
+        }
+        return objects;
+    }
+
+    public void resize(GameObject[] objects){
+        foreach(GameObject obj in objects){
+            obj.transform.localScale = new UnityEngine.Vector3(0.1f, 0.1f, 0.1f);
+            Debug.Log("resize: " + obj.transform.localScale);
+        }
     }
 
     public void spawn(Board board, Unit unit){
@@ -108,9 +153,6 @@ public class TurnsManager : MonoBehaviour
         Renderer renderer = cyl.GetComponent<Renderer>();
 
         GameObject gameTile = tile.getGameO();
-        
-        cyl.transform.position = gameTile.transform.position;
-        cyl.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
 
         unit.piece.associateObj(cyl);
         //Debug.Log(unit.piece.getGameO());
@@ -119,7 +161,8 @@ public class TurnsManager : MonoBehaviour
         UnityEngine.Debug.Log("Peça "+ p.id + " inicializada em x = "+p.x+ " e y =" +p.y);
         game.addPiece(p);
 
-        
+        //cyl.transform.position = gameTile.transform.position; // Posiciona a peça no centro do tile
+        //cyl.transform.localScale = new UnityEngine.Vector3(0.1f, 0.1f, 0.1f); // Define a escala da peça
 
         switch(unit.piece.type.ToString()){
             
@@ -140,6 +183,8 @@ public class TurnsManager : MonoBehaviour
             break;
 
         }
+        Debug.Log("vou tratar de tudo");
+        resize(placePieces(unit.posFocoX, unit.posFocoY, gameTile));
 
     }
 
@@ -156,8 +201,8 @@ public class TurnsManager : MonoBehaviour
         GameObject gameTile = tile.getGameO();
         //Debug.Log(gameTile);
 
-        Vector3 targetPos = gameTile.transform.position;
-
+        UnityEngine.Vector3 targetPos = gameTile.transform.position;
+        
         ObjectMover objm = mover.GetComponent<ObjectMover>();
         objm.StartMoving(mover, targetPos);
 
@@ -165,7 +210,9 @@ public class TurnsManager : MonoBehaviour
         UnityEngine.Debug.Log("Peça "+ p.id + " tem de se mover para x = "+unit.posFocoX+ " e y =" +unit.posFocoY);
         game.UpdatePosPiece(p,unit.posFocoX,unit.posFocoY);
         
-        
+        int numberOfpieces = game.CountPiecesInTile(unit.posFocoX, unit.posFocoY);
+        Debug.Log("MOVENDO: " + numberOfpieces);
+        placePieces(unit.posFocoX, unit.posFocoY, gameTile);
     }
    
     //funcao a ser chamada no botao para proxima jogada
@@ -196,21 +243,19 @@ public class TurnsManager : MonoBehaviour
         if (unitCoroutine != null)
         {
             StopCoroutine(unitCoroutine);
-            Debug.Log("devia parar");
+            Debug.Log("Parou");
             unitCoroutine = null; // Atualiza a variável turnCoroutine para null
             Time.timeScale = 0f;
         }
-        Debug.Log("Pausado");
     }
 
     public void Play()
     {
         paused = false;
-        Debug.Log(unitCoroutine);
-
         if (unitCoroutine == null) 
         {
             Time.timeScale = 1f;
+            Debug.Log("Voltou a andar");
             MakeTurn(turnsList[state.currentTurn]); 
         }
     }

@@ -20,6 +20,6 @@ public class ObjectMover : MonoBehaviour
     // Update is called once per frame
     public void FixedUpdate()
     {
-        movingObject.transform.position = Vector3.MoveTowards(movingObject.transform.position, targetPos, 4 * Time.deltaTime);
+        movingObject.transform.position = Vector3.MoveTowards(movingObject.transform.position, targetPos, 10 * Time.deltaTime);
     }
 }

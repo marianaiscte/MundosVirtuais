@@ -13,7 +13,7 @@ public class Game{
 
     public int nTurns;
 
-    public List<Piece> pieces;
+    public List<Piece> pieces {get;}
 
     public Game(Board gameboard, Player[] gameroles, List<Unit[]> turnlist, string givenName){
         board = gameboard;
@@ -38,5 +38,28 @@ public class Game{
 
     }
 
+    public int CountPiecesInTile(int x, int y){
+        int count = 0;
+        foreach (Piece p in pieces){
+            if(p.x == x && p.y == y){
+                count++;
+                Debug.Log("contei");
+            }
+        }
+    return count;
+    }
+
+    public GameObject[] getObjectsInTile(int x, int y){
+        int n = CountPiecesInTile(x, y);
+        GameObject[] objects = new GameObject[n];
+        for (int i = 0; i < n; i++){
+            foreach (Piece p in pieces){
+                if(p.x == x && p.y == y){
+                    objects[i] = p.getGameO();
+                }
+            }
+        }
+        return objects;
+    }
 }
 
