@@ -135,7 +135,7 @@ public void InitializeTiles(GameObject boardGameObject){
     wall.transform.SetParent(tilesParent.transform);
     
     Renderer wallRenderer = wall.GetComponent<Renderer>();
-    wallRenderer.material.color = Color.white;
+    wallRenderer.material.color = Color.black;
 }
 
 
