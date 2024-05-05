@@ -18,6 +18,13 @@ public class Board
     }
 
 public void InitializeTiles(GameObject boardGameObject){
+
+    Material desertMat = Resources.Load<Material>("Materials/Desert");
+    Material forestMat = Resources.Load<Material>("Materials/Forest");
+    Material plainMat = Resources.Load<Material>("Materials/Plain");
+    Material seaMat = Resources.Load<Material>("Materials/Sea");
+    Material villageMat = Resources.Load<Material>("Materials/Village");
+    Material mountainMat = Resources.Load<Material>("Materials/Mountain");
         
     Vector3 posicaoTabuleiro = boardGameObject.transform.position;
     Quaternion rotacaoTabuleiro = boardGameObject.transform.rotation;
@@ -65,22 +72,22 @@ public void InitializeTiles(GameObject boardGameObject){
             switch (tile.type)
             {
                 case TileType.Village:
-                    renderer.material.color = Color.black;
+                    renderer.material = villageMat;
                     break;
                 case TileType.Forest:
-                    renderer.material.color = Color.green;
+                    renderer.material = forestMat;
                     break;
                 case TileType.Plain:
-                    renderer.material.color = Color.yellow;
+                    renderer.material = plainMat;
                     break;
                 case TileType.Sea:
-                    renderer.material.color = Color.blue;
+                    renderer.material = seaMat;
                     break;
                 case TileType.Desert:
-                    renderer.material.color = Color.yellow;
+                    renderer.material = desertMat;
                     break;
                 case TileType.Mountain:
-                    renderer.material.color = Color.gray;
+                    renderer.material = mountainMat;
                     break;
             }
         }
