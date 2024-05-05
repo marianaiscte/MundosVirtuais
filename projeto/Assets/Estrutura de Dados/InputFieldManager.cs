@@ -9,6 +9,10 @@ public class InputFieldManager : MonoBehaviour
 
     public Button pauseB;
     public Button playB;
+
+    public Button NextTurn;
+    public Button PreviousTurn;
+
     GameObject boardGameObject;
 
     XMLReader xmlReader = new XMLReader();
@@ -38,6 +42,8 @@ public class InputFieldManager : MonoBehaviour
     public void controls(){
         pauseB.onClick.AddListener(turnsManager.Pause);
         playB.onClick.AddListener(turnsManager.Play);
+        NextTurn.onClick.AddListener(turnsManager.NextTurn);
+        PreviousTurn.onClick.AddListener(turnsManager.PreviousTurn);
     }
   
 }

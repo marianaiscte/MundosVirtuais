@@ -1,6 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
+using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 
 public class TurnsManager : MonoBehaviour
@@ -12,6 +15,8 @@ public class TurnsManager : MonoBehaviour
     private bool paused = false;
     public Coroutine unitCoroutine;
     public GameState state;
+
+    //public List<Dictionary<(int,int), Piece>> oldTurnsPositions = new List<Dictionary<(int,int), Piece>>();
 
     public void StartGame(Game games)
     {
@@ -53,18 +58,21 @@ public class TurnsManager : MonoBehaviour
                     break;
 
                 case "attack":
-                    Animator animate = unit.piece.getGameO().GetComponent<Animator>();
-                    animate.SetBool("attack",true);
                     coordenadasAtacadas.Add(unit.attack());
-                    yield return new WaitForSeconds(animate.GetCurrentAnimatorClipInfo(0)[0].clip.length);
-                    animate.SetBool("attack", false);
                     break;
             }
-            yield return new WaitForSecondsRealtime(2f); 
             state.currentUnit++;
+            yield return new WaitForSecondsRealtime(3f); 
         }
+          yield return new WaitForSecondsRealtime(3f); 
+
         handleDeaths(coordenadasAtacadas);
         state.currentUnit = 0;
+        /*Dictionary<(int,int), Piece> turnPositions = new Dictionary<(int,int), Piece>();
+        foreach (Piece p in game.pieces){
+            turnPositions.Add((p.x, p.y), p);
+        }
+        oldTurnsPositions.Add(turnPositions);*/
         NextTurn();
     }
 
@@ -84,29 +92,18 @@ public class TurnsManager : MonoBehaviour
         }
 
         foreach (Piece p in piecesToRemove){
-           StartCoroutine(pieceDeath(p));
+            pieceDeath(p);
         }
     }
 
-
-    public IEnumerator pieceDeath(Piece p){
+    public void pieceDeath(Piece p){
         UnityEngine.Debug.Log("Peça "+ p.id + " vai morrer!");
-
-        // Aciona a animação de "morte"
-        Animator animate = p.getGameO().GetComponent<Animator>();
-        animate.SetBool("died", true);
-
-        // Espere pela duração da animação de "morte"
-        float deathAnimationDuration = animate.GetCurrentAnimatorClipInfo(0)[0].clip.length;
-        yield return new WaitForSeconds(deathAnimationDuration);
-
-        // Destrua o objeto da peça
         game.pieces.Remove(p);
         GameObject peca = p.getGameO();
         Destroy(peca);
-}
+    }
 
-public UnityEngine.Vector3[] placePieces(int x, int y, GameObject gameTile){
+    public UnityEngine.Vector3[] placePieces(int x, int y, GameObject gameTile){
         int numberOfpieces = game.CountPiecesInTile(x, y);
         UnityEngine.Vector3 gameTilePos = gameTile.transform.position;
         UnityEngine.Vector3[] positions = new UnityEngine.Vector3[numberOfpieces];
@@ -116,13 +113,11 @@ public UnityEngine.Vector3[] placePieces(int x, int y, GameObject gameTile){
             case 1:
                // objects[0] = cyl;
                 positions[0] = gameTilePos;
-                Debug.Log("criei um cilindro: " + gameTilePos);
                 break;
             case 2:
                 positions[0] = gameTilePos + new UnityEngine.Vector3(-offset, 0, 0); 
                 //objects[1] = cyl;
                 positions[1] = gameTilePos + new UnityEngine.Vector3(offset, 0, 0); 
-                Debug.Log("estão dois cilindro: " + gameTilePos);
                 break;
              case 3:
                 positions[0] = gameTilePos + new UnityEngine.Vector3(-offset, 0, 0); 
@@ -141,61 +136,68 @@ public UnityEngine.Vector3[] placePieces(int x, int y, GameObject gameTile){
         return positions;
     }
 
-
-    public void spawn(Board board, Unit unit)
-    {
-        int x = unit.posFocoX - 1;
-        int y = unit.posFocoY - 1;
-
-        Tile tile = board.BoardDisplay[x, y];
-        GameObject gameTile = tile.getGameO();
-        
-        GameObject prefabToSpawn = null;
-
-        switch(unit.piece.type.ToString())
-        {
-            case "Soldier":
-                prefabToSpawn = Resources.Load<GameObject>("Pieces/soldier");
-                break;
-            case "Archer":
-                prefabToSpawn = Resources.Load<GameObject>("Pieces/arqueiro");
-                break;
-            case "Mage":
-                prefabToSpawn = Resources.Load<GameObject>("Pieces/mage");
-                break;
-            case "Catapult":
-                prefabToSpawn = Resources.Load<GameObject>("Pieces/catapult");
-                break;
-            default:
-                Debug.LogWarning("Prefab não encontrado para o tipo de peça: " + unit.piece.type.ToString());
-                break;
-        }
-
-        if (prefabToSpawn != null)
-        {
-            Piece p = unit.piece;
-            Debug.Log("Peça "+ p.id + " inicializada em x = "+p.x+ " e y =" +p.y);
-            game.addPiece(p);
-            GameObject pieceObject = Instantiate(prefabToSpawn);
-            pieceObject.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
-
-            unit.piece.associateObj(pieceObject);
-
-            UnityEngine.Vector3[] positions = placePieces(unit.posFocoX, unit.posFocoY, gameTile);
-            GameObject[] objects = game.getObjectsInTile(unit.posFocoX, unit.posFocoY);
-            int i = 0;
-            foreach(GameObject obj in objects){
-                obj.transform.position = positions[i];
-                i++;
-            }
-        }
-        else
-        {
-            Debug.LogError("Falha ao carregar prefab para o tipo de peça: " + unit.piece.type.ToString());
+    public void resize(GameObject[] objects){
+        foreach(GameObject obj in objects){
+            obj.transform.localScale = new UnityEngine.Vector3(0.1f, 0.1f, 0.1f);
         }
     }
 
-       
+    public void spawn(Board board, Unit unit){
+
+        int x = unit.posFocoX - 1;
+        int y = unit.posFocoY - 1;
+
+        //Debug.Log(x + " " + y);
+
+        Tile tile = board.BoardDisplay[x, y];
+
+        GameObject cyl = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        Renderer renderer = cyl.GetComponent<Renderer>();
+
+        GameObject gameTile = tile.getGameO();
+
+        unit.piece.associateObj(cyl);
+        //Debug.Log(unit.piece.getGameO());
+
+        Piece p = unit.piece;
+        UnityEngine.Debug.Log("Peça "+ p.id + " inicializada em x = "+p.x+ " e y =" +p.y);
+        game.addPiece(p);
+
+        //cyl.transform.position = gameTile.transform.position; // Posiciona a peça no centro do tile
+        //cyl.transform.localScale = new UnityEngine.Vector3(0.1f, 0.1f, 0.1f); // Define a escala da peça
+
+        switch(unit.piece.type.ToString()){
+            
+            case "Soldier":
+            renderer.material.color = Color.black;
+            break;
+
+            case"Archer":
+            renderer.material.color = Color.green;
+            break;
+
+            case "Mage":
+            renderer.material.color = Color.cyan;
+            break;
+
+            case"Catapult":
+            renderer.material.color = Color.gray;
+            break;
+
+        }
+        Debug.Log("vou tratar de tudo");
+        UnityEngine.Vector3[] positions = placePieces(unit.posFocoX, unit.posFocoY, gameTile);
+        GameObject[] objects = game.getObjectsInTile(unit.posFocoX, unit.posFocoY);
+        int i = 0;
+        foreach(GameObject obj in objects){
+            obj.transform.position = positions[i];
+            i++;
+        }
+        
+        resize(objects);
+
+    }
+
     public void moveTo(Board board, Unit unit){
 
         int x = unit.posFocoX - 1;
@@ -221,21 +223,22 @@ public UnityEngine.Vector3[] placePieces(int x, int y, GameObject gameTile){
             if(mover.Equals(obj)){
                 targetPos = positions[i];
             }
-            else{
+            else{  
                 obj.transform.position = positions[i];
                 i++;
             }
         }
-
+        
         ObjectMover objm = mover.GetComponent<ObjectMover>();
         objm.StartMoving(mover, targetPos);
-
+        
     }
    
     //funcao a ser chamada no botao para proxima jogada
     public void NextTurn(){
         if (state.currentTurn < turnsList.Count - 1){
             state.currentTurn++; 
+            state.currentUnit = 0;
             MakeTurn(turnsList[state.currentTurn]);
             Debug.Log(turnsList[state.currentTurn]);
         }else{
@@ -246,12 +249,66 @@ public UnityEngine.Vector3[] placePieces(int x, int y, GameObject gameTile){
     // funcao a ser chamada no botao para a jogada anterior
     public void PreviousTurn()
     {
+        Debug.Log(state.currentTurn);
         if (state.currentTurn > 0)
-        {
+        {   
+            state.currentUnit = 0;
             state.currentTurn--;
-            MakeTurn(turnsList[state.currentTurn]);
+           /* Dictionary<(int, int), Piece> turnPositions = oldTurnsPositions[state.currentTurn];
+
+            foreach(KeyValuePair<(int, int), Piece> kvp in turnPositions)
+            {
+                Piece piece = kvp.Value;
+                (int x, int y) = kvp.Key;
+
+                pieceDeath(piece);
+                Tile tile = board.BoardDisplay[x, y];
+
+                GameObject cyl = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                Renderer renderer = cyl.GetComponent<Renderer>();
+
+                GameObject gameTile = tile.getGameO();
+
+                game.addPiece(piece);
+
+                //cyl.transform.position = gameTile.transform.position; // Posiciona a peça no centro do tile
+                //cyl.transform.localScale = new UnityEngine.Vector3(0.1f, 0.1f, 0.1f); // Define a escala da peça
+
+                switch(piece.type.ToString()){
+                    
+                    case "Soldier":
+                    renderer.material.color = Color.black;
+                    break;
+
+                    case"Archer":
+                    renderer.material.color = Color.green;
+                    break;
+
+                    case "Mage":
+                    renderer.material.color = Color.cyan;
+                    break;
+
+                    case"Catapult":
+                    renderer.material.color = Color.gray;
+                    break;
+
+                }
+
+                Debug.Log("vou tratar de tudo");
+                UnityEngine.Vector3[] positions = placePieces(x, y, gameTile);
+                GameObject[] objects = game.getObjectsInTile(x, y);
+                int i = 0;
+                foreach(GameObject obj in objects){
+                    obj.transform.position = positions[i];
+                    i++;
+                }
+                resize(objects);
+            }*/                
         }
+        MakeTurn(turnsList[state.currentTurn]);         
     }
+
+    
 
     // funcao que controla a paragem do jogo
     public void Pause()
@@ -260,21 +317,19 @@ public UnityEngine.Vector3[] placePieces(int x, int y, GameObject gameTile){
         if (unitCoroutine != null)
         {
             StopCoroutine(unitCoroutine);
-            Debug.Log("devia parar");
+            Debug.Log("Parou");
             unitCoroutine = null; // Atualiza a variável turnCoroutine para null
             Time.timeScale = 0f;
         }
-        Debug.Log("Pausado");
     }
 
     public void Play()
     {
         paused = false;
-        Debug.Log(unitCoroutine);
-
         if (unitCoroutine == null) 
         {
             Time.timeScale = 1f;
+            Debug.Log("Voltou a andar");
             MakeTurn(turnsList[state.currentTurn]); 
         }
     }
