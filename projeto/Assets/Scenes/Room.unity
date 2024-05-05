@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -967,7 +967,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &217698373
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4184,6 +4184,10 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3250215705289751930, guid: 3cf1cc3883e105549a2bd9505f44ffbd, type: 3}
+      propertyPath: mainCamera
+      value: 
+      objectReference: {fileID: 1520700980}
     - target: {fileID: 5232979032379815501, guid: 3cf1cc3883e105549a2bd9505f44ffbd, type: 3}
       propertyPath: m_Name
       value: Mesa (1)
@@ -4218,7 +4222,7 @@ PrefabInstance:
       objectReference: {fileID: 636783631}
     - target: {fileID: 9003942811945119947, guid: 3cf1cc3883e105549a2bd9505f44ffbd, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.9350867
+      value: -1.35
       objectReference: {fileID: 0}
     - target: {fileID: 9003942811945119947, guid: 3cf1cc3883e105549a2bd9505f44ffbd, type: 3}
       propertyPath: m_LocalPosition.y
@@ -5034,7 +5038,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1261972216
 RectTransform:
   m_ObjectHideFlags: 0

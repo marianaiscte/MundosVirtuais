@@ -5,6 +5,7 @@ using System.Numerics;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using Vector3 = UnityEngine.Vector3;
 
 public class TurnsManager : MonoBehaviour
 {
@@ -58,13 +59,17 @@ public class TurnsManager : MonoBehaviour
                     break;
 
                 case "attack":
+                    Animator animate = unit.piece.getGameO().GetComponent<Animator>();
+                    animate.SetBool("attack",true);
                     coordenadasAtacadas.Add(unit.attack());
+                    yield return new WaitForSeconds(1f);
+                    animate.SetBool("attack", false);
                     break;
             }
             state.currentUnit++;
             yield return new WaitForSecondsRealtime(3f); 
         }
-          yield return new WaitForSecondsRealtime(3f); 
+          //yield return new WaitForSecondsRealtime(3f); 
 
         handleDeaths(coordenadasAtacadas);
         state.currentUnit = 0;
@@ -75,6 +80,7 @@ public class TurnsManager : MonoBehaviour
         oldTurnsPositions.Add(turnPositions);*/
         NextTurn();
     }
+
 
     public void handleDeaths(List<int []> coordenadasAtacadas){
 
@@ -92,16 +98,26 @@ public class TurnsManager : MonoBehaviour
         }
 
         foreach (Piece p in piecesToRemove){
-            pieceDeath(p);
+            StartCoroutine(pieceDeath(p));
         }
     }
 
-    public void pieceDeath(Piece p){
+    public IEnumerator pieceDeath(Piece p){
         UnityEngine.Debug.Log("Peça "+ p.id + " vai morrer!");
+
+        // Aciona a animação de "morte"
+        Animator animate = p.getGameO().GetComponent<Animator>();
+        animate.SetBool("died", true);
+
+        // Espere pela duração da animação de "morte"
+        float deathAnimationDuration = animate.GetCurrentAnimatorClipInfo(0)[0].clip.length;
+        yield return new WaitForSeconds(1f);
+
+        // Destrua o objeto da peça
         game.pieces.Remove(p);
         GameObject peca = p.getGameO();
         Destroy(peca);
-    }
+}
 
     public UnityEngine.Vector3[] placePieces(int x, int y, GameObject gameTile){
         int numberOfpieces = game.CountPiecesInTile(x, y);
@@ -136,67 +152,60 @@ public class TurnsManager : MonoBehaviour
         return positions;
     }
 
-    public void resize(GameObject[] objects){
-        foreach(GameObject obj in objects){
-            obj.transform.localScale = new UnityEngine.Vector3(0.1f, 0.1f, 0.1f);
-        }
-    }
 
-    public void spawn(Board board, Unit unit){
-
+     public void spawn(Board board, Unit unit)
+    {
         int x = unit.posFocoX - 1;
         int y = unit.posFocoY - 1;
 
-        //Debug.Log(x + " " + y);
-
         Tile tile = board.BoardDisplay[x, y];
-
-        GameObject cyl = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-        Renderer renderer = cyl.GetComponent<Renderer>();
-
         GameObject gameTile = tile.getGameO();
-
-        unit.piece.associateObj(cyl);
-        //Debug.Log(unit.piece.getGameO());
-
-        Piece p = unit.piece;
-        UnityEngine.Debug.Log("Peça "+ p.id + " inicializada em x = "+p.x+ " e y =" +p.y);
-        game.addPiece(p);
-
-        //cyl.transform.position = gameTile.transform.position; // Posiciona a peça no centro do tile
-        //cyl.transform.localScale = new UnityEngine.Vector3(0.1f, 0.1f, 0.1f); // Define a escala da peça
-
-        switch(unit.piece.type.ToString()){
-            
-            case "Soldier":
-            renderer.material.color = Color.black;
-            break;
-
-            case"Archer":
-            renderer.material.color = Color.green;
-            break;
-
-            case "Mage":
-            renderer.material.color = Color.cyan;
-            break;
-
-            case"Catapult":
-            renderer.material.color = Color.gray;
-            break;
-
-        }
-        Debug.Log("vou tratar de tudo");
-        UnityEngine.Vector3[] positions = placePieces(unit.posFocoX, unit.posFocoY, gameTile);
-        GameObject[] objects = game.getObjectsInTile(unit.posFocoX, unit.posFocoY);
-        int i = 0;
-        foreach(GameObject obj in objects){
-            obj.transform.position = positions[i];
-            i++;
-        }
         
-        resize(objects);
+        GameObject prefabToSpawn = null;
 
+        switch(unit.piece.type.ToString())
+        {
+            case "Soldier":
+                prefabToSpawn = Resources.Load<GameObject>("Pieces/soldier");
+                break;
+            case "Archer":
+                prefabToSpawn = Resources.Load<GameObject>("Pieces/archer");
+                break;
+            case "Mage":
+                prefabToSpawn = Resources.Load<GameObject>("Pieces/mage");
+                break;
+            case "Catapult":
+                prefabToSpawn = Resources.Load<GameObject>("Pieces/catapult");
+                break;
+            default:
+                Debug.LogWarning("Prefab não encontrado para o tipo de peça: " + unit.piece.type.ToString());
+                break;
+        }
+
+        if (prefabToSpawn != null)
+        {
+            Piece p = unit.piece;
+            Debug.Log("Peça "+ p.id + " inicializada em x = "+p.x+ " e y =" +p.y);
+            game.addPiece(p);
+            GameObject pieceObject = Instantiate(prefabToSpawn);
+            pieceObject.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+
+            unit.piece.associateObj(pieceObject);
+
+            UnityEngine.Vector3[] positions = placePieces(unit.posFocoX, unit.posFocoY, gameTile);
+            GameObject[] objects = game.getObjectsInTile(unit.posFocoX, unit.posFocoY);
+            int i = 0;
+            foreach(GameObject obj in objects){
+                obj.transform.position = positions[i];
+                i++;
+            }
+        }
+        else
+        {
+            Debug.LogError("Falha ao carregar prefab para o tipo de peça: " + unit.piece.type.ToString());
+        }
     }
+
 
     public void moveTo(Board board, Unit unit){
 
