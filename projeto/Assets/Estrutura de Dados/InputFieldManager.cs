@@ -42,8 +42,12 @@ public class InputFieldManager : MonoBehaviour
     public void controls(){
         pauseB.onClick.AddListener(turnsManager.Pause);
         playB.onClick.AddListener(turnsManager.Play);
-        NextTurn.onClick.AddListener(turnsManager.NextTurn);
+        NextTurn.onClick.AddListener(sendingToTM);
         PreviousTurn.onClick.AddListener(turnsManager.PreviousTurn);
+    }
+
+    private void sendingToTM(){
+        turnsManager.isCalledByScene = true;
     }
   
 }

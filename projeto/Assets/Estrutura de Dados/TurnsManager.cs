@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using Unity.VisualScripting;
 using UnityEditor;
@@ -16,8 +17,10 @@ public class TurnsManager : MonoBehaviour
     private bool paused = false;
     public Coroutine unitCoroutine;
     public GameState state;
+    public bool isCalledByScene;
 
-    //public List<Dictionary<(int,int), Piece>> oldTurnsPositions = new List<Dictionary<(int,int), Piece>>();
+    public List<Dictionary<(int, int), List<Piece>>> oldTurnsPositions = new List<Dictionary<(int, int), List<Piece>>>();
+
 
     public void StartGame(Game games)
     {
@@ -41,7 +44,7 @@ public class TurnsManager : MonoBehaviour
         List<int []> coordenadasAtacadas = new List<int[]>();
         for (int i = state.currentUnit; i < units.Length; i++){
             Unit unit = units[state.currentUnit];
-            Debug.Log(unit);
+            Debug.Log("unit com peça: " + unit.piece.id);
             // Execute as ações para cada unidade do turno
             // Por exemplo:
             switch (unit.action.ToString())
@@ -67,18 +70,15 @@ public class TurnsManager : MonoBehaviour
                     break;
             }
             state.currentUnit++;
-            yield return new WaitForSecondsRealtime(3f); 
+            if(!isCalledByScene){
+                yield return new WaitForSecondsRealtime(3f); 
+            }
         }
           //yield return new WaitForSecondsRealtime(3f); 
 
         handleDeaths(coordenadasAtacadas);
         state.currentUnit = 0;
-        /*Dictionary<(int,int), Piece> turnPositions = new Dictionary<(int,int), Piece>();
-        foreach (Piece p in game.pieces){
-            turnPositions.Add((p.x, p.y), p);
-        }
-        oldTurnsPositions.Add(turnPositions);*/
-        NextTurn();
+        NextTurn(false);
     }
 
 
@@ -124,7 +124,6 @@ public class TurnsManager : MonoBehaviour
         UnityEngine.Vector3 gameTilePos = gameTile.transform.position;
         UnityEngine.Vector3[] positions = new UnityEngine.Vector3[numberOfpieces];
         float offset = 0.2f; // Distância de offset do centro
-        Debug.Log(numberOfpieces);
         switch(numberOfpieces){
             case 1:
                // objects[0] = cyl;
@@ -221,7 +220,7 @@ public class TurnsManager : MonoBehaviour
         //Debug.Log(gameTile);
         Piece p = unit.piece;
         UnityEngine.Debug.Log("Peça "+ p.id + " tem de se mover para x = "+unit.posFocoX+ " e y =" +unit.posFocoY);
-        game.UpdatePosPiece(p,unit.posFocoX,unit.posFocoY);
+        game.UpdatePosPiece(p, unit.posFocoX, unit.posFocoY);
 
         UnityEngine.Vector3 targetPos = new UnityEngine.Vector3();
 
@@ -244,79 +243,124 @@ public class TurnsManager : MonoBehaviour
     }
    
     //funcao a ser chamada no botao para proxima jogada
-    public void NextTurn(){
+    public void NextTurn(bool buttonCall){
+        Pause();
         if (state.currentTurn < turnsList.Count - 1){
+            Debug.Log(buttonCall);
+            isCalledByScene = buttonCall;
+            Debug.Log("Estado atual" + state.currentTurn);
+            Dictionary<(int, int), List<Piece>> turnPositions = new Dictionary<(int, int), List<Piece>>();
+            for (int x = 1; x <= board.Width; x++)
+            {
+                for (int y = 1; y <= board.Height; y++)
+                {
+                    foreach(Piece p in game.getPiecesInTile(x, y)){
+                        Debug.Log((x, y) + ", " +p.id);
+                    }
+                    turnPositions.Add((x, y), game.getPiecesInTile(x, y));
+                }
+            }
+            oldTurnsPositions.Add(turnPositions);
+            Debug.Log(oldTurnsPositions.Count);  
+            game.SaveOldPositions(oldTurnsPositions);
             state.currentTurn++; 
             state.currentUnit = 0;
-            MakeTurn(turnsList[state.currentTurn]);
-            Debug.Log(turnsList[state.currentTurn]);
+            Play();
         }else{
             UnityEngine.Debug.Log("O jogo acabou!");
         }
     }
 
     // funcao a ser chamada no botao para a jogada anterior
+    //ainda tem erros
     public void PreviousTurn()
-    {
-        Debug.Log(state.currentTurn);
-        if (state.currentTurn > 0)
-        {   
+    {  Pause();
+  
+        if (state.currentTurn >= 0){   
             state.currentUnit = 0;
-            state.currentTurn--;
-           /* Dictionary<(int, int), Piece> turnPositions = oldTurnsPositions[state.currentTurn];
-
-            foreach(KeyValuePair<(int, int), Piece> kvp in turnPositions)
-            {
-                Piece piece = kvp.Value;
-                (int x, int y) = kvp.Key;
-
-                pieceDeath(piece);
-                Tile tile = board.BoardDisplay[x, y];
-
-                GameObject cyl = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                Renderer renderer = cyl.GetComponent<Renderer>();
-
-                GameObject gameTile = tile.getGameO();
-
-                game.addPiece(piece);
-
-                //cyl.transform.position = gameTile.transform.position; // Posiciona a peça no centro do tile
-                //cyl.transform.localScale = new UnityEngine.Vector3(0.1f, 0.1f, 0.1f); // Define a escala da peça
-
-                switch(piece.type.ToString()){
-                    
-                    case "Soldier":
-                    renderer.material.color = Color.black;
-                    break;
-
-                    case"Archer":
-                    renderer.material.color = Color.green;
-                    break;
-
-                    case "Mage":
-                    renderer.material.color = Color.cyan;
-                    break;
-
-                    case"Catapult":
-                    renderer.material.color = Color.gray;
-                    break;
-
+            if(state.currentTurn == 0 || state.currentTurn == 1){
+                foreach (Piece piece in game.pieces){
+                if (piece.getGameO() != null){
+                    Destroy(piece.getGameO());
                 }
+            }
 
-                Debug.Log("vou tratar de tudo");
-                UnityEngine.Vector3[] positions = placePieces(x, y, gameTile);
-                GameObject[] objects = game.getObjectsInTile(x, y);
-                int i = 0;
-                foreach(GameObject obj in objects){
-                    obj.transform.position = positions[i];
-                    i++;
+            game.pieces.Clear();
+            //faço o que se faz no play para os movimentos continuarem
+            paused = false;
+            Time.timeScale = 1f;
+            state.currentTurn = 0;
+            MakeTurn(turnsList[0]); // faz o primeiro turno
+
+            }else{
+                state.currentUnit = 0;
+                List<Piece> piecesToNotRemove = new List<Piece>();
+                Debug.Log("na lista: " + oldTurnsPositions.Count);
+                Debug.Log("o estado: " + state.currentTurn);
+
+                if(oldTurnsPositions.Count == state.currentTurn){ oldTurnsPositions.RemoveAt(state.currentTurn - 1); }
+                state.currentTurn--;
+
+                Debug.Log("Existem " + oldTurnsPositions.Count + " registos guardados");
+
+                Dictionary<(int, int), List<Piece>> turnPositions = oldTurnsPositions[state.currentTurn-1];
+
+                //aqui vamos ter todas as peças do dicionário, pq são as peças que queremos manter no tabuleiro
+                foreach(KeyValuePair<(int, int), List<Piece>> kvp in turnPositions)
+                {
+                    Debug.Log("posição do tile: " + kvp.Key);
+                    foreach (Piece piece in kvp.Value)
+                    {
+                        piecesToNotRemove.Add(piece);
+                        Debug.Log("Não remover" + piece.id);                    
+                    }
                 }
-                resize(objects);
-            }*/                
+                //Vamos remover do jogo e do tabuleiro todas as peças que não faziam parte da turn que vamos recriar
+                List<Piece> piecesToRemove = game.pieces.Except(piecesToNotRemove).ToList();
+                game.pieces.RemoveAll(piece => piecesToRemove.Contains(piece));
+                
+                foreach (Piece p in piecesToRemove){
+                    Debug.Log("Remover" + p.id);
+                    GameObject pieceObject = p.getGameO();
+                    Destroy(pieceObject);
+                    p.x = p.oldPositions[0].Item1;
+                    p.y = p.oldPositions[0].Item2;
+                } 
+
+                //aqui vamos percorrer o dicionário e colocar as peças no sitio onde estavam na turn anterior
+                foreach (KeyValuePair<(int, int), List<Piece>> kvp in turnPositions){
+                    List<Piece> pieces = kvp.Value;
+                    (int x, int y) = kvp.Key;
+                    Debug.Log("Vamos pôr no tile:" + kvp.Key);
+                    Tile tile = board.BoardDisplay[x-1, y-1];
+                    GameObject gameTile = tile.getGameO();
+                    UnityEngine.Vector3 gameTilePos = gameTile.transform.position;
+                    Debug.Log(gameTilePos);
+
+                    foreach(Piece p in pieces){
+                        p.x = x;
+                        p.y = y;
+                        GameObject pieceObject = p.getGameO();
+                        //pieceObject.SetActive(false);
+                        pieceObject.transform.position = gameTilePos;
+                        Debug.Log("Pus "+ p.id + "em x = "+p.x+ " e y =" +p.y);
+                    }
+
+                    UnityEngine.Vector3[] positions = placePieces(x, y, gameTile);
+                    GameObject[] objects = game.getObjectsInTile(x, y);
+                    int i = 0;
+                    foreach(GameObject obj in objects){
+                        obj.transform.position = positions[i];
+                        //obj.SetActive(true);
+                        Debug.Log(obj.transform.position);
+                        i++;
+                    }
+                }
+                Debug.Log("tentei voltar atrás");
+                Play();    
+            }
         }
-        MakeTurn(turnsList[state.currentTurn]);         
     }
-
     
 
     // funcao que controla a paragem do jogo

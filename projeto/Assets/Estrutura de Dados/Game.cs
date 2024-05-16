@@ -8,7 +8,6 @@ public class Game{
     public string name { get;}
     public Board board { get;}
     public Player[] roles { get;}
-
     public List<Unit[]> turns = new List<Unit[]>();
 
     public int nTurns;
@@ -25,6 +24,7 @@ public class Game{
     }
 
     public void addPiece(Piece piece){
+        piece.game = this;
         pieces.Add(piece);
     }
 
@@ -43,7 +43,6 @@ public class Game{
         foreach (Piece p in pieces){
             if(p.x == x && p.y == y){
                 count++;
-                Debug.Log("contei");
             }
         }
     return count;
@@ -60,6 +59,48 @@ public class Game{
             }
         }
         return objects;
+    }
+
+    public List<GameObject> getAllObjects(){
+        List<GameObject> allPieces = new List<GameObject>();
+        for (int i = 0; i < pieces.Count; i++){
+            foreach (Piece p in pieces){
+                allPieces[i] = p.getGameO();
+            }
+        }
+        return allPieces;
+    }
+
+    
+    public List<Piece> getPiecesInTile(int x, int y){
+        int n = CountPiecesInTile(x, y);
+        List<Piece> allPiecesInTile = new List<Piece>();
+        for (int i = 0; i < n; i++){
+            foreach (Piece p in pieces){
+                if(p.x == x && p.y == y){
+                    allPiecesInTile.Add(p);
+                }
+            }
+        }
+        return allPiecesInTile;
+    }
+
+    
+    public void SaveOldPositions(List<Dictionary<(int, int), List<Piece>>> oldTurnsPositions){
+        foreach(Piece piece in pieces){
+            List<(int, int)> oldPositions = new List<(int, int)>();
+            foreach (Dictionary<(int, int), List<Piece>> turnPositions in oldTurnsPositions)
+            {
+                foreach (var kvp in turnPositions)
+                {
+                    if (kvp.Value.Contains(piece))
+                    {
+                        oldPositions.Add(kvp.Key);
+                    }
+                }
+            }
+            piece.oldPositions = oldPositions;
+        }
     }
 }
 
