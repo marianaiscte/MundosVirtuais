@@ -1,0 +1,37 @@
+	
+--------------Cat_Clock----------------------------
+
+This pack contains low poly cute cat clock.
+
+Technical Details:-
+		- Vertex count : 195
+		- Tri count : 352
+		- Used Material(s) : Unity standard shader
+		- Textures size : 2048(.png format)
+				
+Features:-
+	- 5 Color variations
+	- Extremely Low poly design
+	- Included post processing layers
+			
+Folder details:-
+
+	Materials : Where the materials for the model located.
+	
+	Meshes : Contain FBX format of the 3d model.
+	
+	(Other folders - Prefabs, Scenes)
+
+How to use:-
+	
+	Simply drag and drop the prefab to your scene and use it.
+	(Prefab(s) located under 
+	Asset > Cat_Clock > Prefabs).
+
+..................................................................................
+
+About Us : We are "SR Studios Kerala", Game developing company located in Alappuzha, Kerala, India
+
+Contact : srstudioskerala@gmail.com
+
+................Thanks for downloading this package................................
