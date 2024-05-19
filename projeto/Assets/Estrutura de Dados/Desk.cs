@@ -15,7 +15,9 @@ public class DeskScript : MonoBehaviour
     void OnMouseDown()
     {
         // Activate the first button when the object is clicked
+        Debug.Log("clicaste na mesa");
         XMLLoader.gameObject.SetActive(true);
+        
     }
 
 }

@@ -19,17 +19,46 @@ public class InputFieldManager : MonoBehaviour
 
     TurnsManager turnsManager;
 
+    private bool startListening = false;
 
     void Start(){
+        Debug.Log(boardGameObject.name);
         boardGameObject = gameObject;
     }
+
+    void Update(){
+    if (startListening){
+        if (Input.GetKeyDown(KeyCode.Space)){
+            Debug.Log("TECLAS " + turnsManager.paused);
+            if (turnsManager.paused)
+            {
+                playB.onClick.Invoke();
+                Debug.Log("retomar reprodução");
+
+            }
+            else
+            {
+                pauseB.onClick.Invoke();
+                Debug.Log("parar reprodução");
+            }
+        } else if (Input.GetKeyDown(KeyCode.RightArrow)){
+            Debug.Log(KeyCode.RightArrow);
+            NextTurn.onClick.Invoke();
+        }
+        else if (Input.GetKeyDown(KeyCode.LeftArrow)){
+            Debug.Log(KeyCode.LeftArrow);
+            PreviousTurn.onClick.Invoke();
+        }
+    }
+}
+
     
     public void ReadStringOutput(string s){
         input = s;
+        Debug.Log(boardGameObject.name);
         Game game = xmlReader.LoadXMLToRead(s, boardGameObject);
         StartXML(game);
         Debug.Log(input);
-
     }
 
     public void StartXML(Game game){
@@ -37,6 +66,7 @@ public class InputFieldManager : MonoBehaviour
         turnsManager = boardGameObject.GetComponent<TurnsManager>();
         turnsManager.StartGame(game);
         controls();
+        startListening = true;
     }
 
     public void controls(){
@@ -46,6 +76,7 @@ public class InputFieldManager : MonoBehaviour
         PreviousTurn.onClick.AddListener(turnsManager.PreviousTurn);
     }
 
+//esta lógica ainda não funciona bem
     private void sendingToTM(){
         turnsManager.isCalledByScene = true;
     }

@@ -14,11 +14,12 @@ public class TurnsManager : MonoBehaviour
     public Board board;
     public Game game;
     private bool isPaused = false;
-    private bool paused = false;
+    public bool paused = false;
+    public bool isCalledByScene = false;
     public Coroutine unitCoroutine;
     public GameState state;
 
-    //public List<Dictionary<(int,int), Piece>> oldTurnsPositions = new List<Dictionary<(int,int), Piece>>();
+    public List<Dictionary<(int, int), List<Piece>>> oldTurnsPositions = new List<Dictionary<(int, int), List<Piece>>>();
 
     public void StartGame(Game games)
     {
@@ -99,7 +100,7 @@ public class TurnsManager : MonoBehaviour
             turnPositions.Add((p.x, p.y), p);
         }
         oldTurnsPositions.Add(turnPositions);*/
-        NextTurn();
+        NextTurn(false);
     }
 
 
@@ -265,12 +266,27 @@ public class TurnsManager : MonoBehaviour
     }
    
     //funcao a ser chamada no botao para proxima jogada
-    public void NextTurn(){
+   public void NextTurn(bool buttonCall){
         if (state.currentTurn < turnsList.Count - 1){
+            isCalledByScene = buttonCall;
+            Debug.Log("Estado atual" + state.currentTurn);
+            Dictionary<(int, int), List<Piece>> turnPositions = new Dictionary<(int, int), List<Piece>>();
+            for (int x = 1; x <= board.Width; x++)
+            {
+                for (int y = 1; y <= board.Height; y++)
+                {
+                    foreach(Piece p in game.getPiecesInTile(x, y)){
+                        //Debug.Log((x, y) + ", " +p.id);
+                    }
+                    turnPositions.Add((x, y), game.getPiecesInTile(x, y));
+                }
+            }
+            oldTurnsPositions.Add(turnPositions);
+            Debug.Log(oldTurnsPositions.Count);  
+            game.SaveOldPositions(oldTurnsPositions);
             state.currentTurn++; 
             state.currentUnit = 0;
             MakeTurn(turnsList[state.currentTurn]);
-            Debug.Log(turnsList[state.currentTurn]);
         }else{
             UnityEngine.Debug.Log("O jogo acabou!");
         }
@@ -280,10 +296,23 @@ public class TurnsManager : MonoBehaviour
     public void PreviousTurn()
     {
         Debug.Log(state.currentTurn);
-        if (state.currentTurn > 0)
-        {   
-            state.currentUnit = 0;
-            state.currentTurn--;
+        if (state.currentTurn >= 0){   
+                state.currentUnit = 0;
+                if(state.currentTurn == 0 || state.currentTurn == 1){
+                    foreach (Piece piece in game.pieces){
+                    if (piece.getGameO() != null){
+                        Destroy(piece.getGameO());
+                    }
+                }
+                
+                game.pieces.Clear();
+                //faço o que se faz no play para os movimentos continuarem
+                Time.timeScale = 1f;
+                state.currentTurn = 0;
+                MakeTurn(turnsList[0]); // faz o primeiro turno
+            } else{
+
+
            /* Dictionary<(int, int), Piece> turnPositions = oldTurnsPositions[state.currentTurn];
 
             foreach(KeyValuePair<(int, int), Piece> kvp in turnPositions)
@@ -334,8 +363,9 @@ public class TurnsManager : MonoBehaviour
                 }
                 resize(objects);
             }*/                
+        MakeTurn(turnsList[state.currentTurn]);
+            }         
         }
-        MakeTurn(turnsList[state.currentTurn]);         
     }
 
     

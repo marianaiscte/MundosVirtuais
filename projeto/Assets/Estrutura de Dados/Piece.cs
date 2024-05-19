@@ -41,16 +41,12 @@ public class Piece
         // Adicione um componente Collider (por exemplo, um Collider de caixa) ao objeto para detectar cliques
         BoxCollider collider = gameO.AddComponent<BoxCollider>();
             // Ajustar o tamanho do collider conforme necessário
-        collider.size = new Vector3(1, 1, 1);
-
-        // Adicione um script para lidar com cliques
+        collider.center = new Vector3(0, 1, 0);
+        collider.size = new Vector3(gameO.transform.localScale.x +1, gameO.transform.localScale.y + 1, gameO.transform.localScale.z + 1); // Defina um tamanho padrão para o collider
+        Debug.Log(gameO.transform.localScale);
+        
         RouteViewer seeRoute = gameO.AddComponent<RouteViewer>();
-
-        // Defina o sprite que você deseja associar
-        Sprite mySprite = Resources.Load<Sprite>("Assets/footsteps_9069966.png"); // Substitua "Sprites/mySprite" pelo caminho do seu sprite
-
-        // Passe uma referência para este objeto para o script de manipulador de cliques
-        seeRoute.SetPieceAndSprite(this, mySprite);
+        seeRoute.SetPiece(this);
     }
 
 

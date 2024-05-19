@@ -9,10 +9,22 @@ public class RouteViewer : MonoBehaviour
     private bool isShowingRoute = false;
     private List<GameObject> routePoints = new List<GameObject>();
     private List<GameObject> otherGameObjects = new List<GameObject>();
-    public void SetPieceAndSprite(Piece p, Sprite ps)
+    private LineRenderer lineRenderer;
+
+    public void SetPiece(Piece p)
     {
         piece = p;
-        pointSprite = ps;
+    }
+
+    void Start()
+    {
+        // Adiciona um LineRenderer ao GameObject
+        lineRenderer = gameObject.AddComponent<LineRenderer>();
+        lineRenderer.startWidth = 0.1f;
+        lineRenderer.endWidth = 0.1f;
+        // Aplica o material ao LineRenderer
+        lineRenderer.material = Resources.Load<Material>("Materials/Path");;
+        lineRenderer.positionCount = 0;
     }
 
         //ir buscar as posições que estão guardadas na peça em piece.oldPositions
@@ -21,7 +33,7 @@ public class RouteViewer : MonoBehaviour
         //isto durar X segundos ou então qd se clica no boneco novamente volta a ficar normal
 
     void OnMouseDown()
-    {
+    { 
         if (isShowingRoute)
         {
             RestoreState();
@@ -48,40 +60,27 @@ public class RouteViewer : MonoBehaviour
         }
         */
 
-        // Instanciar pontos nas posições antigas
-        //tentar primeiro com esferas porque agora não está a dar com sprites (imagens 2D)
+         List<Vector3> routePositions = new List<Vector3>();
+
+        // Adiciona as posições dos pontos da rota
         for (int i = 0; i < piece.oldPositions.Count; i++)
         {
             Tile tile = piece.game.board.BoardDisplay[piece.oldPositions[i].Item1 - 1, piece.oldPositions[i].Item2 - 1];
             GameObject gameTile = tile.getGameO();
-            UnityEngine.Vector3 gameTilePos = gameTile.transform.position;
-            Vector3 position = new Vector3(gameTilePos.x, gameTilePos.y + 1, gameTilePos.z); // Ajustar a altura conforme necessário
-            GameObject point = new GameObject("RoutePoint");
-            point.transform.position = position;
-            SpriteRenderer sr = point.AddComponent<SpriteRenderer>();
-            sr.sprite = pointSprite;
-            routePoints.Add(point);
+            Vector3 gameTilePos = gameTile.transform.position;
+            Vector3 position = new Vector3(gameTilePos.x, gameTilePos.y, gameTilePos.z); // Ajustar a altura conforme necessário
+            routePositions.Add(position);
         }
+        routePositions.Add(piece.getGameO().transform.position);
+        // Atualiza o LineRenderer com as posições da rota
+        lineRenderer.positionCount = routePositions.Count;
+        lineRenderer.SetPositions(routePositions.ToArray());
     }
-
 
     private void RestoreState()
     {
-        /* Reativar os outros GameObjects
-        foreach (GameObject go in otherGameObjects)
-        {
-            go.SetActive(true);
-        }
-        otherGameObjects.Clear();
-        */
-
-        // Destruir os pontos de rota
-        foreach (GameObject point in routePoints)
-        {
-            Destroy(point);
-        }
-        routePoints.Clear();
-
+        // Reseta o LineRenderer
+        lineRenderer.positionCount = 0;
         isShowingRoute = false;
     }
 }
