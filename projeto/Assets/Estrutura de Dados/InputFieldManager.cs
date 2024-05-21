@@ -22,7 +22,7 @@ public class InputFieldManager : MonoBehaviour
     private bool startListening = false;
 
     void Start(){
-        Debug.Log(boardGameObject.name);
+        //Debug.Log(boardGameObject.name);
         boardGameObject = gameObject;
     }
 

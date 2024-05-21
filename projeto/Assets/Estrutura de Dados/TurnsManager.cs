@@ -237,7 +237,16 @@ public class TurnsManager : MonoBehaviour
         Tile tile = board.BoardDisplay[x, y];
 
         GameObject mover = unit.piece.getGameO();
-        mover.AddComponent<ObjectMover>();
+        ObjectMover objectMover = mover.GetComponent<ObjectMover>();
+
+        if (objectMover == null)
+        {
+            objectMover = mover.AddComponent<ObjectMover>();
+        }
+        else
+        {
+            objectMover = mover.GetComponent<ObjectMover>();
+        }
 
         GameObject gameTile = tile.getGameO();
         //Debug.Log(gameTile);
@@ -260,8 +269,8 @@ public class TurnsManager : MonoBehaviour
             }
         }
         
-        ObjectMover objm = mover.GetComponent<ObjectMover>();
-        objm.StartMoving(mover, targetPos);
+        //ObjectMover objm = mover.GetComponent<ObjectMover>();
+        objectMover.StartMoving(mover, targetPos);
         
     }
    
