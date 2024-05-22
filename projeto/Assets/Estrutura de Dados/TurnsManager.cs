@@ -29,7 +29,7 @@ public class TurnsManager : MonoBehaviour
         state.currentTurn = 0;
         state.currentUnit = 0;
         MakeTurn(turnsList[0]); // faz o primeiro turno
-        Debug.Log("começou");
+        //Debug.Log("começou");
 
     }
 
@@ -43,7 +43,7 @@ public class TurnsManager : MonoBehaviour
         List<int []> coordenadasAtacadas = new List<int[]>();
         for (int i = state.currentUnit; i < units.Length; i++){
             Unit unit = units[state.currentUnit];
-            Debug.Log(unit);
+            //Debug.Log(unit);
             // Execute as ações para cada unidade do turno
             // Por exemplo:
             switch (unit.action.ToString())
@@ -125,7 +125,7 @@ public class TurnsManager : MonoBehaviour
     }
 
     public IEnumerator pieceDeath(Piece p){
-        UnityEngine.Debug.Log("Peça "+ p.id + " vai morrer!");
+        //UnityEngine.Debug.Log("Peça "+ p.id + " vai morrer!");
 
         // Aciona a animação de "morte"
         Animator animate = p.getGameO().GetComponent<Animator>();
@@ -146,7 +146,7 @@ public class TurnsManager : MonoBehaviour
         UnityEngine.Vector3 gameTilePos = gameTile.transform.position;
         UnityEngine.Vector3[] positions = new UnityEngine.Vector3[numberOfpieces];
         float offset = 0.2f; // Distância de offset do centro
-        Debug.Log(numberOfpieces);
+        //Debug.Log(numberOfpieces);
         switch(numberOfpieces){
             case 1:
                // objects[0] = cyl;
@@ -207,7 +207,7 @@ public class TurnsManager : MonoBehaviour
         if (prefabToSpawn != null)
         {
             Piece p = unit.piece;
-            Debug.Log("Peça "+ p.id + " inicializada em x = "+p.x+ " e y =" +p.y);
+            //Debug.Log("Peça "+ p.id + " inicializada em x = "+p.x+ " e y =" +p.y);
             game.addPiece(p);
             GameObject pieceObject = Instantiate(prefabToSpawn);
             pieceObject.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
@@ -251,7 +251,7 @@ public class TurnsManager : MonoBehaviour
         GameObject gameTile = tile.getGameO();
         //Debug.Log(gameTile);
         Piece p = unit.piece;
-        UnityEngine.Debug.Log("Peça "+ p.id + " tem de se mover para x = "+unit.posFocoX+ " e y =" +unit.posFocoY);
+        //UnityEngine.Debug.Log("Peça "+ p.id + " tem de se mover para x = "+unit.posFocoX+ " e y =" +unit.posFocoY);
         game.UpdatePosPiece(p,unit.posFocoX,unit.posFocoY);
 
         UnityEngine.Vector3 targetPos = new UnityEngine.Vector3();
@@ -278,7 +278,7 @@ public class TurnsManager : MonoBehaviour
    public void NextTurn(bool buttonCall){
         if (state.currentTurn < turnsList.Count - 1){
             isCalledByScene = buttonCall;
-            Debug.Log("Estado atual" + state.currentTurn);
+            //Debug.Log("Estado atual" + state.currentTurn);
             Dictionary<(int, int), List<Piece>> turnPositions = new Dictionary<(int, int), List<Piece>>();
             for (int x = 1; x <= board.Width; x++)
             {
@@ -304,7 +304,7 @@ public class TurnsManager : MonoBehaviour
     // funcao a ser chamada no botao para a jogada anterior
     public void PreviousTurn()
     {
-        Debug.Log(state.currentTurn);
+        //Debug.Log(state.currentTurn);
         if (state.currentTurn >= 0){   
                 state.currentUnit = 0;
                 if(state.currentTurn == 0 || state.currentTurn == 1){
@@ -386,7 +386,7 @@ public class TurnsManager : MonoBehaviour
         if (unitCoroutine != null)
         {
             StopCoroutine(unitCoroutine);
-            Debug.Log("Parou");
+            //Debug.Log("Parou");
             unitCoroutine = null; // Atualiza a variável turnCoroutine para null
             Time.timeScale = 0f;
         }
@@ -398,7 +398,7 @@ public class TurnsManager : MonoBehaviour
         if (unitCoroutine == null) 
         {
             Time.timeScale = 1f;
-            Debug.Log("Voltou a andar");
+            //Debug.Log("Voltou a andar");
             MakeTurn(turnsList[state.currentTurn]); 
         }
     }

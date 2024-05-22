@@ -55,7 +55,7 @@ public class InputFieldManager : MonoBehaviour
     
     public void ReadStringOutput(string s){
         input = s;
-        Debug.Log(boardGameObject.name);
+        //Debug.Log(boardGameObject.name);
         Game game = xmlReader.LoadXMLToRead(s, boardGameObject);
         StartXML(game);
         Debug.Log(input);
