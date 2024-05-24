@@ -7,6 +7,7 @@ public class UiManager : MonoBehaviour
 {
     public GameObject mainCamera;
     public GameObject topViewCamera;
+    public GameObject miniMap;
 
     // Start is called before the first frame update
     void Start()
@@ -31,11 +32,13 @@ public class UiManager : MonoBehaviour
         {
             mainCamera.SetActive(false);
             topViewCamera.SetActive(true);
+            miniMap.SetActive(true);
         }
         else
         {
             mainCamera.SetActive(true);
             topViewCamera.SetActive(false);
+            miniMap.SetActive(false);
         }
     }
 
