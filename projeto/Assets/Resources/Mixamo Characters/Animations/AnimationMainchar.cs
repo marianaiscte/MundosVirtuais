@@ -1,71 +1,186 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting.Dependencies.Sqlite;
 using UnityEngine;
 
 public class AnimationMainchar : MonoBehaviour
 {
     Animator playerAnim;
-	Rigidbody playerRigid;
-	public float w_speed, wb_speed, olw_speed, rn_speed, ro_speed;
-	bool walking;
+    CharacterController characterController;
+    float walkSpeed, walkBackSpeed, originalWalkSpeed, runAddSpeed, rotationSpeed;
+    public float jumpForce = 5f;
+    public float gravity = 9.81f;
+    float verticalSpeed = 0f; // variável para armazenar a velocidade vertical
+    bool walking;
+    bool isGrounded;
+    bool wasFalling;
+    bool justLand;
+    bool jumping;
+	bool running;
     Transform playerTrans;
-	
-    void Start(){
+
+    void Start()
+    {
         playerAnim = GetComponent<Animator>();
-        playerRigid = GetComponent<Rigidbody>();
+        characterController = GetComponent<CharacterController>();
         playerTrans = GetComponent<Transform>();
+        originalWalkSpeed = 2f;
+        walkSpeed = originalWalkSpeed;
+        walkBackSpeed = 1.5f;
+        runAddSpeed = 3f;
+        rotationSpeed = 100f;
     }
-	
-	void FixedUpdate(){
 
-        Vector3 velocity = Vector3.zero;
-		if(Input.GetKey(KeyCode.W)){
-			velocity = transform.forward * w_speed * Time.deltaTime;
-		}
-		if(Input.GetKey(KeyCode.S)){
-			velocity = -transform.forward * wb_speed * Time.deltaTime;
+    void FixedUpdate(){
+        Vector3 move = Vector3.zero;
+        isGrounded = characterController.isGrounded;
+
+		AnimatorStateInfo stateInfo = playerAnim.GetCurrentAnimatorStateInfo(0);
+
+		if (Input.GetKey(KeyCode.W) && !stateInfo.IsName("Landing")){
+			move += transform.forward * walkSpeed * Time.deltaTime;
+				
+		}if (Input.GetKey(KeyCode.S) && !stateInfo.IsName("Landing")){
+			move += -transform.forward * walkBackSpeed * Time.deltaTime;
 		}
 
-         playerRigid.velocity = velocity;
-	}
-	void Update(){
+        if (isGrounded){
+			if (jumping){
+				verticalSpeed = jumpForce; 
+        
+        	}else if (!jumping){
+            verticalSpeed = -gravity * Time.deltaTime; // Mantém o personagem no chão
+        	}
+        }else{
+            verticalSpeed -= gravity * Time.deltaTime; // Aplica gravidade
+        }
 
-		if(Input.GetKeyDown(KeyCode.W)){
-			playerAnim.SetTrigger("walk");
-			playerAnim.ResetTrigger("idle");
-			walking = true;
-		}
-		if(Input.GetKeyUp(KeyCode.W)){
-			playerAnim.ResetTrigger("walk");
-			playerAnim.SetTrigger("idle");
-			walking = false;
-		}
-		if(Input.GetKeyDown(KeyCode.S)){
-			playerAnim.SetTrigger("back");
-			playerAnim.ResetTrigger("idle");
-		}
-		if(Input.GetKeyUp(KeyCode.S)){
-			playerAnim.ResetTrigger("back");
-			playerAnim.SetTrigger("idle");
-		}
-		if(Input.GetKey(KeyCode.A)){
-			playerTrans.Rotate(0, -ro_speed * Time.deltaTime, 0);
-		}
-		if(Input.GetKey(KeyCode.D)){
-			playerTrans.Rotate(0, ro_speed * Time.deltaTime, 0);
-		}
-    
-		if(walking == true){				
-			if(Input.GetKeyDown(KeyCode.LeftShift)){
-				w_speed = w_speed + rn_speed;
-				playerAnim.SetTrigger("run");
-				playerAnim.ResetTrigger("walk");
-			}
-			if(Input.GetKeyUp(KeyCode.LeftShift)){
-				w_speed = olw_speed;
-				playerAnim.ResetTrigger("run");
-				playerAnim.SetTrigger("walk");
-			}
-		}
-	}
+        move.y = verticalSpeed * Time.deltaTime;
+        characterController.Move(move);
+    }
+
+    void Update()
+    {
+        AnimatorStateInfo stateInfo = playerAnim.GetCurrentAnimatorStateInfo(0);
+
+        if (jumping && stateInfo.IsName("Jump") && stateInfo.normalizedTime >= 1.0f)
+        {
+            playerAnim.ResetTrigger("jump");
+            jumping = false;
+        }
+
+		
+				if (Input.GetKeyDown(KeyCode.Space)){
+					playerAnim.SetTrigger("jump");
+					jumping = true;
+				}
+
+				if (Input.GetKey(KeyCode.W))
+                {
+                    if (Input.GetKey(KeyCode.LeftShift))
+                    {
+                        walkSpeed = originalWalkSpeed + runAddSpeed;
+                        playerAnim.SetTrigger("run");
+                        running = true;
+                    }
+                    else
+                    {
+                        walkSpeed = originalWalkSpeed;
+                        playerAnim.SetTrigger("walk");
+						playerAnim.ResetTrigger("run");
+						running = false;
+                    }
+                    playerAnim.ResetTrigger("idle");
+                    walking = true;
+                }
+                if (Input.GetKeyUp(KeyCode.W))
+                {
+                    playerAnim.ResetTrigger("walk");
+                    walking = false;
+                    if (running)
+                    {
+                        playerAnim.ResetTrigger("run");
+                        running = false;
+                    }
+					playerAnim.SetTrigger("idle");
+                }
+				if (Input.GetKey(KeyCode.S))
+				{
+					playerAnim.SetTrigger("back");
+					playerAnim.ResetTrigger("idle");
+				}
+				if (Input.GetKeyUp(KeyCode.S))
+				{
+					playerAnim.ResetTrigger("back");
+					playerAnim.SetTrigger("idle");
+				}
+
+        if (isGrounded)
+        {
+            playerAnim.ResetTrigger("fall");
+
+            if (justLand && stateInfo.IsName("Landing") && stateInfo.normalizedTime >= 1.0f)
+            {
+                playerAnim.ResetTrigger("land");
+				playerAnim.SetTrigger("idle");
+                justLand = false;
+            }
+
+            if (wasFalling)
+            {
+                playerAnim.SetTrigger("land");
+                wasFalling = false;
+                justLand = true;
+            }
+
+			//if(!stateInfo.IsName("Falling")){
+				
+			//}
+            //if (Input.GetKey(KeyCode.A))
+            //{
+              //  playerTrans.Rotate(0, -rotationSpeed * Time.deltaTime, 0);
+            //}
+            //if (Input.GetKey(KeyCode.D))
+            //{
+              //  playerTrans.Rotate(0, rotationSpeed * Time.deltaTime, 0);
+            //}
+
+            if (walking == true)
+            {
+                if (Input.GetKeyDown(KeyCode.LeftShift))
+                {
+                    walkSpeed = walkSpeed + runAddSpeed;
+                    playerAnim.SetTrigger("run");
+                    playerAnim.ResetTrigger("walk");
+					running = true;
+                }
+                if (Input.GetKeyUp(KeyCode.LeftShift))
+                {
+                    walkSpeed = originalWalkSpeed;
+                    playerAnim.SetTrigger("walk");
+                    playerAnim.ResetTrigger("run");
+					running = false;
+                }
+            }
+        }
+        else
+        {
+            if (!jumping)
+            {
+                playerAnim.SetTrigger("fall");
+                wasFalling = true;
+            }
+        }
+
+    }
+
+    //função de debug, esfera fica verde caso esteja grounded e vermelho caso contrario!
+    void OnDrawGizmos()
+    {
+        if (characterController != null)
+        {
+            Gizmos.color = isGrounded ? Color.green : Color.red;
+            Gizmos.DrawSphere(characterController.bounds.center - new Vector3(0, characterController.bounds.extents.y, 0), 0.1f);
+        }
+    }
 }
