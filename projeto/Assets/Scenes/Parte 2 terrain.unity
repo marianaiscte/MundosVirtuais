@@ -274,9 +274,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   xmlFilePath: C:\Users\maria\Desktop\terrain.xml
   terrain: {fileID: 730493787}
-  terrainType: village
+  terrainType: mountain
   parentObject: {fileID: 1281266701}
+  minDistanceHouse: 5
   minDistance: 5
+  desertLayer: {fileID: 8574412962073106934, guid: 059795529cf3d8e478e3cb9bad6c7044, type: 2}
+  forestLayer: {fileID: 8574412962073106934, guid: eb808b43f69a9d0488adf7b0e205621d, type: 2}
+  mountainGrassLayer: {fileID: 8574412962073106934, guid: eb808b43f69a9d0488adf7b0e205621d, type: 2}
+  mountainRockLayer: {fileID: 8574412962073106934, guid: d6e6f5461896bbe4ba87414aa8443679, type: 2}
+  villageGrassLayer: {fileID: 8574412962073106934, guid: eb808b43f69a9d0488adf7b0e205621d, type: 2}
+  villagePathLayer: {fileID: 8574412962073106934, guid: a395f29e105c9f94fad039f305c4f007, type: 2}
+  plainLayer: {fileID: 8574412962073106934, guid: eb808b43f69a9d0488adf7b0e205621d, type: 2}
 --- !u!154 &730493786
 TerrainCollider:
   m_ObjectHideFlags: 0
@@ -468,8 +476,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1642073107}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.17579918, y: -0.3677453, z: 0.07113304, w: -0.9103835}
-  m_LocalPosition: {x: 256.47394, y: 13.7711525, z: 63.686684}
+  m_LocalRotation: {x: -0.28969383, y: -0.36280596, z: 0.120636374, w: -0.87743723}
+  m_LocalPosition: {x: 152.32832, y: 74.52193, z: 128.26987}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
