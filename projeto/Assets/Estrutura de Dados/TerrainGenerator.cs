@@ -250,9 +250,17 @@ public class TerrainGenerator : MonoBehaviour
         {
             int randomIndex = UnityEngine.Random.Range(0, prefabs.Length);
             GameObject objPrefab = prefabs[randomIndex];
+
+            float randomYRotation = UnityEngine.Random.Range(-180, 180);
+
+            Quaternion randomRotation = Quaternion.Euler(
+            objPrefab.transform.rotation.eulerAngles.x,
+            objPrefab.transform.rotation.eulerAngles.y + randomYRotation, 
+            objPrefab.transform.rotation.eulerAngles.z 
+            );
             
     
-            return Instantiate(objPrefab, position, objPrefab.transform.rotation);
+            return Instantiate(objPrefab, position, randomRotation);
         }
         else
         {

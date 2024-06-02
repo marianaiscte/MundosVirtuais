@@ -274,10 +274,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   xmlFilePath: C:\Users\maria\Desktop\terrain.xml
   terrain: {fileID: 730493787}
-  terrainType: mountain
+  terrainType: plain
   parentObject: {fileID: 1281266701}
   minDistanceHouse: 5
-  minDistance: 5
+  minDistance: 3
   desertLayer: {fileID: 8574412962073106934, guid: 059795529cf3d8e478e3cb9bad6c7044, type: 2}
   forestLayer: {fileID: 8574412962073106934, guid: eb808b43f69a9d0488adf7b0e205621d, type: 2}
   mountainGrassLayer: {fileID: 8574412962073106934, guid: eb808b43f69a9d0488adf7b0e205621d, type: 2}
