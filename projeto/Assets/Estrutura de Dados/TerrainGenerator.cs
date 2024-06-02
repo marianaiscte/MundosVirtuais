@@ -7,10 +7,10 @@ public class TerrainGenerator : MonoBehaviour
     public string xmlFilePath;
     public Terrain terrain;
     public string terrainType;
-    public GameObject parentObject; // GameObject pai para organização
+    public GameObject parentObject; 
     private TerrainData terrainData;
-    private List<Vector3> objectPositions = new List<Vector3>(); // Lista para armazenar posições de todos os objetos
-    public float minDistanceHouse = 5f; // Distância mínima entre objetos
+    private List<Vector3> objectPositions = new List<Vector3>(); 
+    public float minDistanceHouse = 5f; 
     public float minDistance = 3f; // Distância mínima entre objetos
 
 
@@ -22,6 +22,8 @@ public class TerrainGenerator : MonoBehaviour
     public TerrainLayer villageGrassLayer;
     public TerrainLayer villagePathLayer;
     public TerrainLayer plainLayer;
+
+    int PerlinNoiseTerrain = 10;
 
     void Start()
     {
@@ -38,7 +40,8 @@ public class TerrainGenerator : MonoBehaviour
                 return new TerrainLayer[] { desertLayer };
             case "forest":
                 return new TerrainLayer[] { forestLayer };
-            case "mountain":
+            case "mountain":                
+                PerlinNoiseTerrain = 3;
                 return new TerrainLayer[] { mountainGrassLayer, mountainRockLayer };
             case "village":
                 return new TerrainLayer[] { villageGrassLayer, villagePathLayer };
@@ -87,7 +90,7 @@ public class TerrainGenerator : MonoBehaviour
             {
                 float xCoord = (float)x / resolution;
                 float zCoord = (float)z / resolution;
-                float noiseValue = Mathf.PerlinNoise(xCoord * 10, zCoord * 10);
+                float noiseValue = Mathf.PerlinNoise(xCoord * PerlinNoiseTerrain, zCoord * 10);
                 heights[x, z] = noiseValue * maxElevation / terrainData.size.y;
             }
         }
@@ -196,7 +199,6 @@ public class TerrainGenerator : MonoBehaviour
                 {
                     Vector3 position = new Vector3(worldX, height, worldZ);
 
-                    // Verificação de distância mínima para todos os objetos
                     if (type == "house" && !IsPositionValidHouse(position))
                     {
                         continue;

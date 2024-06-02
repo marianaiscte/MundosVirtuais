@@ -274,7 +274,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   xmlFilePath: C:\Users\maria\Desktop\terrain.xml
   terrain: {fileID: 730493787}
-  terrainType: plain
+  terrainType: village
   parentObject: {fileID: 1281266701}
   minDistanceHouse: 5
   minDistance: 3
