@@ -12,18 +12,19 @@ public class TerrainGenerator : MonoBehaviour
     private List<Vector3> objectPositions = new List<Vector3>(); 
     public float minDistanceHouse = 5f; 
     public float minDistance = 3f; // Distância mínima entre objetos
+    public float flattenRadius = 50f; // Raio da área central a ser terraplanada
+
 
 
     // Terrain layers for different types
     public TerrainLayer desertLayer;
     public TerrainLayer forestLayer;
-    public TerrainLayer mountainGrassLayer;
-    public TerrainLayer mountainRockLayer;
-    public TerrainLayer villageGrassLayer;
-    public TerrainLayer villagePathLayer;
+    public TerrainLayer mountainLayer;
+    public TerrainLayer villageLayer;
     public TerrainLayer plainLayer;
+    public TerrainLayer flatAreaLayer;
 
-    int PerlinNoiseTerrain = 10;
+
 
     void Start()
     {
@@ -32,24 +33,59 @@ public class TerrainGenerator : MonoBehaviour
         GenerateTerrainFromXML(xmlFilePath, terrainType);
     }
 
-    TerrainLayer[] GetTerrainLayersForType(string terrainType)
-    {
-        switch (terrainType.ToLower())
+    void FlattenCentralArea(){
+        int resolution = terrainData.heightmapResolution;
+        float[,] heights = terrainData.GetHeights(0, 0, resolution, resolution);
+
+        int centerX = resolution / 2;
+        int centerZ = resolution / 2;
+
+        float centerHeight = heights[centerX, centerZ];
+
+        float flattenRadiusInHeightmapSpace = flattenRadius / terrainData.size.x * resolution;
+
+        float smoothingRadius = flattenRadiusInHeightmapSpace * 0.2f;
+
+        for (int x = 0; x < resolution; x++)
         {
-            case "desert":
-                return new TerrainLayer[] { desertLayer };
-            case "forest":
-                return new TerrainLayer[] { forestLayer };
-            case "mountain":                
-                PerlinNoiseTerrain = 3;
-                return new TerrainLayer[] { mountainGrassLayer, mountainRockLayer };
-            case "village":
-                return new TerrainLayer[] { villageGrassLayer, villagePathLayer };
-            case "plain":
-                return new TerrainLayer[] { plainLayer };
-            default:
-                return new TerrainLayer[] { plainLayer };
+            for (int z = 0; z < resolution; z++)
+            {
+                float distance = Mathf.Sqrt((x - centerX) * (x - centerX) + (z - centerZ) * (z - centerZ));
+
+                if (distance < flattenRadiusInHeightmapSpace)
+                {
+                    heights[x, z] = centerHeight;
+                }
+                else if (distance < flattenRadiusInHeightmapSpace + smoothingRadius)
+                {
+                    float t = (distance - flattenRadiusInHeightmapSpace) / smoothingRadius;
+                    t = Mathf.SmoothStep(0, 1, t);  // Suaviza a interpolação
+                    heights[x, z] = Mathf.Lerp(centerHeight, heights[x, z], t);
+                }
+            }
         }
+
+        terrainData.SetHeights(0, 0, heights);
+    }
+
+
+        TerrainLayer[] GetTerrainLayersForType(string terrainType)
+        {
+            switch (terrainType.ToLower())
+            {
+                case "desert":
+                    return new TerrainLayer[] { desertLayer, flatAreaLayer};
+                case "forest":
+                    return new TerrainLayer[] { forestLayer,flatAreaLayer };
+                case "mountain":                
+                    return new TerrainLayer[] { mountainLayer,flatAreaLayer};
+                case "village":
+                    return new TerrainLayer[] { villageLayer,flatAreaLayer};
+                case "plain":
+                    return new TerrainLayer[] { plainLayer,flatAreaLayer };
+                default:
+                    return new TerrainLayer[] { plainLayer, flatAreaLayer };
+            }
     }
 
     void GenerateTerrainFromXML(string filePath, string terrainType)
@@ -72,6 +108,7 @@ public class TerrainGenerator : MonoBehaviour
             GenerateTerrain(maxElevation);
             PaintTerrain(maxElevation, terrainType);
             PlaceObjects(terrainElement, maxElevation);
+            FlattenCentralArea();
         }
         else
         {
@@ -90,7 +127,7 @@ public class TerrainGenerator : MonoBehaviour
             {
                 float xCoord = (float)x / resolution;
                 float zCoord = (float)z / resolution;
-                float noiseValue = Mathf.PerlinNoise(xCoord * PerlinNoiseTerrain, zCoord * 10);
+                float noiseValue = Mathf.PerlinNoise(xCoord * 10, zCoord * 10);
                 heights[x, z] = noiseValue * maxElevation / terrainData.size.y;
             }
         }
@@ -99,69 +136,56 @@ public class TerrainGenerator : MonoBehaviour
     }
 
     void PaintTerrain(float maxElevation, string terrainType)
+{
+    int resolution = terrainData.alphamapResolution;
+    float[,,] splatmapData = new float[resolution, resolution, terrainData.terrainLayers.Length];
+
+    float centerX = terrainData.size.x / 2;
+    float centerZ = terrainData.size.z / 2;
+    float radius = 50.0f;
+
+
+    for (int y = 0; y < resolution; y++)
     {
-        int resolution = terrainData.alphamapResolution;
-        float[,,] splatmapData = new float[resolution, resolution, terrainData.terrainLayers.Length];
-
-        for (int y = 0; y < resolution; y++)
+        for (int x = 0; x < resolution; x++)
         {
-            for (int x = 0; x < resolution; x++)
+            float worldX = (float)x / resolution * terrainData.size.x;
+            float worldZ = (float)y / resolution * terrainData.size.z;
+            float height = terrain.SampleHeight(new Vector3(worldX, 0, worldZ));
+
+            float[] splatWeights = new float[terrainData.terrainLayers.Length];
+
+            float distance = Mathf.Sqrt(Mathf.Pow(worldX - centerX, 2) + Mathf.Pow(worldZ - centerZ, 2));
+
+            if (distance <= radius)
             {
-                float worldX = (float)x / resolution * terrainData.size.x;
-                float worldZ = (float)y / resolution * terrainData.size.z;
-                float height = terrain.SampleHeight(new Vector3(worldX, 0, worldZ));
-
-                float[] splatWeights = new float[terrainData.terrainLayers.Length];
-
-                if (terrainType.ToLower() == "mountain")
-                {
-                    float rockNoise = Mathf.PerlinNoise(worldX * 0.3f, worldZ * 0.3f); // Scale noise for rock distribution
-                    if (height < maxElevation * 0.5f)
-                    {
-                        splatWeights[0] = 1; // Grass at lower altitudes
-                    }
-                    else if (rockNoise > 0.5f)
-                    {
-                        splatWeights[1] = 1; // Smaller patches of rock at higher altitudes
-                    }
-                    else
-                    {
-                        splatWeights[0] = 1; // Grass at other high altitudes
-                    }
-                }
-                else if (terrainType.ToLower() == "village")
-                {
-                    float pathNoise = Mathf.PerlinNoise(worldX * 0.3f, worldZ * 0.3f); // Scale noise for path distribution
-                    if (height < maxElevation * 0.2f && pathNoise > 0.5f)
-                    {
-                        splatWeights[1] = 1; // Smaller patches of path at very low altitudes
-                    }
-                    else
-                    {
-                        splatWeights[0] = 1; // Grass elsewhere
-                    }
-                }
-                else
-                {
-                    splatWeights[0] = 1; // Single texture for desert, forest, and plain
-                }
-
-                float total = 0;
                 for (int i = 0; i < splatWeights.Length; i++)
                 {
-                    total += splatWeights[i];
-                }
-
-                for (int i = 0; i < splatWeights.Length; i++)
-                {
-                    splatWeights[i] /= total;
-                    splatmapData[x, y, i] = splatWeights[i];
+                    splatWeights[i] = 2;
                 }
             }
-        }
+            else
+            {
+                splatWeights[0] = 1; // Default layer
+            }
 
-        terrainData.SetAlphamaps(0, 0, splatmapData);
+            float total = 0;
+            for (int i = 0; i < splatWeights.Length; i++)
+            {
+                total += splatWeights[i];
+            }
+
+            for (int i = 0; i < splatWeights.Length; i++)
+            {
+                splatWeights[i] /= total;
+                splatmapData[x, y, i] = splatWeights[i];
+            }
+        }
     }
+
+    terrainData.SetAlphamaps(0, 0, splatmapData);
+}
+
 
     void PlaceObjects(XElement terrainElement, float maxElevation)
     {
@@ -184,6 +208,10 @@ public class TerrainGenerator : MonoBehaviour
     {
         int resolution = terrainData.heightmapResolution;
 
+        float centerX = terrainData.size.x / 2;
+        float centerZ = terrainData.size.z / 2;
+        float radius = 50.0f;
+
         for (int x = 0; x < resolution; x++)
         {
             for (int z = 0; z < resolution; z++)
@@ -195,25 +223,32 @@ public class TerrainGenerator : MonoBehaviour
                 float density = height < lowAltitudeThreshold ? densityLow :
                                 height > highAltitudeThreshold ? densityHigh : 0f;
 
-                if (Random.value < density)
-                {
-                    Vector3 position = new Vector3(worldX, height, worldZ);
+                float distance = Mathf.Sqrt(Mathf.Pow(worldX - centerX, 2) + Mathf.Pow(worldZ - centerZ, 2));
 
-                    if (type == "house" && !IsPositionValidHouse(position))
-                    {
-                        continue;
-                    }
+                if (distance <= radius){
+                    continue;
+                }else{
 
-                    if (!IsPositionValid(position))
+                    if (Random.value < density)
                     {
-                        continue;
-                    }
+                        Vector3 position = new Vector3(worldX, height, worldZ);
 
-                    GameObject obj = InstantiateObject(type, position);
-                    if (obj != null)
-                    {
-                        obj.transform.parent = parentObject.transform;
-                        objectPositions.Add(position); // Armazenar a posição do objeto instanciado
+                        if (type == "house" && !IsPositionValidHouse(position))
+                        {
+                            continue;
+                        }
+
+                        if (type != "house" && !IsPositionValid(position))
+                        {
+                            continue;
+                        }
+
+                        GameObject obj = InstantiateObject(type, position);
+                        if (obj != null)
+                        {
+                            obj.transform.parent = parentObject.transform;
+                            objectPositions.Add(position); // Armazenar a posição do objeto instanciado
+                        }
                     }
                 }
             }

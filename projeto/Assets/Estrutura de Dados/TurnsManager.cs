@@ -69,16 +69,20 @@ public class TurnsManager : MonoBehaviour
                     coordenadasAtacadas.Add(unit.attack());
                     yield return new WaitForSeconds(1f);
                     animate.SetBool("attack", false);
+                    GameObject audio = null;
                         GameObject projectileType = null;
                         if (unit.piece.type == PieceType.Archer){
                             //Debug.Log("PROJETEIS!");
                             projectileType = Resources.Load<GameObject>("Projectiles/arrow");
+                            audio = GameObject.Find("arrowAudio");
                         }
                          if (unit.piece.type == PieceType.Mage){
                             projectileType = Resources.Load<GameObject>("Projectiles/fireball");
+                            audio = GameObject.Find("fireballAudio");
                         }
                         if (unit.piece.type == PieceType.Catapult){
                             projectileType = Resources.Load<GameObject>("Projectiles/rock");
+                            audio = GameObject.Find("deathAudio");
                         }
 
                         if(projectileType != null){
@@ -88,7 +92,9 @@ public class TurnsManager : MonoBehaviour
                             projectile.AddComponent<Projectile>();
                             Projectile projectileScript = projectile.AddComponent<Projectile>();
                             projectileScript.targetPosition = gameTile.transform.position;
+                            audio.GetComponent<AudioSource>().Play();
                         }
+
                     break;
             }
             UpdateUI();
@@ -141,12 +147,6 @@ public class TurnsManager : MonoBehaviour
         // Espere pela duração da animação de "morte"
         float deathAnimationDuration = animate.GetCurrentAnimatorClipInfo(0)[0].clip.length;
         yield return new WaitForSeconds(1f);
-
-        Material mat = peca.GetComponent<Renderer>().material;
-        Color oldColor = mat.color;
-        Color newColor = new Color(oldColor.r, oldColor.g, oldColor.b, 0.2f);
-        mat.SetColor("_Color", newColor);
-
         
         float elapsedTime = 0;
         Vector3 originalScale = peca.transform.localScale; 
@@ -320,6 +320,7 @@ public class TurnsManager : MonoBehaviour
         //ObjectMover objm = mover.GetComponent<ObjectMover>();
         objectMover.StartMoving(mover, targetPos);
         Destroy(pieceObject);
+
     }
 
     public void SaveTurn(){
