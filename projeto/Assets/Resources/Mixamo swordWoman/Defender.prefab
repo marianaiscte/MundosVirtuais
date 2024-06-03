@@ -2865,9 +2865,10 @@ GameObject:
   - component: {fileID: 8920714168218789645}
   - component: {fileID: 6769612614410736462}
   - component: {fileID: 5932421600782296715}
+  - component: {fileID: 2882974415227063568}
   m_Layer: 0
-  m_Name: Warrior2
-  m_TagString: Untagged
+  m_Name: Defender
+  m_TagString: Defender
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2881,7 +2882,7 @@ Transform:
   m_GameObject: {fileID: 6247926535938476495}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 8.26792, y: 0.0000009536743, z: 10.282145}
+  m_LocalPosition: {x: 12.530433, y: 0, z: 23.62039}
   m_LocalScale: {x: 0.99, y: 0.99, z: 0.99}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2903,7 +2904,7 @@ Animator:
   m_GameObject: {fileID: 6247926535938476495}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: d4bc8aeee1248da43a4176631929bc9d, type: 3}
-  m_Controller: {fileID: 9100000, guid: 65b24d220c8cbeb40a814835a4a35299, type: 2}
+  m_Controller: {fileID: 9100000, guid: 6e1d7fb2b6b247c499bdd7909b3027fc, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 1
@@ -2956,6 +2957,19 @@ MonoBehaviour:
     - prefab: {fileID: 100000, guid: 7e462abb283b73a4ba97438461785130, type: 3}
     slots: 4
   disabledGraySkeleton: {fileID: 0}
+--- !u!114 &2882974415227063568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6247926535938476495}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe70074a577c7c140b4a59a3c51b7d26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attckerTag: Attacker
 --- !u!1 &6420063992703150257
 GameObject:
   m_ObjectHideFlags: 0

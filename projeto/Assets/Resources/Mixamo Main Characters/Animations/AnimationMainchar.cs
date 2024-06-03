@@ -173,12 +173,12 @@ public class AnimationMainchar : MonoBehaviour
     }
 
     //função de debug, esfera fica verde caso esteja grounded e vermelho caso contrario!
-    void OnDrawGizmos()
-    {
-        if (characterController != null)
-        {
-            Gizmos.color = isGrounded ? Color.green : Color.red;
-            Gizmos.DrawSphere(characterController.bounds.center - new Vector3(0, characterController.bounds.extents.y, 0), 0.1f);
-        }
-    }
+    //void OnDrawGizmos()
+    //{
+        //if (characterController != null)
+        //{
+            //Gizmos.color = isGrounded ? Color.green : Color.red;
+            //Gizmos.DrawSphere(characterController.bounds.center - new Vector3(0, characterController.bounds.extents.y, 0), 0.1f);
+        //}
+    //}
 }
