@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using TMPro;
 
 public class InputFieldManager : MonoBehaviour
 {
@@ -12,6 +13,10 @@ public class InputFieldManager : MonoBehaviour
 
     public Button NextTurn;
     public Button PreviousTurn;
+
+    public TextMeshProUGUI playerNameText;
+    public TextMeshProUGUI turnCountText;
+    public TextMeshProUGUI gameStatusText;
 
     GameObject boardGameObject;
 
@@ -83,5 +88,12 @@ public class InputFieldManager : MonoBehaviour
     
     private void previousTM(){
         turnsManager.goToPrevious = true;
+    }
+
+    public void UpdateUI(string playerName, int turnCount, string gameStatus)
+    {
+        playerNameText.text = "Player: " + playerName;
+        turnCountText.text = "Turn: " + turnCount;
+        gameStatusText.text = gameStatus;
     }
 }

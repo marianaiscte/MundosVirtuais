@@ -20,6 +20,7 @@ public class TurnsManager : MonoBehaviour
     public Coroutine unitCoroutine;
     public GameState state;
     public List<Dictionary<(int, int), List<Piece>>> oldTurnsPositions = new List<Dictionary<(int, int), List<Piece>>>();
+    private InputFieldManager inputFieldManager;
 
     public void StartGame(Game games)
     {
@@ -28,6 +29,8 @@ public class TurnsManager : MonoBehaviour
         this.board = game.board;
         state.currentTurn = 0;
         state.currentUnit = 0;
+        inputFieldManager = FindObjectOfType<InputFieldManager>();
+        UpdateUI();
         MakeTurn(turnsList[0]); // faz o primeiro turno
         //Debug.Log("começou");
     }
@@ -39,6 +42,7 @@ public class TurnsManager : MonoBehaviour
 
     private IEnumerator ExecuteTurn(Unit[] units)
     {
+    
         List<int []> coordenadasAtacadas = new List<int[]>();
         for (int i = state.currentUnit; i < units.Length; i++){
             Unit unit = units[state.currentUnit];
@@ -87,6 +91,7 @@ public class TurnsManager : MonoBehaviour
                         }
                     break;
             }
+            UpdateUI();
             state.currentUnit++;
             if(goToPrevious){
                 PreviousTurn();
@@ -94,6 +99,7 @@ public class TurnsManager : MonoBehaviour
             if(!isCalledByScene){
                 yield return new WaitForSecondsRealtime(3f); 
             } 
+            
         }
           //yield return new WaitForSecondsRealtime(3f); 
 
@@ -283,17 +289,6 @@ public class TurnsManager : MonoBehaviour
 
         UnityEngine.Vector3 targetPos = new UnityEngine.Vector3();
 
-        GameObject charact = getPrefabs(unit);
-        GameObject pieceObject = Instantiate(charact);
-        pieceObject.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
-        unit.piece.associateObj(pieceObject);
-        charact.AddComponent<Renderer>();
-        charact.transform.position = mover.transform.position;
-        Material mat = charact.GetComponent<Renderer>().material;
-        Color oldColor = mat.color;
-        Color newColor = new Color(oldColor.r, oldColor.g, oldColor.b, 0.2f);
-        mat.SetColor("_Color", newColor);
-
         UnityEngine.Vector3[] positions = placePieces(unit.posFocoX,unit.posFocoY, gameTile);
         GameObject[] objects = game.getObjectsInTile(unit.posFocoX, unit.posFocoY);
         int i = 0;
@@ -335,9 +330,11 @@ public class TurnsManager : MonoBehaviour
             SaveTurn();
             state.currentTurn++; 
             state.currentUnit = 0;
+            UpdateUI();
             MakeTurn(turnsList[state.currentTurn]);
         }else{
             UnityEngine.Debug.Log("O jogo acabou!");
+            inputFieldManager.UpdateUI("", state.currentTurn, "Game Over");
         }
     }
 
@@ -410,6 +407,7 @@ public class TurnsManager : MonoBehaviour
                 }
             }
                 state.currentTurn--;
+                UpdateUI();
                 Play();
             }         
         }
@@ -427,6 +425,7 @@ public class TurnsManager : MonoBehaviour
             //Debug.Log("Parou");
             unitCoroutine = null; // Atualiza a variável turnCoroutine para null
             Time.timeScale = 0f;
+            inputFieldManager.UpdateUI("", state.currentTurn, "Paused");
         }
     }
 
@@ -438,17 +437,27 @@ public class TurnsManager : MonoBehaviour
             Time.timeScale = 1f;
             //Debug.Log("Voltou a andar");
             MakeTurn(turnsList[state.currentTurn]); 
+            inputFieldManager.UpdateUI("", state.currentTurn, "Game in Progress");
         }
     }
 
     //ambas as de cima tem de ter mais logica por detras com as animaçoes, tipo o pause temos que garantir que faz com que as cenas parem e 
     //guardem o estado delas (acho eu) e o play tem de ter em consideraçao o estado atual e completar o turn se necessario
-    
-}
+
+    private void UpdateUI()
+    {
+        Debug.Log(state.currentTurn + state.currentUnit);
+        string playerName = turnsList[state.currentTurn][state.currentUnit].piece.owner.name;
+        int turnCount = state.currentTurn + 1;
+        string gameStatus = "Game in Progress";
+        inputFieldManager.UpdateUI(playerName, turnCount, gameStatus);
+    }
+
 
 //guardar estado do jogo
 public struct GameState
 {
     public int currentTurn;
     public int currentUnit;
+}
 }
