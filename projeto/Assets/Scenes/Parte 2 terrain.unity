@@ -274,16 +274,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   xmlFilePath: C:\Users\maria\Desktop\terrain.xml
   terrain: {fileID: 730493787}
-  terrainType: desert
+  terrainType: mountain
   parentObject: {fileID: 1281266701}
   minDistanceHouse: 5
   minDistance: 3
   flattenRadius: 50
   desertLayer: {fileID: 8574412962073106934, guid: 059795529cf3d8e478e3cb9bad6c7044, type: 2}
-  forestLayer: {fileID: 8574412962073106934, guid: eb808b43f69a9d0488adf7b0e205621d, type: 2}
-  mountainLayer: {fileID: 8574412962073106934, guid: eb808b43f69a9d0488adf7b0e205621d, type: 2}
-  villageLayer: {fileID: 8574412962073106934, guid: eb808b43f69a9d0488adf7b0e205621d, type: 2}
-  plainLayer: {fileID: 8574412962073106934, guid: eb808b43f69a9d0488adf7b0e205621d, type: 2}
+  forestLayer: {fileID: 8574412962073106934, guid: d4282c75635d75841ba6a4b836be6939, type: 2}
+  mountainLayer: {fileID: 8574412962073106934, guid: d4282c75635d75841ba6a4b836be6939, type: 2}
+  villageLayer: {fileID: 8574412962073106934, guid: d4282c75635d75841ba6a4b836be6939, type: 2}
+  plainLayer: {fileID: 8574412962073106934, guid: d4282c75635d75841ba6a4b836be6939, type: 2}
   flatAreaLayer: {fileID: 8574412962073106934, guid: 9bb0bedb1277a774787d965868f8cc5d, type: 2}
 --- !u!154 &730493786
 TerrainCollider:

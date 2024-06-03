@@ -109,6 +109,7 @@ public class TerrainGenerator : MonoBehaviour
             PaintTerrain(maxElevation, terrainType);
             PlaceObjects(terrainElement, maxElevation);
             FlattenCentralArea();
+            AddRandomGrassToTerrain();
         }
         else
         {
@@ -305,6 +306,56 @@ public class TerrainGenerator : MonoBehaviour
             return null;
         }
     }
+
+    void AddRandomGrassToTerrain()
+{
+    Texture2D[] grassTextures = Resources.LoadAll<Texture2D>("Terrain/grass");
+
+    if (grassTextures.Length == 0)
+    {
+        Debug.LogError("Nenhuma textura de relva encontrada na pasta Resources/Terrain/grass");
+        return;
+    }
+
+    Debug.Log("Número de texturas de relva encontradas: " + grassTextures.Length);
+
+    DetailPrototype[] detailPrototypes = new DetailPrototype[grassTextures.Length];
+    for (int i = 0; i < grassTextures.Length; i++)
+    {
+        DetailPrototype grassDetail = new DetailPrototype();
+        grassDetail.prototypeTexture = grassTextures[i];
+
+        // Calcula a escala da textura de grama com base na resolução da textura
+        float scale = 1.0f / grassTextures[i].width; // Uma maneira simples de calcular a escala
+        grassDetail.minWidth = scale * 2; // Ajuste conforme necessário
+        grassDetail.maxWidth = scale * 4; // Ajuste conforme necessário
+        grassDetail.minHeight = scale * 2; // Ajuste conforme necessário
+        grassDetail.maxHeight = scale * 4; // Ajuste conforme necessário
+
+        detailPrototypes[i] = grassDetail;
+    }
+
+    terrainData.detailPrototypes = detailPrototypes;
+    int detailResolution = terrainData.detailResolution;
+    int[,] detailLayer = new int[detailResolution, detailResolution];
+    for (int y = 0; y < detailResolution; y++)
+    {
+        for (int x = 0; x < detailResolution; x++)
+        {
+            for (int i = 0; i < grassTextures.Length; i++)
+            {
+                if (Random.value < 0.6f) 
+                {
+                    detailLayer[x, y] = i; 
+                    break;
+                }
+            }
+        }
+    }
+
+    terrainData.SetDetailLayer(0, 0, 0, detailLayer);
+}
+
 
 
 }
