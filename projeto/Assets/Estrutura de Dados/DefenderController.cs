@@ -13,6 +13,9 @@ public class DefenderController : MonoBehaviour
     private bool isblocking = false;
     private bool dodged = false;
     private Transform attacker = null;
+
+    private GameObject attackerObject;
+
     void Start()
     {
         animator = GetComponent<Animator>(); 
@@ -44,17 +47,21 @@ public class DefenderController : MonoBehaviour
                 animator.ResetTrigger("DodgeBack");
                 animator.SetTrigger("DodgeFront");
                 dodged = false;
-                
         }
 
         if(stateInfoDefender.normalizedTime >= 1.0f && stateInfoDefender.IsName("Dodge front")){
             animator.ResetTrigger("DodgeFront");
             animator.SetTrigger("Idle");
-
+        
         }
 
         
         if(stateInfoAttacker.IsName("attack") && !dodged && !isblocking && !stateInfoDefender.IsName("Block") && !stateInfoDefender.IsName("Dodge Back")){
+            
+            if(stateInfoDefender.IsName("Dodge front")){
+                animator.SetTrigger("Die");
+            }
+            
             float randomValue = Random.Range(0f, 1f);
             Debug.Log(randomValue);
             if(randomValue <= 0.3){

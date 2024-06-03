@@ -9,7 +9,7 @@ public class AttackerController : MonoBehaviour
     private Animator animatorDefender;
     public string defenderTag = "Defender"; 
     public float attackProbability = 0.01f;  
-    private bool isAttacking = false;
+    public bool isAttacking = false;
 
     private bool won = false;
 
