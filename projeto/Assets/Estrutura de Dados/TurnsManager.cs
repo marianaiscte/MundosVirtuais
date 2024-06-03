@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using Unity.VisualScripting;
 using UnityEditor;
@@ -13,12 +14,11 @@ public class TurnsManager : MonoBehaviour
     public List<Unit[]> turnsList;
     public Board board;
     public Game game;
-    private bool isPaused = false;
     public bool paused = false;
     public bool isCalledByScene = false;
+    public bool goToPrevious = false;
     public Coroutine unitCoroutine;
     public GameState state;
-
     public List<Dictionary<(int, int), List<Piece>>> oldTurnsPositions = new List<Dictionary<(int, int), List<Piece>>>();
 
     public void StartGame(Game games)
@@ -30,7 +30,6 @@ public class TurnsManager : MonoBehaviour
         state.currentUnit = 0;
         MakeTurn(turnsList[0]); // faz o primeiro turno
         //Debug.Log("começou");
-
     }
 
     private void MakeTurn(Unit[] units)
@@ -89,18 +88,18 @@ public class TurnsManager : MonoBehaviour
                     break;
             }
             state.currentUnit++;
-            yield return new WaitForSecondsRealtime(3f); 
+            if(goToPrevious){
+                PreviousTurn();
+            }
+            if(!isCalledByScene){
+                yield return new WaitForSecondsRealtime(3f); 
+            } 
         }
           //yield return new WaitForSecondsRealtime(3f); 
 
         handleDeaths(coordenadasAtacadas);
         state.currentUnit = 0;
-        /*Dictionary<(int,int), Piece> turnPositions = new Dictionary<(int,int), Piece>();
-        foreach (Piece p in game.pieces){
-            turnPositions.Add((p.x, p.y), p);
-        }
-        oldTurnsPositions.Add(turnPositions);*/
-        NextTurn(false);
+        NextTurn();
     }
 
 
@@ -126,6 +125,8 @@ public class TurnsManager : MonoBehaviour
 
     public IEnumerator pieceDeath(Piece p){
         //UnityEngine.Debug.Log("Peça "+ p.id + " vai morrer!");
+        GameObject peca = p.getGameO();
+        GameObject deathAudio = GameObject.Find("deathAudio");
 
         // Aciona a animação de "morte"
         Animator animate = p.getGameO().GetComponent<Animator>();
@@ -135,10 +136,32 @@ public class TurnsManager : MonoBehaviour
         float deathAnimationDuration = animate.GetCurrentAnimatorClipInfo(0)[0].clip.length;
         yield return new WaitForSeconds(1f);
 
+        Material mat = peca.GetComponent<Renderer>().material;
+        Color oldColor = mat.color;
+        Color newColor = new Color(oldColor.r, oldColor.g, oldColor.b, 0.2f);
+        mat.SetColor("_Color", newColor);
+
+        
+        float elapsedTime = 0;
+        Vector3 originalScale = peca.transform.localScale; 
+
+        while (elapsedTime < 1f)
+        {
+            float progress = elapsedTime / 1f;
+            peca.transform.localScale = Vector3.Lerp(originalScale, Vector3.zero, elapsedTime / 1f);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        if(deathAudio != null){
+            Debug.Log("FDSSSS");
+            deathAudio.GetComponent<AudioSource>().Play();
+        }
+
         // Destrua o objeto da peça
         game.pieces.Remove(p);
-        GameObject peca = p.getGameO();
-        Destroy(peca);
+        peca.SetActive(false);
+
 }
 
     public UnityEngine.Vector3[] placePieces(int x, int y, GameObject gameTile){
@@ -174,15 +197,7 @@ public class TurnsManager : MonoBehaviour
         return positions;
     }
 
-
-     public void spawn(Board board, Unit unit)
-    {
-        int x = unit.posFocoX - 1;
-        int y = unit.posFocoY - 1;
-
-        Tile tile = board.BoardDisplay[x, y];
-        GameObject gameTile = tile.getGameO();
-        
+    private GameObject getPrefabs(Unit unit){
         GameObject prefabToSpawn = null;
 
         switch(unit.piece.type.ToString())
@@ -203,6 +218,18 @@ public class TurnsManager : MonoBehaviour
                 Debug.LogWarning("Prefab não encontrado para o tipo de peça: " + unit.piece.type.ToString());
                 break;
         }
+        return prefabToSpawn;
+    }
+
+     public void spawn(Board board, Unit unit)
+    {
+        int x = unit.posFocoX - 1;
+        int y = unit.posFocoY - 1;
+
+        Tile tile = board.BoardDisplay[x, y];
+        GameObject gameTile = tile.getGameO();
+        
+        GameObject prefabToSpawn = getPrefabs(unit);
 
         if (prefabToSpawn != null)
         {
@@ -256,6 +283,17 @@ public class TurnsManager : MonoBehaviour
 
         UnityEngine.Vector3 targetPos = new UnityEngine.Vector3();
 
+        GameObject charact = getPrefabs(unit);
+        GameObject pieceObject = Instantiate(charact);
+        pieceObject.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+        unit.piece.associateObj(pieceObject);
+        charact.AddComponent<Renderer>();
+        charact.transform.position = mover.transform.position;
+        Material mat = charact.GetComponent<Renderer>().material;
+        Color oldColor = mat.color;
+        Color newColor = new Color(oldColor.r, oldColor.g, oldColor.b, 0.2f);
+        mat.SetColor("_Color", newColor);
+
         UnityEngine.Vector3[] positions = placePieces(unit.posFocoX,unit.posFocoY, gameTile);
         GameObject[] objects = game.getObjectsInTile(unit.posFocoX, unit.posFocoY);
         int i = 0;
@@ -273,26 +311,28 @@ public class TurnsManager : MonoBehaviour
         objectMover.StartMoving(mover, targetPos);
         
     }
+
+    public void SaveTurn(){
+        Dictionary<(int, int), List<Piece>> turnPositions = new Dictionary<(int, int), List<Piece>>();
+        for (int x = 1; x <= board.Width; x++)
+        {
+            for (int y = 1; y <= board.Height; y++)
+            {
+                turnPositions.Add((x, y), game.getPiecesInTile(x, y));
+            }
+        }
+        Debug.Log(turnPositions==null);
+        oldTurnsPositions.Add(turnPositions);
+        Debug.Log(oldTurnsPositions.Count);  
+        game.SaveOldPositions(oldTurnsPositions);
+    }
    
     //funcao a ser chamada no botao para proxima jogada
-   public void NextTurn(bool buttonCall){
+   public void NextTurn(){
         if (state.currentTurn < turnsList.Count - 1){
-            isCalledByScene = buttonCall;
+            isCalledByScene = false;
             //Debug.Log("Estado atual" + state.currentTurn);
-            Dictionary<(int, int), List<Piece>> turnPositions = new Dictionary<(int, int), List<Piece>>();
-            for (int x = 1; x <= board.Width; x++)
-            {
-                for (int y = 1; y <= board.Height; y++)
-                {
-                    foreach(Piece p in game.getPiecesInTile(x, y)){
-                        //Debug.Log((x, y) + ", " +p.id);
-                    }
-                    turnPositions.Add((x, y), game.getPiecesInTile(x, y));
-                }
-            }
-            oldTurnsPositions.Add(turnPositions);
-            Debug.Log(oldTurnsPositions.Count);  
-            game.SaveOldPositions(oldTurnsPositions);
+            SaveTurn();
             state.currentTurn++; 
             state.currentUnit = 0;
             MakeTurn(turnsList[state.currentTurn]);
@@ -304,62 +344,60 @@ public class TurnsManager : MonoBehaviour
     // funcao a ser chamada no botao para a jogada anterior
     public void PreviousTurn()
     {
-        //Debug.Log(state.currentTurn);
+        Pause();
+        goToPrevious = false;
         if (state.currentTurn >= 0){   
                 state.currentUnit = 0;
                 if(state.currentTurn == 0 || state.currentTurn == 1){
                     foreach (Piece piece in game.pieces){
-                    if (piece.getGameO() != null){
                         Destroy(piece.getGameO());
-                    }
                 }
                 
-                game.pieces.Clear();
-                //faço o que se faz no play para os movimentos continuarem
-                Time.timeScale = 1f;
+                game.pieces.Clear(); 
                 state.currentTurn = 0;
-                MakeTurn(turnsList[0]); // faz o primeiro turno
+                Play(); // faz o primeiro turno
+
             } else{
 
+            Dictionary<(int, int), List<Piece>> turnPositions = oldTurnsPositions[state.currentTurn - 2];
 
-           /* Dictionary<(int, int), Piece> turnPositions = oldTurnsPositions[state.currentTurn];
+            // Obter todas as peças em turnPositions
+            HashSet<Piece> turnPositionPieces = new HashSet<Piece>(turnPositions.Values.SelectMany(list => list));
 
-            foreach(KeyValuePair<(int, int), Piece> kvp in turnPositions)
-            {
-                Piece piece = kvp.Value;
-                (int x, int y) = kvp.Key;
+            // Obter as peças que não estão no turnPositions
+            List<Piece> piecesToKill = game.pieces
+                .Where(piece => !turnPositionPieces.Contains(piece))
+                .ToList();
 
-                pieceDeath(piece);
-                Tile tile = board.BoardDisplay[x, y];
+            foreach (Piece piece in piecesToKill){
+                game.pieces.Remove(piece);
+                GameObject peca = piece.getGameO();
+                Destroy(peca);
+            }
 
-                GameObject cyl = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                Renderer renderer = cyl.GetComponent<Renderer>();
+            // Obter todas as peças do jogo
+            HashSet<Piece> gamePieces = new HashSet<Piece>(game.pieces);
 
-                GameObject gameTile = tile.getGameO();
+            // Obter todas as peças em turnPositions que não estão em game.pieces
+            List<Piece> piecesToAdd = turnPositions.Values
+                .SelectMany(list => list)
+                .Where(piece => !gamePieces.Contains(piece))
+                .ToList();
 
+            foreach (Piece piece in piecesToAdd){
                 game.addPiece(piece);
+                piece.getGameO().SetActive(true);
+            }
 
-                //cyl.transform.position = gameTile.transform.position; // Posiciona a peça no centro do tile
-                //cyl.transform.localScale = new UnityEngine.Vector3(0.1f, 0.1f, 0.1f); // Define a escala da peça
+                //chegando aqui temos: peças que não existiam apagadas, e peças que morreram mas estavam cá antes vivas again
 
-                switch(piece.type.ToString()){
-                    
-                    case "Soldier":
-                    renderer.material.color = Color.black;
-                    break;
-
-                    case"Archer":
-                    renderer.material.color = Color.green;
-                    break;
-
-                    case "Mage":
-                    renderer.material.color = Color.cyan;
-                    break;
-
-                    case"Catapult":
-                    renderer.material.color = Color.gray;
-                    break;
-
+            foreach (KeyValuePair<(int, int), List<Piece>> kvp in turnPositions)
+            {
+                (int x, int y) = kvp.Key;
+                Tile tile = board.BoardDisplay[x-1, y-1];
+                GameObject gameTile = tile.getGameO();
+                foreach(Piece piece in kvp.Value){
+                    game.UpdatePosPiece(piece, x, y);
                 }
 
                 Debug.Log("vou tratar de tudo");
@@ -370,9 +408,9 @@ public class TurnsManager : MonoBehaviour
                     obj.transform.position = positions[i];
                     i++;
                 }
-                resize(objects);
-            }*/                
-        MakeTurn(turnsList[state.currentTurn]);
+            }
+                state.currentTurn--;
+                Play();
             }         
         }
     }
@@ -402,7 +440,6 @@ public class TurnsManager : MonoBehaviour
             MakeTurn(turnsList[state.currentTurn]); 
         }
     }
-
 
     //ambas as de cima tem de ter mais logica por detras com as animaçoes, tipo o pause temos que garantir que faz com que as cenas parem e 
     //guardem o estado delas (acho eu) e o play tem de ter em consideraçao o estado atual e completar o turn se necessario
