@@ -4,10 +4,15 @@ using UnityEngine;
 
 public class AttackerController : MonoBehaviour
 {
-    private Animator animator;
+    private Animator animatorAttacker;
+
+    private Animator animatorDefender;
     public string defenderTag = "Defender"; 
     public float attackProbability = 0.01f;  
     private bool isAttacking = false;
+
+    private bool won = false;
+
     private float lastAttackTime = 0.0f;
 
     public float attackCooldown = 10.0f;   
@@ -16,8 +21,8 @@ public class AttackerController : MonoBehaviour
 
     void Start()
     {
-        animator = GetComponent<Animator>(); // Obtém o componente Animator
-        if (animator == null)
+        animatorAttacker = GetComponent<Animator>(); // Obtém o componente Animator
+        if (animatorAttacker == null)
         {
             Debug.LogError("Animator component not found on " + gameObject.name);
         }
@@ -28,12 +33,26 @@ public class AttackerController : MonoBehaviour
 
     void Update()
     {
-        AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+        AnimatorStateInfo stateInfoA = animatorAttacker.GetCurrentAnimatorStateInfo(0);
+        AnimatorStateInfo stateInfoD = animatorDefender.GetCurrentAnimatorStateInfo(0);
 
-        if(isAttacking && stateInfo.normalizedTime >= 1.0f && stateInfo.IsName("attack")){
+        if (stateInfoD.IsName("die")){
+                won = true;
+        }
+
+        
+        if (won)
+        {
+            animatorAttacker.ResetTrigger("Attacking");
+            animatorAttacker.ResetTrigger("Idle");
+            animatorAttacker.SetTrigger("Victory");
+        }
+
+
+        if(isAttacking && stateInfoA.normalizedTime >= 1.0f && stateInfoA.IsName("attack")){
             lastAttackTime = Time.time;
-            animator.ResetTrigger("Attacking");
-            animator.SetTrigger("Idle");
+            animatorAttacker.ResetTrigger("Attacking");
+            animatorAttacker.SetTrigger("Idle");
             AttackOccurred();
             isAttacking = false;
 
@@ -43,25 +62,19 @@ public class AttackerController : MonoBehaviour
             float randomValue = Random.Range(0f, 1f);
             if (randomValue <= attackProbability)
             {
-                Debug.Log(randomValue);
-                animator.ResetTrigger("Idle");
-                animator.SetTrigger("Attacking");
+                //Debug.Log(randomValue);
+                animatorAttacker.ResetTrigger("Idle");
+                animatorAttacker.SetTrigger("Attacking");
                 isAttacking = true;
 
             }
             else
             {
-                animator.ResetTrigger("Attacking");
-                animator.SetTrigger("Idle");
+                animatorAttacker.ResetTrigger("Attacking");
+                animatorAttacker.SetTrigger("Idle");
             }
         }
 
-        if (defender == null || !defender.gameObject.activeSelf)
-        {
-            animator.ResetTrigger("Attacking");
-            animator.ResetTrigger("Idle");
-            animator.SetTrigger("Victory");
-        }
     }
 
     void FindDefender()
@@ -69,6 +82,8 @@ public class AttackerController : MonoBehaviour
         GameObject defenderObject = GameObject.FindWithTag(defenderTag);
         if (defenderObject != null){
             defender = defenderObject.transform;
+            animatorDefender = defenderObject.GetComponent<Animator>();
+            
         }
     }
 
