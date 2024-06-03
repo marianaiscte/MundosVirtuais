@@ -15,7 +15,7 @@ public class AttackerController : MonoBehaviour
 
     private float lastAttackTime = 0.0f;
 
-    public float attackCooldown = 10.0f;   
+    public float attackCooldown = 2.0f;   
 
     private Transform defender = null;
 
