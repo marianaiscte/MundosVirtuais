@@ -578,7 +578,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   defenderTag: Defender
   attackProbability: 0.01
-  attackCooldown: 10
+  isAttacking: 0
+  attackCooldown: 1
 --- !u!1 &1112530207
 GameObject:
   m_ObjectHideFlags: 0
@@ -903,7 +904,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attckerTag: Attacker
-  blockProbability: 0.01
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -9,13 +9,13 @@ public class AttackerController : MonoBehaviour
     private Animator animatorDefender;
     public string defenderTag = "Defender"; 
     public float attackProbability = 0.01f;  
-    private bool isAttacking = false;
+    public bool isAttacking = false;
 
     private bool won = false;
 
     private float lastAttackTime = 0.0f;
 
-    public float attackCooldown = 10.0f;   
+    public float attackCooldown = 2.0f;   
 
     private Transform defender = null;
 
