@@ -49,7 +49,7 @@ public class DefenderController : MonoBehaviour
                 dodged = false;
         }
 
-        if(stateInfoDefender.normalizedTime >= 1.0f && stateInfoDefender.IsName("Dodge front")){
+        if(stateInfoDefender.normalizedTime >= 1.0f && stateInfoDefender.IsName("Dodge front") && !stateInfoAttacker.IsName("attack")){
             animator.ResetTrigger("DodgeFront");
             animator.SetTrigger("Idle");
         
@@ -59,21 +59,23 @@ public class DefenderController : MonoBehaviour
         if(stateInfoAttacker.IsName("attack") && !dodged && !isblocking && !stateInfoDefender.IsName("Block") && !stateInfoDefender.IsName("Dodge Back")){
             
             if(stateInfoDefender.IsName("Dodge front")){
+                animator.ResetTrigger("DodgeFront");
                 animator.SetTrigger("Die");
-            }
-            
-            float randomValue = Random.Range(0f, 1f);
-            Debug.Log(randomValue);
-            if(randomValue <= 0.3){
-                animator.ResetTrigger("Idle");
-                animator.SetTrigger("DodgeBack");
-                dodged = true;
-            }else if (randomValue < 0.9){
-                animator.ResetTrigger("Idle");
-                animator.SetTrigger("Block");
-                isblocking = true;
             }else{
-                animator.SetTrigger("Die");
+                
+                float randomValue = Random.Range(0f, 1f);
+                Debug.Log(randomValue);
+                if(randomValue <= 0.3){
+                    animator.ResetTrigger("Idle");
+                    animator.SetTrigger("DodgeBack");
+                    dodged = true;
+                }else if (randomValue < 0.9){
+                    animator.ResetTrigger("Idle");
+                    animator.SetTrigger("Block");
+                    isblocking = true;
+                }else{
+                    animator.SetTrigger("Die");
+                }
             }
 
         }
