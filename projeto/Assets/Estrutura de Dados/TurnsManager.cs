@@ -288,11 +288,13 @@ public class TurnsManager : MonoBehaviour
         game.UpdatePosPiece(p,unit.posFocoX,unit.posFocoY);
 
         UnityEngine.Vector3 targetPos = new UnityEngine.Vector3();
+
         GameObject charact = getPrefabs(unit);
-        
+        Debug.Log(charact);
         GameObject pieceObject = Instantiate(charact);
         pieceObject.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
         pieceObject.transform.position = mover.transform.position;
+        Debug.Log(pieceObject.transform.position);
 
         Renderer[] renderers = pieceObject.GetComponentsInChildren<Renderer>();
         foreach (Renderer renderer in renderers)
@@ -319,8 +321,13 @@ public class TurnsManager : MonoBehaviour
         
         //ObjectMover objm = mover.GetComponent<ObjectMover>();
         objectMover.StartMoving(mover, targetPos);
-        Destroy(pieceObject);
+        StartCoroutine(DestroyAfterSeconds(pieceObject, 2f));
+    }
 
+    private IEnumerator DestroyAfterSeconds(GameObject obj, float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+        Destroy(obj);
     }
 
     public void SaveTurn(){
