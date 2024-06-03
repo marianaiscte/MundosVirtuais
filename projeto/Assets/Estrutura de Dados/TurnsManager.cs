@@ -288,6 +288,21 @@ public class TurnsManager : MonoBehaviour
         game.UpdatePosPiece(p,unit.posFocoX,unit.posFocoY);
 
         UnityEngine.Vector3 targetPos = new UnityEngine.Vector3();
+        GameObject charact = getPrefabs(unit);
+        
+        GameObject pieceObject = Instantiate(charact);
+        pieceObject.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+        pieceObject.transform.position = mover.transform.position;
+
+        Renderer[] renderers = pieceObject.GetComponentsInChildren<Renderer>();
+        foreach (Renderer renderer in renderers)
+        {
+            Color oldColor = renderer.material.color;
+            Color newColor = new Color(oldColor.r, oldColor.g, oldColor.b, 0.5f);
+            Debug.Log("Old Color: " + oldColor);
+            Debug.Log("New Color: " + newColor);
+            renderer.material.color = newColor; // Ajusta a cor do material
+        }
 
         UnityEngine.Vector3[] positions = placePieces(unit.posFocoX,unit.posFocoY, gameTile);
         GameObject[] objects = game.getObjectsInTile(unit.posFocoX, unit.posFocoY);
@@ -304,7 +319,7 @@ public class TurnsManager : MonoBehaviour
         
         //ObjectMover objm = mover.GetComponent<ObjectMover>();
         objectMover.StartMoving(mover, targetPos);
-        
+        Destroy(pieceObject);
     }
 
     public void SaveTurn(){
