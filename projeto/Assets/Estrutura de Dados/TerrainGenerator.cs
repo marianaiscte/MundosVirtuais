@@ -108,10 +108,9 @@ public class TerrainGenerator : MonoBehaviour
             GenerateTerrain(maxElevation);
             PaintTerrain(maxElevation, terrainType);
             PlaceObjects(terrainElement, maxElevation);
-            FlattenCentralArea();
-            AddRandomGrassToTerrain();
-        }
-        else
+            FlattenCentralArea();    
+            PlaceAttackerAndDefenderAndChar();
+        }else
         {
             Debug.LogError("Terrain type not found in XML");
         }
@@ -307,55 +306,53 @@ public class TerrainGenerator : MonoBehaviour
         }
     }
 
-    void AddRandomGrassToTerrain()
-{
-    Texture2D[] grassTextures = Resources.LoadAll<Texture2D>("Terrain/grass");
-
-    if (grassTextures.Length == 0)
+    
+    void PlaceAttackerAndDefenderAndChar()
     {
-        Debug.LogError("Nenhuma textura de relva encontrada na pasta Resources/Terrain/grass");
-        return;
-    }
+        Vector3 centerPosition = new Vector3(terrainData.size.x / 2, 0, terrainData.size.z / 2);
+        centerPosition.y = terrain.SampleHeight(centerPosition);
 
-    Debug.Log("Número de texturas de relva encontradas: " + grassTextures.Length);
+        Vector3 attackerpos = new Vector3(centerPosition.x-1,centerPosition.y,centerPosition.z);
+        Vector3 defenderPosition = new Vector3(centerPosition.x+1,centerPosition.y,centerPosition.z);
+        Vector3 charpos = new Vector3(centerPosition.x,centerPosition.y,230);
 
-    DetailPrototype[] detailPrototypes = new DetailPrototype[grassTextures.Length];
-    for (int i = 0; i < grassTextures.Length; i++)
-    {
-        DetailPrototype grassDetail = new DetailPrototype();
-        grassDetail.prototypeTexture = grassTextures[i];
 
-        // Calcula a escala da textura de grama com base na resolução da textura
-        float scale = 1.0f / grassTextures[i].width; // Uma maneira simples de calcular a escala
-        grassDetail.minWidth = scale * 2; // Ajuste conforme necessário
-        grassDetail.maxWidth = scale * 4; // Ajuste conforme necessário
-        grassDetail.minHeight = scale * 2; // Ajuste conforme necessário
-        grassDetail.maxHeight = scale * 4; // Ajuste conforme necessário
 
-        detailPrototypes[i] = grassDetail;
-    }
+        GameObject attackerPrefab = Resources.Load<GameObject>("Mixamo swordWoman/Attacker");
+        GameObject defenderPrefab = Resources.Load<GameObject>("Mixamo swordWoman/Defender");
+        GameObject charPrefab = Resources.Load<GameObject>("Mixamo swordWoman/Main char");
 
-    terrainData.detailPrototypes = detailPrototypes;
-    int detailResolution = terrainData.detailResolution;
-    int[,] detailLayer = new int[detailResolution, detailResolution];
-    for (int y = 0; y < detailResolution; y++)
-    {
-        for (int x = 0; x < detailResolution; x++)
+
+        if (attackerPrefab != null)
         {
-            for (int i = 0; i < grassTextures.Length; i++)
-            {
-                if (Random.value < 0.6f) 
-                {
-                    detailLayer[x, y] = i; 
-                    break;
-                }
-            }
+            GameObject attacker = Instantiate(attackerPrefab, attackerpos, attackerPrefab.transform.rotation);
+            attacker.transform.parent = parentObject.transform;
         }
+        else
+        {
+            Debug.LogError("Attacker prefab not found.");
+        }
+
+        if (defenderPrefab != null)
+        {
+            GameObject defender = Instantiate(defenderPrefab, defenderPosition,  defenderPrefab.transform.rotation);
+            defender.transform.parent = parentObject.transform;
+        }
+        else
+        {
+            Debug.LogError("Defender prefab not found.");
+        }
+
+        if (charPrefab != null)
+        {
+            GameObject mainChar = Instantiate(charPrefab, charpos, charPrefab.transform.rotation);
+            
+        }
+        else
+        {
+            Debug.LogError("Main char prefab not found.");
+        }
+
     }
-
-    terrainData.SetDetailLayer(0, 0, 0, detailLayer);
-}
-
-
 
 }

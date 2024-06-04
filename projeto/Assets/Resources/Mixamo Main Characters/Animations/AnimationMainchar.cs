@@ -17,6 +17,9 @@ public class AnimationMainchar : MonoBehaviour
     bool justLand;
     bool jumping;
 	bool running;
+
+    public float groundCheckDistance = 1.0f;
+
     Transform playerTrans;
 
     void Start()
@@ -34,7 +37,6 @@ public class AnimationMainchar : MonoBehaviour
     void FixedUpdate(){
         Vector3 move = Vector3.zero;
         isGrounded = characterController.isGrounded;
-
 		AnimatorStateInfo stateInfo = playerAnim.GetCurrentAnimatorStateInfo(0);
 
 		if (Input.GetKey(KeyCode.W) && !stateInfo.IsName("Landing")){
