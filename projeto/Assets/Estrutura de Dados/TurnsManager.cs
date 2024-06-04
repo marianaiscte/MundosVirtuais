@@ -6,6 +6,8 @@ using System.Numerics;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using Quaternion = UnityEngine.Quaternion;
 using Vector3 = UnityEngine.Vector3;
 
@@ -22,11 +24,17 @@ public class TurnsManager : MonoBehaviour
     public List<Dictionary<(int, int), List<Piece>>> oldTurnsPositions = new List<Dictionary<(int, int), List<Piece>>>();
     private InputFieldManager inputFieldManager;
 
+    string player1name;
+    string player2name;
+
     public void StartGame(Game games)
     {
         this.game = games;
         this.turnsList = game.turns;
         this.board = game.board;
+        Player [] names = game.roles;
+        player1name = names[0].name;
+        player1name = names[1].name;
         state.currentTurn = 0;
         state.currentUnit = 0;
         inputFieldManager = FindObjectOfType<InputFieldManager>();
@@ -64,6 +72,9 @@ public class TurnsManager : MonoBehaviour
                     break;
 
                 case "attack":
+                    if(unit.piece.type == PieceType.Soldier){
+                        soldierAttack(unit);
+                    }
                     Animator animate = unit.piece.getGameO().GetComponent<Animator>();
                     animate.SetBool("attack",true);
                     coordenadasAtacadas.Add(unit.attack());
@@ -112,6 +123,20 @@ public class TurnsManager : MonoBehaviour
         handleDeaths(coordenadasAtacadas);
         state.currentUnit = 0;
         NextTurn();
+    }
+
+    public void soldierAttack(Unit unit){
+        Debug.Log("vou procurar");
+        List<Piece> pieces = game.getPiecesInTile(unit.posFocoX, unit.posFocoY);
+        foreach(Piece piece in pieces){
+            if(piece.type == PieceType.Soldier){
+                //Pause();
+                Debug.Log("DA LHEEEE");
+                //if(inputFieldManager.changeScene()){
+                  //  Play();
+                //}
+            }
+        }
     }
 
 
@@ -216,17 +241,34 @@ public class TurnsManager : MonoBehaviour
         switch(unit.piece.type.ToString())
         {
             case "Soldier":
-                prefabToSpawn = Resources.Load<GameObject>("Pieces/soldier");
+                if(unit.rolePlaying == player1name){
+                    prefabToSpawn = Resources.Load<GameObject>("Pieces/soldier1");
+                }else{
+                    prefabToSpawn = Resources.Load<GameObject>("Pieces/soldier2");
+                }
                 break;
+
             case "Archer":
-                prefabToSpawn = Resources.Load<GameObject>("Pieces/archer");
+            if(unit.rolePlaying == player1name){
+                prefabToSpawn = Resources.Load<GameObject>("Pieces/archer1");
+            }else{
+                prefabToSpawn = Resources.Load<GameObject>("Pieces/archer2");
+            }
                 break;
+
             case "Mage":
-                prefabToSpawn = Resources.Load<GameObject>("Pieces/mage");
+            if(unit.rolePlaying == player1name){
+                prefabToSpawn = Resources.Load<GameObject>("Pieces/mage1");
+            }else{
+                prefabToSpawn = Resources.Load<GameObject>("Pieces/mage1");
+
+            }
                 break;
+
             case "Catapult":
                 prefabToSpawn = Resources.Load<GameObject>("Pieces/catapult");
                 break;
+
             default:
                 Debug.LogWarning("Prefab não encontrado para o tipo de peça: " + unit.piece.type.ToString());
                 break;

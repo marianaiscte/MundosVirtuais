@@ -3,6 +3,8 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using TMPro;
+using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class InputFieldManager : MonoBehaviour
 {
@@ -18,6 +20,10 @@ public class InputFieldManager : MonoBehaviour
     public TextMeshProUGUI playerNameText;
     public TextMeshProUGUI turnCountText;
     public TextMeshProUGUI gameStatusText;
+
+    public GameObject changeScenePanel;
+    public Button yesChange;
+    public Button noChange;
 
     GameObject boardGameObject;
 
@@ -105,4 +111,28 @@ public class InputFieldManager : MonoBehaviour
             gameInfo.SetActive(true);
         }
     }
+
+    public bool changeScene(){
+        bool clicked = false;
+        Debug.Log("vou entrar na scene");
+        changeScenePanel.SetActive(true);
+        yesChange.onClick.AddListener(() => {
+            clicked = true;
+            SceneManager.LoadScene("Parte 2 terrain");
+    });
+        noChange.onClick.AddListener(() => {
+        clicked = true;
+        changeScenePanel.SetActive(false);
+    });
+        //StartCoroutine(waitForUserResponse(clicked));
+        return true;
+    }
+
+
+
+    private IEnumerator waitForUserResponse(bool clicked)
+    {
+        yield return new WaitUntil (() => clicked);
+    }
+    
 }
