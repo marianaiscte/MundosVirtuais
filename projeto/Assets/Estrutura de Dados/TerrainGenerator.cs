@@ -33,6 +33,10 @@ public class TerrainGenerator : MonoBehaviour
         GenerateTerrainFromXML(xmlFilePath, terrainType);
     }
 
+    void Update()
+    {}
+
+
     void FlattenCentralArea(){
         int resolution = terrainData.heightmapResolution;
         float[,] heights = terrainData.GetHeights(0, 0, resolution, resolution);

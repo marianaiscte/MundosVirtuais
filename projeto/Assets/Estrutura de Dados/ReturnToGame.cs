@@ -6,6 +6,8 @@ using UnityEngine.SceneManagement;
 public class ReturnToGame : MonoBehaviour
 {
     public void goBack(){
-            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync("Room2");
+        FindObjectOfType<SceneController>().GoBack();
     }
+
+    
 }

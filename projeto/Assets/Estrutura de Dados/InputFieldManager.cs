@@ -119,14 +119,18 @@ public class InputFieldManager : MonoBehaviour
 
     public void changeScene(){
         Debug.Log("vou entrar na scene");
-        turnsManager.Pause();
+        //turnsManager.Pause();
         changeScenePanel.SetActive(true);
-        yesChange.onClick.AddListener(() => {
-            SceneManager.LoadScene("Parte 2 terrain");
-    });
-        noChange.onClick.AddListener(() => {
-        changeScenePanel.SetActive(false);
-        turnsManager.Play();
-    });
     }
+
+
+    public void changeSceneYES(){
+        FindObjectOfType<SceneController>().ChangeScene();
+    }
+
+    public void changeSceneNO(){
+        changeScenePanel.SetActive(false);
+        //turnsManager.Play();
+    }
+
 }
