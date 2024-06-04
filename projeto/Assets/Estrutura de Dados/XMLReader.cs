@@ -188,7 +188,7 @@ public Game LoadXMLToRead(string xmlFilePath, GameObject boardGameObject){
                             pieceDictionary.Add(id, piece);
                         }
 
-                        Unit unit = new Unit(action, piece, x, y);
+                        Unit unit = new Unit(action, piece, x, y, role);
                         unitsInTurn.Add(unit);
                     } while (xmlr.ReadToNextSibling("unit"));
                 }

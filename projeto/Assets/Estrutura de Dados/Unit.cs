@@ -21,12 +21,15 @@ public class Unit
     public int posFocoX { get; private set; }
     public int posFocoY { get; private set; }
 
-    public Unit(ActionType actionType, Piece pieceInAction, int posX, int posY)
+    public string rolePlaying { get; private set; }
+
+    public Unit(ActionType actionType, Piece pieceInAction, int posX, int posY, string role)
     {
         action = actionType;
         piece = pieceInAction;
         posFocoX = posX;
         posFocoY = posY;
+        rolePlaying = role;
     }
 
     public void hold(){
