@@ -6,6 +6,8 @@ using System.Numerics;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using Quaternion = UnityEngine.Quaternion;
 using Vector3 = UnityEngine.Vector3;
 
@@ -64,6 +66,9 @@ public class TurnsManager : MonoBehaviour
                     break;
 
                 case "attack":
+                    if(unit.piece.type == PieceType.Soldier){
+                        soldierAttack(unit);
+                    }
                     Animator animate = unit.piece.getGameO().GetComponent<Animator>();
                     animate.SetBool("attack",true);
                     coordenadasAtacadas.Add(unit.attack());
@@ -112,6 +117,20 @@ public class TurnsManager : MonoBehaviour
         handleDeaths(coordenadasAtacadas);
         state.currentUnit = 0;
         NextTurn();
+    }
+
+    public void soldierAttack(Unit unit){
+        Debug.Log("vou procurar");
+        List<Piece> pieces = game.getPiecesInTile(unit.posFocoX, unit.posFocoY);
+        foreach(Piece piece in pieces){
+            if(piece.type == PieceType.Soldier){
+                //Pause();
+                Debug.Log("DA LHEEEE");
+                //if(inputFieldManager.changeScene()){
+                  //  Play();
+                //}
+            }
+        }
     }
 
 
