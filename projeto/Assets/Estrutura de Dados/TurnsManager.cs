@@ -132,11 +132,8 @@ public class TurnsManager : MonoBehaviour
         List<Piece> pieces = game.getPiecesInTile(unit.posFocoX, unit.posFocoY);
         foreach(Piece piece in pieces){
             if(piece.type == PieceType.Soldier){
-                //Pause();
                 Debug.Log("DA LHEEEE");
-                //if(inputFieldManager.changeScene()){
-                  //  Play();
-                //}
+                inputFieldManager.changeScene();
             }
         }
     }
