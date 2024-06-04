@@ -14,6 +14,7 @@ public class InputFieldManager : MonoBehaviour
     public Button NextTurn;
     public Button PreviousTurn;
 
+    public GameObject gameInfo;
     public TextMeshProUGUI playerNameText;
     public TextMeshProUGUI turnCountText;
     public TextMeshProUGUI gameStatusText;
@@ -95,5 +96,13 @@ public class InputFieldManager : MonoBehaviour
         playerNameText.text = "Player: " + playerName;
         turnCountText.text = "Turn: " + turnCount;
         gameStatusText.text = gameStatus;
+    }
+
+    public void showInfo(){
+        if (gameInfo.activeSelf){
+            gameInfo.SetActive(false);
+        }else{
+            gameInfo.SetActive(true);
+        }
     }
 }

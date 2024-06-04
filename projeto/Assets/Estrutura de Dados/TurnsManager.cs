@@ -364,7 +364,7 @@ public class TurnsManager : MonoBehaviour
             MakeTurn(turnsList[state.currentTurn]);
         }else{
             UnityEngine.Debug.Log("O jogo acabou!");
-            inputFieldManager.UpdateUI("", state.currentTurn, "Game Over");
+            inputFieldManager.UpdateUI("", state.currentTurn + 1, "Game Over");
         }
     }
 
@@ -455,7 +455,7 @@ public class TurnsManager : MonoBehaviour
             //Debug.Log("Parou");
             unitCoroutine = null; // Atualiza a variável turnCoroutine para null
             Time.timeScale = 0f;
-            inputFieldManager.UpdateUI("", state.currentTurn, "Paused");
+            inputFieldManager.UpdateUI("", state.currentTurn + 1, "Paused");
         }
     }
 
@@ -467,7 +467,7 @@ public class TurnsManager : MonoBehaviour
             Time.timeScale = 1f;
             //Debug.Log("Voltou a andar");
             MakeTurn(turnsList[state.currentTurn]); 
-            inputFieldManager.UpdateUI("", state.currentTurn, "Game in Progress");
+            inputFieldManager.UpdateUI("", state.currentTurn + 1, "Game in Progress");
         }
     }
 
