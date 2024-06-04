@@ -75,11 +75,13 @@ public class TurnsManager : MonoBehaviour
                     if(unit.piece.type == PieceType.Soldier){
                         soldierAttack(unit);
                     }
-                    Animator animate = unit.piece.getGameO().GetComponent<Animator>();
-                    animate.SetBool("attack",true);
-                    coordenadasAtacadas.Add(unit.attack());
-                    yield return new WaitForSeconds(1f);
-                    animate.SetBool("attack", false);
+                    if(unit.piece.type != PieceType.Catapult){
+                        Animator animate = unit.piece.getGameO().GetComponent<Animator>();
+                        animate.SetBool("attack",true);
+                        coordenadasAtacadas.Add(unit.attack());
+                        yield return new WaitForSeconds(1f);
+                        animate.SetBool("attack", false);
+                    }
                     GameObject audio = null;
                         GameObject projectileType = null;
                         if (unit.piece.type == PieceType.Archer){
@@ -166,12 +168,14 @@ public class TurnsManager : MonoBehaviour
         GameObject deathAudio = GameObject.Find("deathAudio");
 
         // Aciona a animação de "morte"
-        Animator animate = p.getGameO().GetComponent<Animator>();
-        animate.SetBool("died", true);
+        if(p.type != PieceType.Catapult){
+            Animator animate = p.getGameO().GetComponent<Animator>();
+            animate.SetBool("died", true);
 
-        // Espere pela duração da animação de "morte"
-        float deathAnimationDuration = animate.GetCurrentAnimatorClipInfo(0)[0].clip.length;
-        yield return new WaitForSeconds(1f);
+            // Espere pela duração da animação de "morte"
+            float deathAnimationDuration = animate.GetCurrentAnimatorClipInfo(0)[0].clip.length;
+            yield return new WaitForSeconds(1f);
+        }
         
         float elapsedTime = 0;
         Vector3 originalScale = peca.transform.localScale; 
