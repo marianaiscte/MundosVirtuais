@@ -12,6 +12,7 @@ public class InputFieldManager : MonoBehaviour
 
     public Button pauseB;
     public Button playB;
+    public Button restart;
 
     public Button NextTurn;
     public Button PreviousTurn;
@@ -86,6 +87,10 @@ public class InputFieldManager : MonoBehaviour
         playB.onClick.AddListener(turnsManager.Play);
         NextTurn.onClick.AddListener(nextTM);
         PreviousTurn.onClick.AddListener(previousTM);
+        restart.onClick.AddListener(() => {
+            turnsManager.state.currentTurn = 0;
+            turnsManager.PreviousTurn();
+        });
     }
 
 //esta lógica ainda não funciona bem
@@ -112,27 +117,16 @@ public class InputFieldManager : MonoBehaviour
         }
     }
 
-    public bool changeScene(){
-        bool clicked = false;
+    public void changeScene(){
         Debug.Log("vou entrar na scene");
+        turnsManager.Pause();
         changeScenePanel.SetActive(true);
         yesChange.onClick.AddListener(() => {
-            clicked = true;
             SceneManager.LoadScene("Parte 2 terrain");
     });
         noChange.onClick.AddListener(() => {
-        clicked = true;
         changeScenePanel.SetActive(false);
+        turnsManager.Play();
     });
-        //StartCoroutine(waitForUserResponse(clicked));
-        return true;
     }
-
-
-
-    private IEnumerator waitForUserResponse(bool clicked)
-    {
-        yield return new WaitUntil (() => clicked);
-    }
-    
 }
