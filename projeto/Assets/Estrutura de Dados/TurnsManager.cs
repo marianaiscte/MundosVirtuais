@@ -159,15 +159,22 @@ public class TurnsManager : MonoBehaviour
             yield return null;
         }
 
+        GameObject smoke = Resources.Load<GameObject>("Audio/SmokeEffect");
+        GameObject smokeEffect = Instantiate(smoke);
+
         if(deathAudio != null){
             Debug.Log("FDSSSS");
+            ParticleSystem ps = smoke.GetComponentInChildren<ParticleSystem>();
+            ps.transform.position = peca.transform.position;
+            ps.Play();
             deathAudio.GetComponent<AudioSource>().Play();
+            ps.Stop();
         }
 
         // Destrua o objeto da peça
         game.pieces.Remove(p);
         peca.SetActive(false);
-
+        StartCoroutine(DestroyAfterSeconds(smokeEffect, 5f));
 }
 
     public UnityEngine.Vector3[] placePieces(int x, int y, GameObject gameTile){
@@ -179,25 +186,25 @@ public class TurnsManager : MonoBehaviour
         switch(numberOfpieces){
             case 1:
                // objects[0] = cyl;
-                positions[0] = gameTilePos;
+                positions[0] = gameTilePos + new UnityEngine.Vector3(0, 0.025f, 0);
                 break;
             case 2:
-                positions[0] = gameTilePos + new UnityEngine.Vector3(-offset, 0, 0); 
+                positions[0] = gameTilePos + new UnityEngine.Vector3(-offset, 0.025f, 0); 
                 //objects[1] = cyl;
-                positions[1] = gameTilePos + new UnityEngine.Vector3(offset, 0, 0); 
+                positions[1] = gameTilePos + new UnityEngine.Vector3(offset, 0.025f, 0); 
                 break;
              case 3:
-                positions[0] = gameTilePos + new UnityEngine.Vector3(-offset, 0, 0); 
-                positions[1] = gameTilePos + new UnityEngine.Vector3(offset, 0, 0);
+                positions[0] = gameTilePos + new UnityEngine.Vector3(-offset, 0.025f, 0); 
+                positions[1] = gameTilePos + new UnityEngine.Vector3(offset, 0.025f, 0);
                 //objects[2] = cyl;
-                positions[2] = gameTilePos + new UnityEngine.Vector3(0, 0, offset); 
+                positions[2] = gameTilePos + new UnityEngine.Vector3(0, 0.025f, offset); 
                 break;
             case 4:
-                positions[0] = gameTilePos + new UnityEngine.Vector3(-offset, 0, -offset); 
-                positions[1] = gameTilePos + new UnityEngine.Vector3(offset, 0, -offset);
-                positions[2] = gameTilePos + new UnityEngine.Vector3(-offset, 0, offset); 
+                positions[0] = gameTilePos + new UnityEngine.Vector3(-offset, 0.025f, -offset); 
+                positions[1] = gameTilePos + new UnityEngine.Vector3(offset, 0.025f, -offset);
+                positions[2] = gameTilePos + new UnityEngine.Vector3(-offset, 0.025f, offset); 
                 //objects[3] = cyl;
-                positions[3] = gameTilePos + new UnityEngine.Vector3(offset, 0, offset); 
+                positions[3] = gameTilePos + new UnityEngine.Vector3(offset, 0.025f, offset); 
                 break;
         }
         return positions;
