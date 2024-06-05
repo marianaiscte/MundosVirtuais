@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class TerrainGenerator : MonoBehaviour
 {
-    public string xmlFilePath;
     public Terrain terrain;
     //public string terrainType;
     public GameObject parentObject; 
@@ -32,7 +31,21 @@ public class TerrainGenerator : MonoBehaviour
         GameObject gameObjectTerrain = GameObject.Find("terrainType");
         string terrainType = gameObjectTerrain.GetComponent<terrainTypeHolder>().terrainType.ToLower();
         terrainData.terrainLayers = GetTerrainLayersForType(terrainType); // Defina as camadas de textura
-        GenerateTerrainFromXML(xmlFilePath, terrainType);
+        TextAsset[] resources = Resources.LoadAll<TextAsset>("xml");
+         if (resources.Length > 0)
+        {
+            TextAsset firstXml = resources[0] as TextAsset;
+            string resourceName = firstXml.name;
+            string resourcePath = "Resources/xml/" + resourceName;
+            string xmlContent = firstXml.text;
+            Debug.Log("Xml encontrado: " + resourcePath);
+            GenerateTerrainFromXML(xmlContent, terrainType);         
+        }
+        else
+        {
+            Debug.Log("Nenhum recurso encontrado na pasta: Resources/xml");
+        }
+        
     }
 
 
@@ -91,9 +104,9 @@ public class TerrainGenerator : MonoBehaviour
             }
     }
 
-    void GenerateTerrainFromXML(string filePath, string terrainType)
+    void GenerateTerrainFromXML(string xmlContent, string terrainType)
     {
-        XDocument xmlDoc = XDocument.Load(filePath);
+        XDocument xmlDoc = XDocument.Parse(xmlContent);
         XElement terrainElement = null;
 
         foreach (XElement square in xmlDoc.Descendants("square"))

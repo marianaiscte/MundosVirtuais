@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<environment>
+	<square type="forest" maximum_elevation="10">
+		<object type="tree" density_low_altitute="0.8" density_high_altitute ="0.6" />
+		<object type="rock" density_low_altitute="0.1" density_high_altitute ="0.2" />
+	</square>
+	<square type="plain" maximum_elevation="1">
+		<object type="tree" density_low_altitute="0.2" density_high_altitute ="0.2" />
+		<object type="rock" density_low_altitute="0.1" density_high_altitute ="0.1" />
+		<object type="house" density_low_altitute="0.1" density_high_altitute ="0.1" />
+	</square>
+	<square type="desert" maximum_elevation="20">
+		<object type="rock" density_low_altitute="0.1" density_high_altitute ="0.8" />
+	</square>
+	<square type="mountain" maximum_elevation="100">
+		<object type="tree" density_low_altitute="0.1" density_high_altitute ="0.2" />
+		<object type="rock" density_low_altitute="0.3" density_high_altitute ="0.6" />
+	</square>
+	<square type="village" maximum_elevation="3">
+		<object type="tree" density_low_altitute="0.2" density_high_altitute ="0.1" />
+		<object type="house" density_low_altitute="0.4" density_high_altitute ="0.5" />
+	</square>
+</environment>
+
