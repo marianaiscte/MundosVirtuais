@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Xml.Schema;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
@@ -53,7 +54,7 @@ public class TurnsManager : MonoBehaviour
 
     private IEnumerator ExecuteTurn(Unit[] units)
     {
-    
+        List<(int, int, int)> fights = new List<(int, int, int)>();
         List<int []> coordenadasAtacadas = new List<int[]>();
         for (int i = state.currentUnit; i < units.Length; i++){
             Unit unit = units[state.currentUnit];
@@ -75,17 +76,20 @@ public class TurnsManager : MonoBehaviour
                     break;
 
                 case "attack":
+                    coordenadasAtacadas.Add(unit.attack());
                     if(unit.piece.type == PieceType.Soldier){
                         Tile tile = board.BoardDisplay[unit.posFocoX-1, unit.posFocoY-1];
                         if(tile.type != TileType.Sea){
                         TileType type = tile.type;
-                            soldierAttack(unit,type);
+                            bool soldierFight = soldierAttack(unit,type);
+                            if(soldierFight){
+                                fights.Add((unit.posFocoX, unit.posFocoY, unit.piece.id));
+                            }
                         }
                     }
                     if(unit.piece.type != PieceType.Catapult){
                         Animator animate = unit.piece.getGameO().GetComponent<Animator>();
                         animate.SetBool("attack",true);
-                        coordenadasAtacadas.Add(unit.attack());
                         yield return new WaitForSeconds(1f);
                         animate.SetBool("attack", false);
                     }
@@ -129,25 +133,27 @@ public class TurnsManager : MonoBehaviour
         }
           //yield return new WaitForSecondsRealtime(3f); 
 
-        handleDeaths(coordenadasAtacadas);
+        handleDeaths(coordenadasAtacadas, fights);
         state.currentUnit = 0;
         NextTurn();
     }
 
-    public void soldierAttack(Unit unit, TileType tileType){
+    public bool soldierAttack(Unit unit, TileType tileType){
         //Debug.Log("vou procurar");
+        bool soldierFight = false;
         List<Piece> pieces = game.getPiecesInTile(unit.posFocoX, unit.posFocoY);
         foreach(Piece piece in pieces){
             if(piece.type == PieceType.Soldier){
                 //Debug.Log("DA LHEEEE");
+                soldierFight = true;
                 inputFieldManager.changeScene(tileType.ToString());
             }
         }
+        return true;
     }
 
 
-    public void handleDeaths(List<int []> coordenadasAtacadas){
-
+    public void handleDeaths(List<int []> coordenadasAtacadas, List<(int, int, int)> fights){
         List<Piece> piecesToRemove = new List<Piece>();
 
         foreach(int[] coord in coordenadasAtacadas){
@@ -155,8 +161,12 @@ public class TurnsManager : MonoBehaviour
             int y = coord[1];
 
             foreach (Piece p in game.pieces){
-                if(p.x == x && p.y == y){
-                    piecesToRemove.Add(p);
+                if(p.x == x && p.y == y){                    
+                    if(fights.Exists(fight => fight.Item1 == x && fight.Item2 == y)){
+                        if(!fights.Exists(fight => fight.Item3 == p.id)){
+                            piecesToRemove.Add(p);  
+                        } 
+                    } else piecesToRemove.Add(p);
                 }
             }
         }
