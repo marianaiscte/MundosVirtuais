@@ -37,10 +37,16 @@ public class InputFieldManager : MonoBehaviour
     public string terraintypeString;
     public string nameTabuleiro;
 
+    private Button clearB;
+
     void Start(){
         //Debug.Log(boardGameObject.name);
         boardGameObject = gameObject;
         nameTabuleiro = boardGameObject.name;
+        GameObject clear = GameObject.Find("ClearTable");
+        clearB = clear.GetComponent<Button>();
+        clearB.GetComponent<CanvasRenderer>().SetAlpha(0.0f); // Tornar visível
+        clearB.interactable = false; // Tornar interativo
     }
 
     void Update(){
@@ -111,6 +117,15 @@ public class InputFieldManager : MonoBehaviour
         playerNameText.text = "Player: " + playerName;
         turnCountText.text = "Turn: " + turnCount;
         gameStatusText.text = gameStatus;
+        Debug.Log("irei entrar");
+        if(gameStatus=="Game Over" && turnsManager.state.currentTurn >= turnsManager.turnsList.Count - 1){
+            clearB.GetComponent<CanvasRenderer>().SetAlpha(1.0f); // Tornar visível
+            clearB.interactable = true; // Tornar interativo
+            TableSpawner scriptTS = GetComponentInParent<TableSpawner>();
+            clearB.onClick.AddListener(() => {
+                scriptTS.startNewGame();
+            });
+        }
     }
 
     public void showInfo(){

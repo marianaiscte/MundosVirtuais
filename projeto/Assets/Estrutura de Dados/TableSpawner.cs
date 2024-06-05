@@ -9,6 +9,8 @@ public class TableSpawner : MonoBehaviour
 {
     public GameObject gameTablePrefab; // O prefab da mesa de jogo
     public Transform tablePosition; // Referência ao primeiro GameObject vazio
+
+    GameObject table;
     
     /*public Button pauseB;
     public Button playB;
@@ -22,12 +24,12 @@ public class TableSpawner : MonoBehaviour
 
     void Start()
     {
-        GameObject table1 = InstantiateTable1();
+        table = InstantiateTable();
         
-        linkSetUp(table1);
+        linkSetUp(table);
     }
 
-    public GameObject InstantiateTable1(){
+    public GameObject InstantiateTable(){
         // Instancia a primeira mesa
         GameObject table1 = Instantiate(gameTablePrefab, tablePosition.position, tablePosition.rotation);
         table1.transform.SetParent(tablePosition);
@@ -56,6 +58,7 @@ public class TableSpawner : MonoBehaviour
         GameObject buttons = GameObject.Find("Buttons");
         Button[] bs = buttons.GetComponents<Button>();
         foreach(Button b in bs){
+            Debug.Log(b==null);
             b.GetComponent<CanvasRenderer>().SetAlpha(0.0f); // Tornar visível
             b.interactable = false; // Tornar interativo
         }
@@ -100,6 +103,12 @@ public class TableSpawner : MonoBehaviour
                 Debug.LogError("Objeto com a tag 'Buttons' não encontrado.");
             }
         }
+    }
+
+    public void startNewGame(){
+        Destroy(table);
+        table = InstantiateTable();
+        linkSetUp(table);
     }
 
 }
