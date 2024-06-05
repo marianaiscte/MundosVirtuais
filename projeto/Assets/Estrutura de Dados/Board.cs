@@ -17,6 +17,7 @@ public class Board
         BoardDisplay = boardDisplay;
     }
 
+// Função que inicializa as casas do tabuleiro com o material suposto
 public void InitializeTiles(GameObject boardGameObject){
 
     Material desertMat = Resources.Load<Material>("Materials/Desert");
@@ -48,7 +49,7 @@ public void InitializeTiles(GameObject boardGameObject){
     {
         for (int y = 0; y < this.Height; y++)
         {
-            // Obtém o tile na posição (x, y)
+            // Obtém a casa na posição (x, y)
             Tile tile = this.BoardDisplay[x, y];    
 
             // Calcula a posição do cubo em relação ao tabuleiro
@@ -58,7 +59,7 @@ public void InitializeTiles(GameObject boardGameObject){
                 -escala.z / 2f + (zC / 2f) + x * zC
             ) ;
 
-            // Cria o cubo
+            // Cria o objeto que vai corresponder à casa
             GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
             cube.transform.localScale = new Vector3(xC, 0.05f, zC); 
             cube.transform.SetParent(tilesParent.transform); 
@@ -67,7 +68,7 @@ public void InitializeTiles(GameObject boardGameObject){
 
             tile.associateCube(cube);
 
-            // Define a cor do cubo com base no tipo de tile
+            // Define o material do cubo com base no tipo de tile
             Renderer renderer = cube.GetComponent<Renderer>();
             switch (tile.type)
             {
@@ -104,11 +105,13 @@ public void InitializeTiles(GameObject boardGameObject){
     tilesParent.transform.rotation = rotacaoTabuleiro;
 }
 
-    public void BorderMaker(Vector3 scale, string wallType, Vector3 boardPosition, GameObject tilesParent) {
+// Função que cria as bordas do tabuleiro consoante o seu tamanho 
+public void BorderMaker(Vector3 scale, string wallType, Vector3 boardPosition, GameObject tilesParent) {
     GameObject wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
     Vector3 wallScale;
     Vector3 wallPositionOffset;
     
+    // Cria o tamanho de cada lado e sua posição
     switch (wallType) {
         case "left":
             wallScale = new Vector3(scale.x + 0.1f, 0.07f, 0.05f);

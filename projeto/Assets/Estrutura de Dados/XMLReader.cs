@@ -33,14 +33,22 @@ public class XMLReader : MonoBehaviour
         string xmlContent = File.ReadAllText(xmlFilePath);
         //Debug.Log(xmlContent);
         string dtdContent = File.ReadAllText("Assets/Resources/dtd/play-out.dtd"); 
-        //Debug.Log(dtdContent);
+        Debug.Log(dtdContent);
 
         File.WriteAllText("Assets/Resources/dtd/tempXml.xml", xmlContent);
+        foreach (string line in xmlContent.Split('\n'))
+        {
+            Debug.Log(line);
+        }
 
-        XmlReaderSettings settings = new XmlReaderSettings();
-        settings.DtdProcessing = DtdProcessing.Parse; 
-        settings.ValidationType = ValidationType.DTD; 
 
+        XmlReaderSettings settings = new XmlReaderSettings
+        {
+            DtdProcessing = DtdProcessing.Parse,
+            ValidationType = ValidationType.DTD,
+            //IgnoreWhitespace = true // Isso instrui o XmlReader a ignorar nós de espaço em branco
+        };
+        Debug.Log(settings==null);
         settings.ValidationEventHandler += new ValidationEventHandler(ValidationCallback);
 
             
@@ -66,10 +74,12 @@ public class XMLReader : MonoBehaviour
         List<Unit[]> allTurns = new List<Unit[]>();
 
         while(xmlr.Read()){
+            Debug.Log(xmlr.Name);
             //switch case para escolher o que fazer com cada tag?? Se calhar ter uma função para cada tipo de tag, senão aqui fica too much
             //todos eles vão ter de entrar dentro dos seus child -> pôr mais um loop nessas funções para percorrer filhos?
 
             if (xmlr.NodeType == XmlNodeType.Element){
+                Debug.Log(xmlr.Name);
                 switch (xmlr.Name){
                     case "game": 
                         game_name = DealWithGame(xmlr); 
@@ -130,7 +140,7 @@ public class XMLReader : MonoBehaviour
         while (xmlr.Read()) {
             if (xmlr.NodeType == XmlNodeType.Element) {
                 //Debug.Log("Entrei");
-                //Debug.Log(xmlr.Name);
+                Debug.Log(xmlr.Name);
                 // Verifica se a tag atual está na lista de tags esperadas
                 if (expectedTags.Contains(xmlr.Name)) {
             switch (xmlr.Name) {
