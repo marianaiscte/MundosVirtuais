@@ -27,7 +27,9 @@ public class TurnsManager : MonoBehaviour
     string player1name;
     string player2name;
 
-    public void StartGame(Game games)
+    GameObject boardGameObject;
+
+    public void StartGame(Game games, GameObject boardGameObjectgiven)
     {
         this.game = games;
         this.turnsList = game.turns;
@@ -38,6 +40,7 @@ public class TurnsManager : MonoBehaviour
         state.currentTurn = 0;
         state.currentUnit = 0;
         inputFieldManager = FindObjectOfType<InputFieldManager>();
+        boardGameObject = boardGameObjectgiven;
         UpdateUI();
         MakeTurn(turnsList[0]); // faz o primeiro turno
         //Debug.Log("começou");
@@ -207,7 +210,7 @@ public class TurnsManager : MonoBehaviour
         int numberOfpieces = game.CountPiecesInTile(x, y);
         UnityEngine.Vector3 gameTilePos = gameTile.transform.position;
         UnityEngine.Vector3[] positions = new UnityEngine.Vector3[numberOfpieces];
-        float offset = 0.2f; // Distância de offset do centro
+        float offset = 0.1f; // Distância de offset do centro
         //Debug.Log(numberOfpieces);
         switch(numberOfpieces){
             case 1:
@@ -294,8 +297,8 @@ public class TurnsManager : MonoBehaviour
             game.addPiece(p);
             GameObject pieceObject = Instantiate(prefabToSpawn);
             pieceObject.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
-
             unit.piece.associateObj(pieceObject);
+            pieceObject.transform.parent = boardGameObject.transform;
 
             UnityEngine.Vector3[] positions = placePieces(unit.posFocoX, unit.posFocoY, gameTile);
             GameObject[] objects = game.getObjectsInTile(unit.posFocoX, unit.posFocoY);

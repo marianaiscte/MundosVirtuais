@@ -77,7 +77,7 @@ public class InputFieldManager : MonoBehaviour
     public void StartXML(Game game){
         boardGameObject.AddComponent<TurnsManager>();
         turnsManager = boardGameObject.GetComponent<TurnsManager>();
-        turnsManager.StartGame(game);
+        turnsManager.StartGame(game,boardGameObject);
         controls();
         startListening = true;
     }
@@ -125,7 +125,7 @@ public class InputFieldManager : MonoBehaviour
 
 
     public void changeSceneYES(){
-        FindObjectOfType<SceneController>().ChangeScene();
+        SceneManager.LoadScene("Parte 2 terrain");
     }
 
     public void changeSceneNO(){
