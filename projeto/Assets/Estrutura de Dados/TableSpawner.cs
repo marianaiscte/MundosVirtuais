@@ -54,8 +54,12 @@ public class TableSpawner : MonoBehaviour
         ifm.restart = restartButtonTransform.GetComponent<Button>();
 
         GameObject buttons = GameObject.Find("Buttons");
-        buttons.SetActive(false);
-        
+        Button[] bs = buttons.GetComponents<Button>();
+        foreach(Button b in bs){
+            b.GetComponent<CanvasRenderer>().SetAlpha(0.0f); // Tornar visível
+            b.interactable = false; // Tornar interativo
+        }
+
         Transform canva = table.transform.Find("Canvas");
         Transform screen = canva.transform.Find("InitialScreen");
         Transform path = screen.transform.Find("path");
@@ -84,9 +88,14 @@ public class TableSpawner : MonoBehaviour
         p.onEndEdit.AddListener(OnEnd);
         void OnEnd(string input){
             if (buttons != null){
-                buttons.SetActive(true);
-                camM.GetComponent<GameObject>().SetActive(true);
-                showinfo.GetComponent<GameObject>().SetActive(true);
+                foreach(Button b in bs){
+                    b.GetComponent<CanvasRenderer>().SetAlpha(1.0f); // Tornar visível
+                    b.interactable = true; // Tornar interativo
+                }
+                switchCam.GetComponent<CanvasRenderer>().SetAlpha(1.0f); // Tornar visível
+                switchCam.interactable = true; // Tornar interativo
+                showgameinfo.GetComponent<CanvasRenderer>().SetAlpha(1.0f); // Tornar visível
+                showgameinfo.interactable = true; // Tornar interativo
             }else {
                 Debug.LogError("Objeto com a tag 'Buttons' não encontrado.");
             }

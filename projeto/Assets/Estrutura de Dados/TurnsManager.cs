@@ -356,6 +356,30 @@ public class TurnsManager : MonoBehaviour
         Renderer[] renderers = pieceObject.GetComponentsInChildren<Renderer>();
         foreach (Renderer renderer in renderers)
         {
+            // Obtenha o material original do renderer
+            Material originalMaterial = renderer.material;
+
+            // Crie uma cópia do material para não alterar o material original do prefab
+            Material transparentMaterial = new Material(originalMaterial)
+            {
+                // Defina o shader para Universal Render Pipeline/Lit
+                shader = Shader.Find("Universal Render Pipeline/Lit")
+            };
+
+            // Ajuste as propriedades do material para torná-lo transparente
+            transparentMaterial.SetFloat("_Surface", 1); // 1 é para Transparente
+            transparentMaterial.SetFloat("_Blend", (float)UnityEngine.Rendering.BlendMode.DstAlpha);
+            transparentMaterial.SetFloat("_SrcBlend", (float)UnityEngine.Rendering.BlendMode.SrcAlpha);
+            transparentMaterial.SetFloat("_DstBlend", (float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+            transparentMaterial.SetFloat("_ZWrite", 0);
+            transparentMaterial.DisableKeyword("_ALPHATEST_ON");
+            transparentMaterial.EnableKeyword("_ALPHABLEND_ON");
+            transparentMaterial.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+            transparentMaterial.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+            
+            // Aplique o material transparente ao renderer
+            renderer.material = transparentMaterial;
+
             Color oldColor = renderer.material.color;
             Color newColor = new Color(oldColor.r, oldColor.g, oldColor.b, 0.5f);
             //Debug.Log("Old Color: " + oldColor);

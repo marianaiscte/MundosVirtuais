@@ -652,7 +652,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &279133777
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2168,6 +2168,7 @@ Transform:
   - {fileID: 991955196}
   - {fileID: 2062511498}
   - {fileID: 1434126645}
+  - {fileID: 1238505942}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &916244366
@@ -3634,6 +3635,52 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6543581176825929603, guid: fa8eb2eb998ad8c489fe86794b62dfe1, type: 3}
   m_PrefabInstance: {fileID: 1236100211}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1238505941
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1238505942}
+  - component: {fileID: 1238505943}
+  m_Layer: 0
+  m_Name: TableL
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1238505942
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1238505941}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 10.26, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 849710507}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1238505943
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1238505941}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d426da58c5d294644a0236aca7b0c68d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameTablePrefab: {fileID: 1818858145858046231, guid: bcb4883c27d733e4a94fc41aea32a564, type: 3}
+  tablePosition: {fileID: 1238505942}
 --- !u!1001 &1240822431
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4442,7 +4489,7 @@ GameObject:
   - component: {fileID: 1434126645}
   - component: {fileID: 1434126646}
   m_Layer: 0
-  m_Name: Table
+  m_Name: TableR
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5513,7 +5560,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1735402110
 RectTransform:
   m_ObjectHideFlags: 0
