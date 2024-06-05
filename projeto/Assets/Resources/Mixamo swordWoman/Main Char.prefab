@@ -3078,6 +3078,7 @@ GameObject:
   - component: {fileID: 4462064620767029901}
   - component: {fileID: 1347104898773689214}
   - component: {fileID: 189304756065377278}
+  - component: {fileID: 1067862938502299271}
   m_Layer: 0
   m_Name: Main Char
   m_TagString: Untagged
@@ -3094,7 +3095,7 @@ Transform:
   m_GameObject: {fileID: 5321785096881472197}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 250, y: 2.28, z: 230}
+  m_LocalPosition: {x: 19.000055, y: -0.0000019073486, z: 14.301712}
   m_LocalScale: {x: 0.98, y: 0.98, z: 0.98}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3212,6 +3213,25 @@ MonoBehaviour:
   jumpForce: 5
   gravity: 9.81
   groundCheckDistance: 1
+--- !u!114 &1067862938502299271
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5321785096881472197}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c7f5eb0e9787e845941677d3ead921e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sounds:
+  - {fileID: 8300000, guid: 84791105067df53478958992842ecfae, type: 3}
+  - {fileID: 8300000, guid: 1566f48f49f81b94cadbcd77fa8c4542, type: 3}
+  - {fileID: 8300000, guid: 836771fe457405141922399479a18e20, type: 3}
+  - {fileID: 8300000, guid: dee6884d15b4fd54598398339eccd56f, type: 3}
+  - {fileID: 8300000, guid: 66e4050974c986248a410c835bc57790, type: 3}
+  - {fileID: 8300000, guid: e875b668d283efa4ba15cd552c413304, type: 3}
 --- !u!1 &5359189127701116725
 GameObject:
   m_ObjectHideFlags: 0
@@ -5909,7 +5929,7 @@ Transform:
   m_GameObject: {fileID: 8977678647484403077}
   serializedVersion: 2
   m_LocalRotation: {x: 0.26442382, y: -0.16042008, z: 0.044655137, w: 0.9499218}
-  m_LocalPosition: {x: 0.7237181, y: 1.33, z: -2.0816257}
+  m_LocalPosition: {x: 0.7237181, y: 1.33, z: -2.0816326}
   m_LocalScale: {x: 1.0204082, y: 1.0204082, z: 1.020408}
   m_ConstrainProportionsScale: 0
   m_Children:

@@ -24,7 +24,6 @@ public class AudioParte2 : MonoBehaviour
 
   void block(){
     AudioManager.instance.source.PlayOneShot(sounds[3]);
-
   }
 
   void die(){

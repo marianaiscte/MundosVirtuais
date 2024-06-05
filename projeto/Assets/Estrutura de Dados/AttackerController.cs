@@ -13,6 +13,8 @@ public class AttackerController : MonoBehaviour
 
     private bool won = false;
 
+    private bool firstWon = false;
+
     private float lastAttackTime = 0.0f;
 
     public float attackCooldown = 2.0f;   
@@ -40,8 +42,16 @@ public class AttackerController : MonoBehaviour
                 won = true;
         }
 
+        if(won && !firstWon && stateInfoA.IsName("Victory") &&  stateInfoA.normalizedTime >= 1.0f){
+            animatorAttacker.ResetTrigger("Victory");
+            animatorAttacker.SetTrigger("Idle");
+            won = false;
+            firstWon = true;
+
+        }
+
         
-        if (won)
+        if (won && !firstWon)
         {
             animatorAttacker.ResetTrigger("Attacking");
             animatorAttacker.ResetTrigger("Idle");
@@ -58,7 +68,7 @@ public class AttackerController : MonoBehaviour
 
         }
 
-        if (!isAttacking && Time.time >= lastAttackTime + attackCooldown){
+        if (!isAttacking && Time.time >= lastAttackTime + attackCooldown && !stateInfoD.IsName("die")){
             float randomValue = Random.Range(0f, 1f);
             if (randomValue <= attackProbability)
             {

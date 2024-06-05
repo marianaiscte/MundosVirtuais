@@ -41,9 +41,9 @@ public class XMLReader : MonoBehaviour
         settings.DtdProcessing = DtdProcessing.Parse; 
         settings.ValidationType = ValidationType.DTD; 
 
-        settings.ValidationEventHandler += new ValidationEventHandler(ValidationCallback);
+        ValidationEventHandler handler = new ValidationEventHandler(ValidationCallback);
+        settings.ValidationEventHandler += handler;
 
-            
         XmlReader xmlr = XmlReader.Create("Assets/Resources/dtd/tempXml.xml", settings);
         BoardGameObject = boardGameObject;
         return ReadXML(xmlr, boardGameObject);  

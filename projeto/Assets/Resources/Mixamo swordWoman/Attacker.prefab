@@ -4675,6 +4675,7 @@ GameObject:
   - component: {fileID: 9118530000161646519}
   - component: {fileID: 1203988175683955290}
   - component: {fileID: 8014248824887409946}
+  - component: {fileID: 7192134952668619279}
   m_Layer: 0
   m_Name: Attacker
   m_TagString: Attacker
@@ -4690,8 +4691,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7431216723893494658}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 249, y: 45.18, z: 237.8593}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 10.712489, y: 0, z: 23.794155}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4702,7 +4703,7 @@ Transform:
   - {fileID: 359395906817786901}
   - {fileID: 6214510422089555532}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &8709575574210874748
 Animator:
   serializedVersion: 5
@@ -4808,6 +4809,25 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 1.13, z: 0}
+--- !u!114 &7192134952668619279
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7431216723893494658}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c7f5eb0e9787e845941677d3ead921e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sounds:
+  - {fileID: 8300000, guid: 84791105067df53478958992842ecfae, type: 3}
+  - {fileID: 8300000, guid: 1566f48f49f81b94cadbcd77fa8c4542, type: 3}
+  - {fileID: 8300000, guid: 836771fe457405141922399479a18e20, type: 3}
+  - {fileID: 8300000, guid: dee6884d15b4fd54598398339eccd56f, type: 3}
+  - {fileID: 8300000, guid: 66e4050974c986248a410c835bc57790, type: 3}
+  - {fileID: 8300000, guid: e875b668d283efa4ba15cd552c413304, type: 3}
 --- !u!1 &7479985070945699930
 GameObject:
   m_ObjectHideFlags: 0
