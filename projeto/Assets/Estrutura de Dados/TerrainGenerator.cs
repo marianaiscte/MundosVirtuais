@@ -6,7 +6,7 @@ public class TerrainGenerator : MonoBehaviour
 {
     public string xmlFilePath;
     public Terrain terrain;
-    public string terrainType;
+    //public string terrainType;
     public GameObject parentObject; 
     private TerrainData terrainData;
     private List<Vector3> objectPositions = new List<Vector3>(); 
@@ -29,12 +29,11 @@ public class TerrainGenerator : MonoBehaviour
     void Start()
     {
         terrainData = terrain.terrainData;
+        GameObject gameObjectTerrain = GameObject.Find("terrainType");
+        string terrainType = gameObjectTerrain.GetComponent<terrainTypeHolder>().terrainType.ToLower();
         terrainData.terrainLayers = GetTerrainLayersForType(terrainType); // Defina as camadas de textura
         GenerateTerrainFromXML(xmlFilePath, terrainType);
     }
-
-    void Update()
-    {}
 
 
     void FlattenCentralArea(){

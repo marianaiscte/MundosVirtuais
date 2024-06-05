@@ -76,7 +76,11 @@ public class TurnsManager : MonoBehaviour
 
                 case "attack":
                     if(unit.piece.type == PieceType.Soldier){
-                        soldierAttack(unit);
+                        Tile tile = board.BoardDisplay[unit.posFocoX-1, unit.posFocoY-1];
+                        if(tile.type != TileType.Sea){
+                        TileType type = tile.type;
+                            soldierAttack(unit,type);
+                        }
                     }
                     if(unit.piece.type != PieceType.Catapult){
                         Animator animate = unit.piece.getGameO().GetComponent<Animator>();
@@ -130,13 +134,13 @@ public class TurnsManager : MonoBehaviour
         NextTurn();
     }
 
-    public void soldierAttack(Unit unit){
-        Debug.Log("vou procurar");
+    public void soldierAttack(Unit unit, TileType tileType){
+        //Debug.Log("vou procurar");
         List<Piece> pieces = game.getPiecesInTile(unit.posFocoX, unit.posFocoY);
         foreach(Piece piece in pieces){
             if(piece.type == PieceType.Soldier){
-                Debug.Log("DA LHEEEE");
-                inputFieldManager.changeScene();
+                //Debug.Log("DA LHEEEE");
+                inputFieldManager.changeScene(tileType.ToString());
             }
         }
     }
@@ -192,7 +196,7 @@ public class TurnsManager : MonoBehaviour
         GameObject smokeEffect = Instantiate(smoke);
 
         if(deathAudio != null){
-            Debug.Log("FDSSSS");
+            //Debug.Log("FDSSSS");
             ParticleSystem ps = smoke.GetComponentInChildren<ParticleSystem>();
             ps.transform.position = peca.transform.position;
             ps.Play();
@@ -354,8 +358,8 @@ public class TurnsManager : MonoBehaviour
         {
             Color oldColor = renderer.material.color;
             Color newColor = new Color(oldColor.r, oldColor.g, oldColor.b, 0.5f);
-            Debug.Log("Old Color: " + oldColor);
-            Debug.Log("New Color: " + newColor);
+            //Debug.Log("Old Color: " + oldColor);
+            //Debug.Log("New Color: " + newColor);
             renderer.material.color = newColor; // Ajusta a cor do material
         }
 

@@ -34,9 +34,13 @@ public class InputFieldManager : MonoBehaviour
 
     private bool startListening = false;
 
+    public string terraintypeString;
+    public string nameTabuleiro;
+
     void Start(){
         //Debug.Log(boardGameObject.name);
         boardGameObject = gameObject;
+        nameTabuleiro = boardGameObject.name;
     }
 
     void Update(){
@@ -117,14 +121,35 @@ public class InputFieldManager : MonoBehaviour
         }
     }
 
-    public void changeScene(){
-        Debug.Log("vou entrar na scene");
+    public void changeScene(string tiletype){
         //turnsManager.Pause();
         changeScenePanel.SetActive(true);
+        terraintypeString = tiletype;
+        GameObject gameObjectTerrainType = GameObject.Find("terrainType");
+        if (gameObjectTerrainType != null)
+        {
+            // Acesse a variável pública contendo a string
+            terrainTypeHolder stringTerrainComp = gameObjectTerrainType.GetComponent<terrainTypeHolder>();
+            
+            if (stringTerrainComp != null)
+            {
+               stringTerrainComp.terrainType = terraintypeString;
+            }
+            else
+            {
+                Debug.LogWarning("Componente StringHolder não encontrado no GameObject.");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("GameObject não encontrado com o nome especificado.");
+        }
     }
+    
 
 
     public void changeSceneYES(){
+        //Debug.Log("vou entrar na scene");
         SceneManager.LoadScene("Parte 2 terrain");
     }
 
