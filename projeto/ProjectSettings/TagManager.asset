@@ -8,6 +8,7 @@ TagManager:
   - Ground
   - Defender
   - Attacker
+  - Controls
   layers:
   - Default
   - TransparentFX

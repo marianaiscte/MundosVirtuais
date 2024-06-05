@@ -1,61 +1,97 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class TableSpawner : MonoBehaviour
 {
     public GameObject gameTablePrefab; // O prefab da mesa de jogo
-    public Transform tablePosition1; // Referência ao primeiro GameObject vazio
-    public Transform tablePosition2; // Referência ao segundo GameObject vazio
-    public Button pauseB;
+    public Transform tablePosition; // Referência ao primeiro GameObject vazio
+    
+    /*public Button pauseB;
     public Button playB;
     public Button NextTurn;
     public Button PreviousTurn;
-    public Button XMLLoader;
+    public Button Restart;
     public GameObject mainCamera;
     public GameObject topViewCamera;
-    public Light luz;
-    public Slider lightSlider;
+    public GameObject MiniMap;
+    public GameObject GameControls; */
 
     void Start()
     {
-        // Instancia a primeira mesa
-        GameObject table1 = Instantiate(gameTablePrefab, tablePosition1.position, tablePosition1.rotation);
-        table1.transform.SetParent(tablePosition1);
+        GameObject table1 = InstantiateTable1();
         
-        // Instancia a segunda mesa
-        GameObject table2 = Instantiate(gameTablePrefab, tablePosition2.position, tablePosition2.rotation);
-        table2.transform.SetParent(tablePosition2);
-
-        Transform Tabuleiro = table1.transform.Find("Tabuleiro");
-        InputFieldManager ifm = Tabuleiro.GetComponent<InputFieldManager>();
-        Debug.Log(ifm==null);
-        ifm.pauseB = pauseB;
-        ifm.playB = playB;
-        ifm.NextTurn = NextTurn;
-        ifm.PreviousTurn = PreviousTurn;
-
-        Transform deskS = table1.transform.Find("(Prb)Desk1 (1)");
-        Transform desk1 = deskS.transform.Find("desk1");
-        DeskScript desk = desk1.GetComponent<DeskScript>();
-        Debug.Log(desk==null);
-        desk.XMLLoader = XMLLoader;
-        //desk.Start();
-
-        Transform camM = table1.transform.Find("CameraManager");
-        UiManager uim = camM.GetComponent<UiManager>();
-        Debug.Log(uim==null);
-        uim.mainCamera = mainCamera;
-        //este temos de mudar para dar para as duas mesas
-        uim.topViewCamera = topViewCamera;
-       
-        Transform deskLight = table1.transform.Find("(Prb)DeskLight");
-        Transform dl = deskLight.transform.Find("deskLight");
-        Transform lamp = dl.transform.Find("deskLight_base");
-        LampLight deskLamp = lamp.GetComponent<LampLight>();
-        deskLamp.luz = luz;
-        deskLamp.lightSlider = lightSlider;
+        linkSetUp(table1);
     }
+
+    public GameObject InstantiateTable1(){
+        // Instancia a primeira mesa
+        GameObject table1 = Instantiate(gameTablePrefab, tablePosition.position, tablePosition.rotation);
+        table1.transform.SetParent(tablePosition);
+        Debug.Log("criei1");
+        return table1;
+    }
+
+    public void linkSetUp(GameObject table){
+
+        Transform Tabuleiro = table.transform.Find("Tabuleiro");
+        InputFieldManager ifm = Tabuleiro.GetComponent<InputFieldManager>();
+        GameObject GameControls = GameObject.Find("GameControls");
+        Debug.Log(ifm==null);
+        GameObject pauseButtonTransform = GameObject.Find("Pause");
+        Debug.Log(pauseButtonTransform==null);
+        ifm.pauseB = pauseButtonTransform.GetComponent<Button>();
+        GameObject playButtonTransform = GameObject.Find("Play");
+        ifm.playB = playButtonTransform.GetComponent<Button>();
+        GameObject nextButtonTransform = GameObject.Find("NextTurn");
+        ifm.NextTurn = nextButtonTransform.GetComponent<Button>();
+        GameObject previousButtonTransform = GameObject.Find("PreviousTurn");
+        ifm.PreviousTurn = previousButtonTransform.GetComponent<Button>();
+        GameObject restartButtonTransform = GameObject.Find("Restart");
+        ifm.restart = restartButtonTransform.GetComponent<Button>();
+
+        GameObject buttons = GameObject.Find("Buttons");
+        buttons.SetActive(false);
+        
+        Transform canva = table.transform.Find("Canvas");
+        Transform screen = canva.transform.Find("InitialScreen");
+        Transform path = screen.transform.Find("path");
+        TMP_InputField p = path.GetComponent<TMP_InputField>();
+        Debug.Log(path);
+        Debug.Log(p==null);
+
+        Transform camM = canva.transform.Find("CameraSwitch");
+        Transform topview = table.transform.Find("TopViewCamera");
+        Camera topviewcam = topview.GetComponent<Camera>();
+        Debug.Log(camM==null);
+        Button switchCam = camM.GetComponent<Button>();
+        UiManager uim = topview.GetComponent<UiManager>();
+        switchCam.onClick.AddListener(changescene);
+        void changescene(){
+            uim.changeCamera();
+        }
+        Debug.Log(uim==null);
+        uim.mainCamera = GameObject.Find("Main Camera");
+        uim.miniMap = GameObject.Find("MiniMap");
+
+        Transform showinfo = canva.transform.Find("ShowGameInfo");
+        Button showgameinfo = showinfo.GetComponent<Button>();
+        showgameinfo.onClick.AddListener(ifm.showInfo);
+
+        p.onEndEdit.AddListener(OnEnd);
+        void OnEnd(string input){
+            if (buttons != null){
+                buttons.SetActive(true);
+                camM.GetComponent<GameObject>().SetActive(true);
+                showinfo.GetComponent<GameObject>().SetActive(true);
+            }else {
+                Debug.LogError("Objeto com a tag 'Buttons' não encontrado.");
+            }
+        }
+    }
+
 }
 
