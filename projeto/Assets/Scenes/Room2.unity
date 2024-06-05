@@ -2722,6 +2722,7 @@ GameObject:
   m_Component:
   - component: {fileID: 582194636}
   - component: {fileID: 582194637}
+  - component: {fileID: 582194638}
   m_Layer: 0
   m_Name: terrainType
   m_TagString: Untagged
@@ -2738,11 +2739,11 @@ Transform:
   m_GameObject: {fileID: 582194635}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 247.0835, y: 170.55737, z: 214.32985}
+  m_LocalPosition: {x: 252.53337, y: 172.49776, z: 239.54016}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 849710507}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &582194637
 MonoBehaviour:
@@ -2757,6 +2758,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   terrainType: 
+--- !u!114 &582194638
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 582194635}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aef73720b9776ac4489e76564f7eb179, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &588778255
 GameObject:
   m_ObjectHideFlags: 0
@@ -3579,7 +3592,6 @@ Transform:
   - {fileID: 367911199}
   - {fileID: 991955196}
   - {fileID: 2062511498}
-  - {fileID: 582194636}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &916244366
@@ -10063,3 +10075,4 @@ SceneRoots:
   - {fileID: 235614703}
   - {fileID: 1669506293}
   - {fileID: 849710507}
+  - {fileID: 582194636}
