@@ -18,22 +18,19 @@ public class UiManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        /*
-        if (Input.GetKeyDown(KeyCode.C) && !cKeyPressed){
-            Debug.Log("C pressed");
-            changeCamera();
-        }
-        
-        */
+
     }
 
+    // Lida com a mudança de camera e com o minimapa
     public void changeCamera(){
+        // Se a camera principal estiver ativa, esta é desativada e é ativada a camera superior à mesa e o minimapa tambem fica visivel
         if(mainCamera.activeSelf)
         {
             mainCamera.SetActive(false);
             topViewCamera.SetActive(true);
             miniMap.SetActive(true);
         }
+        // alteracoes inversas
         else
         {
             mainCamera.SetActive(true);
