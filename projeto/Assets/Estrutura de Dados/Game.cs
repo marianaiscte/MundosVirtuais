@@ -23,11 +23,13 @@ public class Game{
         pieces = new List<Piece>();
     }
 
+    // Função para adicionar uma peça ao jogo
     public void addPiece(Piece piece){
         piece.game = this;
         pieces.Add(piece);
     }
 
+    // Função para atualizar a posição de uma peça
     public void UpdatePosPiece(Piece piece, int newX, int newY){
     if (pieces.Contains(piece)){
         piece.x = newX;
@@ -38,6 +40,7 @@ public class Game{
 
     }
 
+    // Função para contar o número de peças numa posição específica do tabuleiro
     public int CountPiecesInTile(int x, int y){
         int count = 0;
         foreach (Piece p in pieces){
@@ -48,6 +51,7 @@ public class Game{
     return count;
     }
 
+    // Função para obter os GameObjects nas posições específicas do tabuleiro
     public GameObject[] getObjectsInTile(int x, int y){
         int n = CountPiecesInTile(x, y);
         GameObject[] objects = new GameObject[n];
@@ -61,6 +65,7 @@ public class Game{
         return objects;
     }
 
+    // Função para obter todos os GameObjects no jogo
     public List<GameObject> getAllObjects(){
         List<GameObject> allPieces = new List<GameObject>();
         for (int i = 0; i < pieces.Count; i++){
@@ -71,7 +76,7 @@ public class Game{
         return allPieces;
     }
 
-    
+    // Função para obter todas as peças numa posição específica do tabuleiro
     public List<Piece> getPiecesInTile(int x, int y){
         int n = CountPiecesInTile(x, y);
         List<Piece> allPiecesInTile = new List<Piece>();
@@ -85,7 +90,7 @@ public class Game{
         return allPiecesInTile;
     }
 
-    
+    // Função para salvar as posições antigas das peças para todos os turnos anteriores    
     public void SaveOldPositions(List<Dictionary<(int, int), List<Piece>>> oldTurnsPositions){
         foreach(Piece piece in pieces){
             List<(int, int)> oldPositions = new List<(int, int)>();

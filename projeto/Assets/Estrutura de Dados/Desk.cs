@@ -5,21 +5,21 @@ using UnityEngine.UI;
 
 public class DeskScript : MonoBehaviour
 {
-    public Button XMLLoader; // Reference to the button you want to activate
+    public Button XMLLoader; // Referência ao botão que vai ser ativado
 
-    public bool gameIsPlaying = false;
+    public bool gameIsPlaying = false; // Booleano que serve para o utilizador não ativar o botão a meio de um jogo
 
     void Start()
     {
         XMLLoader.gameObject.SetActive(false);
     }
 
+    // Quando o objeto é clicado
     void OnMouseDown()
     {
-        if(!gameIsPlaying){// Activate the first button when the object is clicked
-        Debug.Log("clicaste na mesa");
-        XMLLoader.gameObject.SetActive(true);
-        gameIsPlaying = true;
+        if(!gameIsPlaying){
+            XMLLoader.gameObject.SetActive(true);
+            gameIsPlaying = true;
         }
         
     }
