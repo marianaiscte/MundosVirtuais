@@ -8,6 +8,10 @@ using Vector3 = UnityEngine.Vector3;
 using Quaternion = UnityEngine.Quaternion;
 using System.Diagnostics;
 using Debug = UnityEngine.Debug;
+using System.Xml.Schema;
+using System.IO;
+using System.Xml.Resolvers;
+
 
 public class XMLReader : MonoBehaviour
 {
@@ -23,26 +27,38 @@ public class XMLReader : MonoBehaviour
 
     Dictionary<int, Piece> pieceDictionary = new Dictionary<int, Piece>();
 
-public Game LoadXMLToRead(string xmlFilePath, GameObject boardGameObject){        
-        XmlReader xmlr = XmlReader.Create(xmlFilePath);
-        BoardGameObject = boardGameObject;
-        return ReadXML(xmlr, boardGameObject);        /* Carrega o ficheiro XML da pasta Resources (mudar isto)
-        TextAsset xmlAsset = Resources.Load<TextAsset>(xmlFilePath);
-
-        if (xmlAsset != null){
-            // Cria um novo leitor XML
-            XmlReader xmlr = XmlReader.Create(new System.IO.StringReader(xmlAsset.text));
+    public Game LoadXMLToRead(string xmlFilePath, GameObject boardGameObject) {     
+ 
         
-            // Chama uma função para processar o XML
-            return ReadXML(xmlr);
-        }else {
-            Debug.LogError("Ficheiro XML não encontrado: " + xmlFilePath);
-            return null;
-            }*/
+        string xmlContent = File.ReadAllText(xmlFilePath);
+        //Debug.Log(xmlContent);
+        string dtdContent = File.ReadAllText("Assets/Resources/dtd/play-out.dtd"); 
+        //Debug.Log(dtdContent);
+
+        File.WriteAllText("Assets/Resources/dtd/tempXml.xml", xmlContent);
+
+        XmlReaderSettings settings = new XmlReaderSettings();
+        settings.DtdProcessing = DtdProcessing.Parse; 
+        settings.ValidationType = ValidationType.DTD; 
+
+        settings.ValidationEventHandler += new ValidationEventHandler(ValidationCallback);
+
+            
+        XmlReader xmlr = XmlReader.Create("Assets/Resources/dtd/tempXml.xml", settings);
+        BoardGameObject = boardGameObject;
+        return ReadXML(xmlr, boardGameObject);  
+           
+    }
+
+    private void ValidationCallback(object sender, ValidationEventArgs args) {
+    if (args.Severity == XmlSeverityType.Warning)
+        Debug.LogWarning("Warning: " + args.Message);
+    else if (args.Severity == XmlSeverityType.Error)
+        Debug.LogError("Error: " + args.Message);
     }
 
     public Game ReadXML(XmlReader xmlr, GameObject boardGameObject){
-        //coisas para checkar DTD
+
 
         string game_name = ""; // Declare outside the switch statement
         Player[] roles = null;
