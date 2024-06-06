@@ -12,20 +12,9 @@ public class TableSpawner : MonoBehaviour
 
     GameObject table;
     
-    /*public Button pauseB;
-    public Button playB;
-    public Button NextTurn;
-    public Button PreviousTurn;
-    public Button Restart;
-    public GameObject mainCamera;
-    public GameObject topViewCamera;
-    public GameObject MiniMap;
-    public GameObject GameControls; */
-
     void Start()
     {
         table = InstantiateTable();
-        
         linkSetUp(table);
     }
 
@@ -55,14 +44,6 @@ public class TableSpawner : MonoBehaviour
         GameObject restartButtonTransform = GameObject.Find("Restart");
         ifm.restart = restartButtonTransform.GetComponent<Button>();
 
-        GameObject buttons = GameObject.Find("Buttons");
-        Button[] bs = buttons.GetComponents<Button>();
-        foreach(Button b in bs){
-            Debug.Log(b==null);
-            b.GetComponent<CanvasRenderer>().SetAlpha(0.0f); // Tornar visível
-            b.interactable = false; // Tornar interativo
-        }
-
         Transform canva = table.transform.Find("Canvas");
         Transform screen = canva.transform.Find("InitialScreen");
         Transform path = screen.transform.Find("path");
@@ -70,39 +51,32 @@ public class TableSpawner : MonoBehaviour
         Debug.Log(path);
         Debug.Log(p==null);
 
-        Transform camM = canva.transform.Find("CameraSwitch");
+        Transform show = canva.transform.Find("show");
+        Transform camM = show.transform.Find("CameraSwitch");
         Transform topview = table.transform.Find("TopViewCamera");
-        Camera topviewcam = topview.GetComponent<Camera>();
+        GameObject topviewcam = topview.GetComponent<GameObject>();
         Debug.Log(camM==null);
         Button switchCam = camM.GetComponent<Button>();
         UiManager uim = topview.GetComponent<UiManager>();
+        uim.mainCamera = GameObject.Find("Main Camera");
+        uim.miniMap = GameObject.Find("MiniMap");
         switchCam.onClick.AddListener(changescene);
         void changescene(){
             uim.changeCamera();
         }
         Debug.Log(uim==null);
-        uim.mainCamera = GameObject.Find("Main Camera");
-        uim.miniMap = GameObject.Find("MiniMap");
 
-        Transform showinfo = canva.transform.Find("ShowGameInfo");
-        Button showgameinfo = showinfo.GetComponent<Button>();
-        showgameinfo.onClick.AddListener(ifm.showInfo);
+        GameObject showbutton = show.gameObject;
+        showbutton.SetActive(false);
 
         p.onEndEdit.AddListener(OnEnd);
         void OnEnd(string input){
-            if (buttons != null){
-                foreach(Button b in bs){
-                    b.GetComponent<CanvasRenderer>().SetAlpha(1.0f); // Tornar visível
-                    b.interactable = true; // Tornar interativo
-                }
-                switchCam.GetComponent<CanvasRenderer>().SetAlpha(1.0f); // Tornar visível
-                switchCam.interactable = true; // Tornar interativo
-                showgameinfo.GetComponent<CanvasRenderer>().SetAlpha(1.0f); // Tornar visível
-                showgameinfo.interactable = true; // Tornar interativo
-            }else {
-                Debug.LogError("Objeto com a tag 'Buttons' não encontrado.");
+                Debug.Log("AHHHHHH");
+                showbutton.SetActive(true);
             }
-        }
+
+        Transform clearTable = canva.transform.Find("ClearTable");
+        ifm.clearB = clearTable.GetComponent<Button>();
     }
 
     public void startNewGame(){

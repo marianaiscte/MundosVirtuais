@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE game SYSTEM "play-out.dtd">
 <game name="game test case">
@@ -11,6 +12,17 @@
 		<village/> <forest/> <sea/><village/> <forest/>
 		<sea/> <plain/> <mountain/><village/> <forest/>
 		<village/> <forest/> <sea/><village/> <forest/>
+=======
+<?xml version="1.0"?>
+<game>
+	<roles>
+		<role name="Bruno"/>
+		<role name="Ana"/>
+	</roles>
+	<board width="8" height="2">
+		<sea/><sea/><sea/><sea/><sea/><sea/><sea/><sea/>
+		<village/><desert/><desert/><desert/><desert/><desert/><desert/><desert/>
+>>>>>>> Stashed changes
 	</board>
 	<turns>
 		<turn>
@@ -30,6 +42,9 @@
 			<unit id="1" role="player 1" type="soldier" action="attack" x="3" y="2"/>
 
 			
+		</turn>
+		<turn>
+			<unit id="1" role="Bruno" type="archer" action="move_to" x="3" y="1" />
 		</turn>
 	</turns>
 </game>

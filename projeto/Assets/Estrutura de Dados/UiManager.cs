@@ -23,9 +23,14 @@ public class UiManager : MonoBehaviour
 
     // Lida com a mudança de camera e com o minimapa
     public void changeCamera(){
+<<<<<<< Updated upstream
         // Se a camera principal estiver ativa, esta é desativada e é ativada a camera superior à mesa e o minimapa tambem fica visivel
+=======
+        Debug.Log("1223");
+>>>>>>> Stashed changes
         if(mainCamera.activeSelf)
         {
+            Debug.Log("123143");
             mainCamera.SetActive(false);
             topViewCamera.SetActive(true);
             miniMap.SetActive(true);
