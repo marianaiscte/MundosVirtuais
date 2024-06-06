@@ -65,7 +65,13 @@ public class TableSpawner : MonoBehaviour
 
         // Associa as câmeras da cena ao script associado ao botão acima
         uim.mainCamera = GameObject.Find("Main Camera");
-        uim.miniMap = GameObject.Find("MiniMap");
+        //uim.miniMap = GameObject.Find("MiniMap");
+        //uim.miniMap.SetActive(false);
+
+        //Transform miniMap = canva.transform.Find("MiniMap");
+        //uim.miniMap.SetActive(false);
+
+        
 
         // Ação a executar ao pressionar o botão acima
         switchCam.onClick.AddListener(changescene);
@@ -86,8 +92,6 @@ public class TableSpawner : MonoBehaviour
                 showbutton.SetActive(true);
             }
 
-        Transform clearTable = canva.transform.Find("ClearTable");
-        ifm.clearB = clearTable.GetComponent<Button>();
     }
 
 // Função para começar um jogo novo numa mesa onde acabou um jogo

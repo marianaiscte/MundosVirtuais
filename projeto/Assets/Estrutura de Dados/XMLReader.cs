@@ -30,23 +30,22 @@ public class XMLReader : MonoBehaviour
     public Game LoadXMLToRead(string xmlFilePath, GameObject boardGameObject) {     
  
         
-        string xmlContent = File.ReadAllText(xmlFilePath);
+        //string xmlContent = File.ReadAllText(xmlFilePath);
         //Debug.Log(xmlContent);
-        string dtdContent = File.ReadAllText("Assets/Resources/dtd/play-out.dtd"); 
+        //string dtdContent = File.ReadAllText("Assets/Resources/dtd/play-out.dtd"); 
         //Debug.Log(dtdContent);
         
-        File.WriteAllText("Assets/Resources/dtd/tempXml.xml", xmlContent); // escreve o conteudo do xml num ficheiro temporario
+        //File.WriteAllText("Assets/Resources/dtd/tempXml.xml", xmlContent); // escreve o conteudo do xml num ficheiro temporario
 
         XmlReaderSettings settings = new XmlReaderSettings
         {
             DtdProcessing = DtdProcessing.Parse,
             ValidationType = ValidationType.DTD,
-            //IgnoreWhitespace = true // Isso instrui o XmlReader a ignorar nós de espaço em branco
         };
         Debug.Log(settings==null);
         settings.ValidationEventHandler += new ValidationEventHandler(ValidationCallback); //handler para validacao
 
-        XmlReader xmlr = XmlReader.Create("Assets/Resources/dtd/tempXml.xml", settings); // leitor com as configuracoes especificadas
+        XmlReader xmlr = XmlReader.Create(xmlFilePath, settings); // leitor com as configuracoes especificadas
         BoardGameObject = boardGameObject;
         return ReadXML(xmlr, boardGameObject);  
            

@@ -138,12 +138,9 @@ public class TurnsManager : MonoBehaviour
             if(goToPrevious){
                 PreviousTurn();
             }
-            if(isCalledByScene){
-                NextTurn();
-            } else {
-                //se não, e se não tiver sido chamado o botão para avançar de turno, espera-se 3s entre cada unit
-                yield return new WaitForSecondsRealtime(3f);
-            } 
+            if(!isCalledByScene){
+                yield return new WaitForSecondsRealtime(3f); 
+            }
             
         }
           //yield return new WaitForSecondsRealtime(3f); 

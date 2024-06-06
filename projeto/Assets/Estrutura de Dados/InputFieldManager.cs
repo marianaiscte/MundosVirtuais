@@ -27,8 +27,6 @@ public class InputFieldManager : MonoBehaviour
     public Button yesChange;
     public Button noChange;
 
-    public Button clearB;
-
     GameObject boardGameObject;
 
     XMLReader xmlReader = new XMLReader();
@@ -40,13 +38,12 @@ public class InputFieldManager : MonoBehaviour
     public string terraintypeString;
     public string nameTabuleiro;
 
+    public GameObject clearB;
 
     void Start(){
         //Debug.Log(boardGameObject.name);
         boardGameObject = gameObject;
         nameTabuleiro = boardGameObject.name;
-        clearB.GetComponent<CanvasRenderer>().SetAlpha(0.0f); // Tornar visível
-        clearB.interactable = false;
     }
 
     void Update(){
@@ -122,11 +119,11 @@ public class InputFieldManager : MonoBehaviour
         turnCountText.text = "Turn: " + turnCount;
         gameStatusText.text = gameStatus;
         Debug.Log("irei entrar");
-        if(gameStatus=="Game Over" && turnsManager.state.currentTurn >= turnsManager.turnsList.Count - 1){
-            clearB.GetComponent<CanvasRenderer>().SetAlpha(1.0f); // Tornar visível
-            clearB.interactable = true; // Tornar interativo
+       if(gameStatus=="Game Over" && turnsManager.state.currentTurn >= turnsManager.turnsList.Count - 1){
+            clearB.SetActive(true);
+            Button clear = clearB.GetComponent<Button>();
             TableSpawner scriptTS = GetComponentInParent<TableSpawner>();
-            clearB.onClick.AddListener(() => {
+            clear.onClick.AddListener(() => {
                 scriptTS.startNewGame();
             });
         }
