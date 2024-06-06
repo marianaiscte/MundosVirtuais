@@ -4,14 +4,16 @@ using UnityEngine;
 
 public class ObjectMover : MonoBehaviour
 {
+    //Guarda a referência ao objeto que será movido
     GameObject movingObject;
 
+    //posição alvo
     Vector3 targetPos;
 
+    //Guarda o componente Animator do objeto em movimento
     Animator animate;
 
-
-    // Método para iniciar o movimento do objeto
+    // Função para iniciar o movimento do objeto
     public void StartMoving(GameObject movingObject, Vector3 targetPos)
     {
         this.movingObject = movingObject;
