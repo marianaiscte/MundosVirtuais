@@ -67,7 +67,6 @@ public class AttackerController : MonoBehaviour
 
         if(isAttacking && stateInfoA.normalizedTime >= 1.0f && stateInfoA.IsName("attack")){ //verifica se
         //o attacker ja acabou a animação de attacking para voltar a idle
-            lastAttackTime = Time.time;
             animatorAttacker.ResetTrigger("Attacking");
             animatorAttacker.SetTrigger("Idle");
             lastAttackTime = Time.time;            
