@@ -54,49 +54,7 @@ public class TerrainGenerator : MonoBehaviour
         
     }
 
-//função que trata de "planificar" a arena (círculo no centro do terrain)
-    void FlattenCentralArea(){
-        int resolution = terrainData.heightmapResolution;
-        float[,] heights = terrainData.GetHeights(0, 0, resolution, resolution);
-
-        int centerX = resolution / 2;//coordenada X do centro
-        int centerZ = resolution / 2;//coordenada Z do centro
-
-        float centerHeight = heights[centerX, centerZ]; //altura do centro
-
-        //Calcula o raio da área que será nivelada, 
-        float flattenRadiusInHeightmapSpace = flattenRadius / terrainData.size.x * resolution;
-
-        //raio de suavização para suavizar a transição entre a área nivelada e o terreno a sua volta
-        float smoothingRadius = flattenRadiusInHeightmapSpace * 0.2f;
-
-
-        for (int x = 0; x < resolution; x++)
-        {
-            for (int z = 0; z < resolution; z++)
-            {
-                //Calcula a distância entre o ponto atual e o centro do terreno
-                float distance = Mathf.Sqrt((x - centerX) * (x - centerX) + (z - centerZ) * (z - centerZ));
-
-                if (distance < flattenRadiusInHeightmapSpace)
-                { //Se o ponto estiver dentro da área a ser nivelada, sua altura é definida como a altura do centro do terreno.
-                    heights[x, z] = centerHeight;
-                }
-                else if (distance < flattenRadiusInHeightmapSpace + smoothingRadius)
-                {//Se o ponto estiver dentro da zona de suavização, a altura do ponto é interpolada entre a 
-                //altura do centro do terreno e sua altura original, usando uma função de suavização 
-                    float t = (distance - flattenRadiusInHeightmapSpace) / smoothingRadius;
-                    t = Mathf.SmoothStep(0, 1, t);  // Suaviza a interpolação
-                    heights[x, z] = Mathf.Lerp(centerHeight, heights[x, z], t);
-                }
-            }
-        }
-
-        terrainData.SetHeights(0, 0, heights);
-    }
-
-
-    //função que retorna a matriz de terrainLayers com base no tipo de terreno especificado
+   //função que retorna a matriz de terrainLayers com base no tipo de terreno especificado
         TerrainLayer[] GetTerrainLayersForType(string terrainType)
         {
             switch (terrainType.ToLower())
@@ -115,8 +73,7 @@ public class TerrainGenerator : MonoBehaviour
                     return new TerrainLayer[] { plainLayer, flatAreaLayer };
             }
     }
-
-//função "principal" -> recebe o conteúdo do xml e o terrainType e gera o terreno baseando-se nisso
+    //função "principal" -> recebe o conteúdo do xml e o terrainType e gera o terreno baseando-se nisso
     void GenerateTerrainFromXML(string xmlContent, string terrainType)
     {
         XDocument xmlDoc = XDocument.Parse(xmlContent);
@@ -150,6 +107,9 @@ public class TerrainGenerator : MonoBehaviour
             Debug.LogError("Terrain type not found in XML");
         }
     }
+
+
+
     //função que gera o terreno com base na maxElevation com Perlin Noise
     void GenerateTerrain(float maxElevation)
     {
@@ -318,6 +278,49 @@ public class TerrainGenerator : MonoBehaviour
         }
         return true;
     }
+
+    //função que trata de "planificar" a arena (círculo no centro do terrain)
+    void FlattenCentralArea(){
+        int resolution = terrainData.heightmapResolution;
+        float[,] heights = terrainData.GetHeights(0, 0, resolution, resolution);
+
+        int centerX = resolution / 2;//coordenada X do centro
+        int centerZ = resolution / 2;//coordenada Z do centro
+
+        float centerHeight = heights[centerX, centerZ]; //altura do centro
+
+        //Calcula o raio da área que será nivelada, 
+        float flattenRadiusInHeightmapSpace = flattenRadius / terrainData.size.x * resolution;
+
+        //raio de suavização para suavizar a transição entre a área nivelada e o terreno a sua volta
+        float smoothingRadius = flattenRadiusInHeightmapSpace * 0.2f;
+
+
+        for (int x = 0; x < resolution; x++)
+        {
+            for (int z = 0; z < resolution; z++)
+            {
+                //Calcula a distância entre o ponto atual e o centro do terreno
+                float distance = Mathf.Sqrt((x - centerX) * (x - centerX) + (z - centerZ) * (z - centerZ));
+
+                if (distance < flattenRadiusInHeightmapSpace)
+                { //Se o ponto estiver dentro da área a ser nivelada, sua altura é definida como a altura do centro do terreno.
+                    heights[x, z] = centerHeight;
+                }
+                else if (distance < flattenRadiusInHeightmapSpace + smoothingRadius)
+                {//Se o ponto estiver dentro da zona de suavização, a altura do ponto é interpolada entre a 
+                //altura do centro do terreno e sua altura original, usando uma função de suavização 
+                    float t = (distance - flattenRadiusInHeightmapSpace) / smoothingRadius;
+                    t = Mathf.SmoothStep(0, 1, t);  // Suaviza a interpolação
+                    heights[x, z] = Mathf.Lerp(centerHeight, heights[x, z], t);
+                }
+            }
+        }
+
+        terrainData.SetHeights(0, 0, heights);
+    }
+
+
 
 //função que instancia o objeto em si, de acordo com a posição e com uma rotaçao em y aleatória
     GameObject InstantiateObject(string type, Vector3 position){
