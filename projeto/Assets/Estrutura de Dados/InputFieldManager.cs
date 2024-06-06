@@ -47,7 +47,7 @@ public class InputFieldManager : MonoBehaviour
         GameObject clear = GameObject.Find("ClearTable");
         clearB = clear.GetComponent<Button>();
         clearB.GetComponent<CanvasRenderer>().SetAlpha(0.0f); // Tornar visível
-        clearB.interactable = false; // Tornar interativo
+        clearB.interactable = false; // Tornar nao interativo
     }
 
     void Update(){
