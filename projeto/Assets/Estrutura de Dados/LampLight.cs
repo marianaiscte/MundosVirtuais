@@ -21,6 +21,7 @@ public class LampLight : MonoBehaviour{
     {
         if (Input.GetMouseButtonDown(0))
         {
+            //Cria um raio a partir da posição do rato a partir da câmera principal
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
 
