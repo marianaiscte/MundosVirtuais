@@ -11,7 +11,7 @@ public class ObjectMover : MonoBehaviour
     Animator animate;
 
 
-    // Start is called before the first frame update
+    // Método para iniciar o movimento do objeto
     public void StartMoving(GameObject movingObject, Vector3 targetPos)
     {
         this.movingObject = movingObject;
@@ -21,11 +21,11 @@ public class ObjectMover : MonoBehaviour
         
     }
 
-    // Update is called once per frame
+    // Método FixedUpdate é chamado em intervalos fixos de tempo
     public void FixedUpdate()
     {
-        movingObject.transform.position = Vector3.MoveTowards(movingObject.transform.position, targetPos, 1 * Time.deltaTime);
-           if (movingObject.transform.position == targetPos)
+        movingObject.transform.position = Vector3.MoveTowards(movingObject.transform.position, targetPos, 1 * Time.deltaTime); // move o objeto na direcao pertendida
+           if (movingObject.transform.position == targetPos) // se chegou à posicao final coloca o boolean que controlar o movimento a falso
         {
             animate.SetBool("moving", false);
         }
