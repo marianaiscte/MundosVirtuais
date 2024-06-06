@@ -17,7 +17,7 @@ public enum TileType
 public class Tile
 {
     public TileType type;
-    public GameObject gameO;
+    public GameObject gameO; // Referência para o GameObject associado ao tile
 
     // Inicializa o tile
     public Tile(TileType tileType)
