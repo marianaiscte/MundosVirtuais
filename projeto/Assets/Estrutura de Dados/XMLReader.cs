@@ -36,11 +36,6 @@ public class XMLReader : MonoBehaviour
         Debug.Log(dtdContent);
 
         File.WriteAllText("Assets/Resources/dtd/tempXml.xml", xmlContent);
-        foreach (string line in xmlContent.Split('\n'))
-        {
-            Debug.Log(line);
-        }
-
 
         XmlReaderSettings settings = new XmlReaderSettings
         {
@@ -139,7 +134,6 @@ public class XMLReader : MonoBehaviour
         while (xmlr.Read()) {
             if (xmlr.NodeType == XmlNodeType.Element) {
                 //Debug.Log("Entrei");
-                Debug.Log(xmlr.Name);
                 // Verifica se a tag atual está na lista de tags esperadas
                 if (expectedTags.Contains(xmlr.Name)) {
             switch (xmlr.Name) {

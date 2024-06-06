@@ -27,6 +27,8 @@ public class InputFieldManager : MonoBehaviour
     public Button yesChange;
     public Button noChange;
 
+    public Button clearB;
+
     GameObject boardGameObject;
 
     XMLReader xmlReader = new XMLReader();
@@ -38,16 +40,16 @@ public class InputFieldManager : MonoBehaviour
     public string terraintypeString;
     public string nameTabuleiro;
 
-    private Button clearB;
 
     void Start(){
         //Debug.Log(boardGameObject.name);
         boardGameObject = gameObject;
         nameTabuleiro = boardGameObject.name;
+
         GameObject clear = GameObject.Find("ClearTable");
         clearB = clear.GetComponent<Button>();
         clearB.GetComponent<CanvasRenderer>().SetAlpha(0.0f); // Tornar visível
-        clearB.interactable = false; // Tornar nao interativo
+        clearB.interactable = false;
     }
 
     void Update(){
