@@ -67,6 +67,10 @@ public class TableSpawner : MonoBehaviour
         Debug.Log(uim==null);
 
         GameObject showbutton = show.gameObject;
+
+        if(gameObject.name == "TableL"){
+            showbutton.transform.localPosition = new Vector3(-1678f, 0f, 0f);
+        }
         showbutton.SetActive(false);
 
         p.onEndEdit.AddListener(OnEnd);
