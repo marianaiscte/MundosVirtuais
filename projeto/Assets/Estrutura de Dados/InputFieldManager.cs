@@ -8,6 +8,7 @@ using System.Collections;
 
 public class InputFieldManager : MonoBehaviour
 {
+    // inicializacao de varios elementos do hud
     private string input; // Variável para armazenar o texto digitado pelo usuário
 
     public Button pauseB;
@@ -26,6 +27,8 @@ public class InputFieldManager : MonoBehaviour
     public Button yesChange;
     public Button noChange;
 
+    public Button clearB;
+
     GameObject boardGameObject;
 
     XMLReader xmlReader = new XMLReader();
@@ -37,19 +40,15 @@ public class InputFieldManager : MonoBehaviour
     public string terraintypeString;
     public string nameTabuleiro;
 
-    private Button clearB;
 
     void Start(){
         //Debug.Log(boardGameObject.name);
         boardGameObject = gameObject;
         nameTabuleiro = boardGameObject.name;
-        GameObject clear = GameObject.Find("ClearTable");
-        clearB = clear.GetComponent<Button>();
-        clearB.GetComponent<CanvasRenderer>().SetAlpha(0.0f); // Tornar visível
-        clearB.interactable = false; // Tornar interativo
     }
 
     void Update(){
+    // usar o teclado para controlar o hud (colocar os jogos em causa, retom-los, avancar uma jogada e andar para tras uma jogada)
     if (startListening){
         if (Input.GetKeyDown(KeyCode.Space)){
             Debug.Log("TECLAS " + turnsManager.paused);
@@ -65,25 +64,26 @@ public class InputFieldManager : MonoBehaviour
                 Debug.Log("parar reprodução");
             }
         } else if (Input.GetKeyDown(KeyCode.RightArrow)){
-            Debug.Log(KeyCode.RightArrow);
+            //Debug.Log(KeyCode.RightArrow);
             NextTurn.onClick.Invoke();
         }
         else if (Input.GetKeyDown(KeyCode.LeftArrow)){
-            Debug.Log(KeyCode.LeftArrow);
+            //Debug.Log(KeyCode.LeftArrow);
             PreviousTurn.onClick.Invoke();
         }
     }
 }
 
-    
+    // Método para ler a entrada de string e inicializar o jogo
     public void ReadStringOutput(string s){
         input = s;
         //Debug.Log(boardGameObject.name);
         Game game = xmlReader.LoadXMLToRead(s, boardGameObject);
         StartXML(game);
-        Debug.Log(input);
+        //Debug.Log(input);
     }
 
+    // Método para iniciar o jogo a partir dos dados carregados
     public void StartXML(Game game){
         boardGameObject.AddComponent<TurnsManager>();
         turnsManager = boardGameObject.GetComponent<TurnsManager>();
@@ -92,6 +92,7 @@ public class InputFieldManager : MonoBehaviour
         startListening = true;
     }
 
+    // Método que liga os botoes as funcoes do turns manager que controlam o jogo
     public void controls(){
         pauseB.onClick.AddListener(turnsManager.Pause);
         playB.onClick.AddListener(turnsManager.Play);
@@ -103,7 +104,6 @@ public class InputFieldManager : MonoBehaviour
         });
     }
 
-//esta lógica ainda não funciona bem
     private void nextTM(){
         turnsManager.isCalledByScene = true;
     }
@@ -112,6 +112,8 @@ public class InputFieldManager : MonoBehaviour
         turnsManager.goToPrevious = true;
     }
 
+
+    // dar update às informacoes do jogo e no caso do jogo ter acabado, surgir um botao para resetar a mesa (poder comecar um novo jogo)
     public void UpdateUI(string playerName, int turnCount, string gameStatus)
     {
         playerNameText.text = "Player: " + playerName;
@@ -128,6 +130,8 @@ public class InputFieldManager : MonoBehaviour
         }
     }
 
+
+    // mete ativo o painel com as informacoes do jogo
     public void showInfo(){
         if (gameInfo.activeSelf){
             gameInfo.SetActive(false);
@@ -136,6 +140,7 @@ public class InputFieldManager : MonoBehaviour
         }
     }
 
+    // mudança para a scene 2 (a das batalhas)
     public void changeScene(string tiletype){
         //turnsManager.Pause();
         changeScenePanel.SetActive(true);
@@ -143,12 +148,12 @@ public class InputFieldManager : MonoBehaviour
         GameObject gameObjectTerrainType = GameObject.Find("terrainType");
         if (gameObjectTerrainType != null)
         {
-            // Acesse a variável pública contendo a string
             terrainTypeHolder stringTerrainComp = gameObjectTerrainType.GetComponent<terrainTypeHolder>();
             
             if (stringTerrainComp != null)
             {
-               stringTerrainComp.terrainType = terraintypeString;
+                // Define a propriedade terrainType do componente com o valor de terraintypeString
+                stringTerrainComp.terrainType = terraintypeString;
             }
             else
             {
@@ -162,12 +167,13 @@ public class InputFieldManager : MonoBehaviour
     }
     
 
-
+    // aceitar a mudanca para a scene da bathalha
     public void changeSceneYES(){
         //Debug.Log("vou entrar na scene");
         SceneManager.LoadScene("Parte 2 terrain");
     }
 
+    // nao aceitar a mudanca de scene
     public void changeSceneNO(){
         changeScenePanel.SetActive(false);
         //turnsManager.Play();
