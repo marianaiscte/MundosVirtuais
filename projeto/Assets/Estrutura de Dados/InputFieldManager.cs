@@ -27,6 +27,8 @@ public class InputFieldManager : MonoBehaviour
     public Button yesChange;
     public Button noChange;
 
+    public GameObject clearB;
+
     GameObject boardGameObject;
 
     XMLReader xmlReader = new XMLReader();
@@ -38,7 +40,6 @@ public class InputFieldManager : MonoBehaviour
     public string terraintypeString;
     public string nameTabuleiro;
 
-    public GameObject clearB;
 
     void Start(){
         //Debug.Log(boardGameObject.name);
@@ -119,9 +120,9 @@ public class InputFieldManager : MonoBehaviour
         turnCountText.text = "Turn: " + turnCount;
         gameStatusText.text = gameStatus;
         Debug.Log("irei entrar");
-       if(gameStatus=="Game Over" && turnsManager.state.currentTurn >= turnsManager.turnsList.Count - 1){
+        if(gameStatus=="Game Over" && turnsManager.state.currentTurn >= turnsManager.turnsList.Count - 1){
             clearB.SetActive(true);
-            Button clear = clearB.GetComponent<Button>();
+            Button clear = clearB.GetComponentInChildren<Button>();
             TableSpawner scriptTS = GetComponentInParent<TableSpawner>();
             clear.onClick.AddListener(() => {
                 scriptTS.startNewGame();

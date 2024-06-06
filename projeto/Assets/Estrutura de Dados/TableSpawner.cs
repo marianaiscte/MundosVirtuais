@@ -10,12 +10,12 @@ public class TableSpawner : MonoBehaviour
 {
     public GameObject gameTablePrefab; // O prefab da mesa de jogo
     public Transform tablePosition; // Referência ao GameObject vazio
-
     GameObject table;
     
     void Start()
     {
-        // Instancia as mesas assim que o jogo começa: tantas mesas quanto os objetos empty com este script associado
+        // Instancia as mesas assim que o jogo começa: 
+        //tantas mesas quanto os objetos empty com este script associado
         table = InstantiateTable();
         linkSetUp(table);
     }
@@ -62,16 +62,10 @@ public class TableSpawner : MonoBehaviour
  
         Button switchCam = camM.GetComponent<Button>();
         UiManager uim = topview.GetComponent<UiManager>();
-
+      
         // Associa as câmeras da cena ao script associado ao botão acima
         uim.mainCamera = GameObject.Find("Main Camera");
-        //uim.miniMap = GameObject.Find("MiniMap");
-        //uim.miniMap.SetActive(false);
-
-        //Transform miniMap = canva.transform.Find("MiniMap");
-        //uim.miniMap.SetActive(false);
-
-        
+        uim.miniMap = minimap;
 
         // Ação a executar ao pressionar o botão acima
         switchCam.onClick.AddListener(changescene);

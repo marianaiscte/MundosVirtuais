@@ -23,7 +23,8 @@ public class TurnsManager : MonoBehaviour
     public bool goToPrevious = false; //se o utilizador usou o botão de PreviousTurn
     public Coroutine unitCoroutine; //execução de units
     public GameState state; //estado atual do jogo, ou seja, turno e unit
-    public List<Dictionary<(int, int), List<Piece>>> oldTurnsPositions = new List<Dictionary<(int, int), List<Piece>>>(); //lista dos tiles e das peças lá no final de cada turno
+     //lista dos tiles e das peças lá no final de cada turno
+    public List<Dictionary<(int, int), List<Piece>>> oldTurnsPositions = new List<Dictionary<(int, int), List<Piece>>>();
     private InputFieldManager inputFieldManager;
 
     string player1name;
@@ -59,7 +60,8 @@ public class TurnsManager : MonoBehaviour
     {
         //tupla para guardar os espadachins que atacam numa casa (portanto não devem morrer nesse confronto)
         List<(int, int, int)> fights = new List<(int, int, int)>();
-        //lista que guarda as coordenadas atacadas em cada unit para eliminir as peças que lá se encontram no fim do turno (menos os soldados que apenas atacaram e não morreram, daí a lista acima)
+        //lista que guarda as coordenadas atacadas em cada unit para eliminir as 
+        //peças que lá se encontram no fim do turno (menos os soldados que apenas atacaram e não morreram, daí a lista acima)
         List<int []> coordenadasAtacadas = new List<int[]>();
         //percorre units
         for (int i = state.currentUnit; i < units.Length; i++){
@@ -86,7 +88,8 @@ public class TurnsManager : MonoBehaviour
                         Tile tile = board.BoardDisplay[unit.posFocoX-1, unit.posFocoY-1];
                         if(tile.type != TileType.Sea){
                         TileType type = tile.type;
-                        //vai para uma função que verifica se é uma luta com outro espadachim, e se for inicia a visualização animada em 3D
+                        //vai para uma função que verifica se é uma luta com outro espadachim, 
+                        //e se for inicia a visualização animada em 3D
                             bool soldierFight = soldierAttack(unit,type);
                             //adiciona o soldado que não morre à lista
                             if(soldierFight){
@@ -141,7 +144,6 @@ public class TurnsManager : MonoBehaviour
             if(!isCalledByScene){
                 yield return new WaitForSecondsRealtime(3f); 
             }
-            
         }
           //yield return new WaitForSecondsRealtime(3f); 
 
@@ -234,6 +236,7 @@ public class TurnsManager : MonoBehaviour
 //Função que serve para colocar as peças numa casa consoante o numero de peças lá colocadas
     public UnityEngine.Vector3[] placePieces(int x, int y, GameObject gameTile){
         int numberOfpieces = game.CountPiecesInTile(x, y);
+        Debug.Log(numberOfpieces);
         UnityEngine.Vector3 gameTilePos = gameTile.transform.position;
         UnityEngine.Vector3[] positions = new UnityEngine.Vector3[numberOfpieces];
         float offset = 0.1f; // Distância de offset do centro
@@ -317,7 +320,8 @@ public class TurnsManager : MonoBehaviour
         
         GameObject prefabToSpawn = getPrefabs(unit);
 
-//se o prefab não for null, cria-se a peça, com o id únic, adiciona-se a peça ao jogo e coloca-se na casa consoante o numero de peças lá existentes
+//se o prefab não for null, cria-se a peça, com o id únic, adiciona-se a peça ao jogo e 
+//coloca-se na casa consoante o numero de peças lá existentes
         if (prefabToSpawn != null)
         {
             Piece p = unit.piece;
@@ -371,7 +375,7 @@ public class TurnsManager : MonoBehaviour
         game.UpdatePosPiece(p,unit.posFocoX,unit.posFocoY);
 
         UnityEngine.Vector3 targetPos = new UnityEngine.Vector3();
-
+       
         //fantasma da peça ao mover-se:
         // obtém o prefab associado à unit e instancia um objeto novo igual
         GameObject charact = getPrefabs(unit);
@@ -393,9 +397,7 @@ public class TurnsManager : MonoBehaviour
             {
                 // redefine o shader para ser possível utilizar transparência
                 shader = Shader.Find("Universal Render Pipeline/Lit")
-            };
-
-            // Ajusta as propriedades do material para torná-lo transparente
+            };// Ajusta as propriedades do material para torná-lo transparente
             transparentMaterial.SetFloat("_Surface", 1); // 1 é para Transparente
             transparentMaterial.SetFloat("_Blend", (float)UnityEngine.Rendering.BlendMode.DstAlpha);
             transparentMaterial.SetFloat("_SrcBlend", (float)UnityEngine.Rendering.BlendMode.SrcAlpha);
@@ -417,16 +419,18 @@ public class TurnsManager : MonoBehaviour
         UnityEngine.Vector3[] positions = placePieces(unit.posFocoX,unit.posFocoY, gameTile);
         GameObject[] objects = game.getObjectsInTile(unit.posFocoX, unit.posFocoY);
         int i = 0;
-        foreach(GameObject obj in objects){
-            if(mover.Equals(obj)){
+        Debug.Log(objects);
+        Debug.Log(unit.piece.id);
+        foreach(Piece pi in game.getPiecesInTile(unit.posFocoX, unit.posFocoY)){
+            if(unit.piece.Equals(pi)){
                 targetPos = positions[i];
-            }
-            else{  
-                obj.transform.position = positions[i];
+            }else{ 
+                if(pi.getGameO()!=mover){
+                pi.getGameO().transform.position = positions[i];
                 i++;
+                }
             }
         }
-        
         // Move o objeto para a posição alvo (movimento)
         objectMover.StartMoving(mover, targetPos);
         // Corrotina para esperar alguns segundos antes de destruir o "fantasma"
