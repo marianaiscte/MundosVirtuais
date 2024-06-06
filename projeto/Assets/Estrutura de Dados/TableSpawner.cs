@@ -65,7 +65,7 @@ public class TableSpawner : MonoBehaviour
       
         // Associa as câmeras da cena ao script associado ao botão acima
         uim.mainCamera = GameObject.Find("Main Camera");
-        uim.miniMap = minimap;
+        //uim.miniMap = minimap;
 
         // Ação a executar ao pressionar o botão acima
         switchCam.onClick.AddListener(changescene);
