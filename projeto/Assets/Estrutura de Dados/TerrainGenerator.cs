@@ -2,20 +2,25 @@ using System.Collections.Generic;
 using System.Xml.Linq;
 using UnityEngine;
 
+//função que trata de gerar o terreno da parte 2 do trabalho (e instanciar os espadachins e o personagem principal)
 public class TerrainGenerator : MonoBehaviour
 {
+    //O próprio terrain a ser gerado
     public Terrain terrain;
-    //public string terrainType;
+   //GameObject onde ficarão todos os prefabs de ambiente
     public GameObject parentObject; 
+    //TerrainData do Terrain
     private TerrainData terrainData;
+    //Lista da posição de todos os prefabs de ambiente
     private List<Vector3> objectPositions = new List<Vector3>(); 
+    //distancia mínima entre casas (de modo a evitar sobreposições)
     public float minDistanceHouse = 5f; 
-    public float minDistance = 3f; // Distância mínima entre objetos
+    public float minDistance = 3f; // Distância mínima entre objetos (de modo a evitar sobreposições)
     public float flattenRadius = 50f; // Raio da área central a ser terraplanada
 
 
 
-    // Terrain layers for different types
+// Terrain Layers para todos os tipos de terreno e uma para a terraplana    public TerrainLayer desertLayer;
     public TerrainLayer desertLayer;
     public TerrainLayer forestLayer;
     public TerrainLayer mountainLayer;
@@ -24,14 +29,15 @@ public class TerrainGenerator : MonoBehaviour
     public TerrainLayer flatAreaLayer;
 
 
-
+//função de Start onde sao feitas as associações essencias e a busca do terrainType a gerar ao 
+//GameObject "terrainType" que tem um terrainTypeHolder
     void Start()
     {
         terrainData = terrain.terrainData;
         GameObject gameObjectTerrain = GameObject.Find("terrainType");
         string terrainType = gameObjectTerrain.GetComponent<terrainTypeHolder>().terrainType.ToLower();
-        terrainData.terrainLayers = GetTerrainLayersForType(terrainType); // Defina as camadas de textura
-        TextAsset[] resources = Resources.LoadAll<TextAsset>("xml");
+        terrainData.terrainLayers = GetTerrainLayersForType(terrainType);//Definição das Layers
+        TextAsset[] resources = Resources.LoadAll<TextAsset>("xml"); //busca do ficheiro xml com as elevações e densidade de objetos
          if (resources.Length > 0)
         {
             TextAsset firstXml = resources[0] as TextAsset;
@@ -48,43 +54,7 @@ public class TerrainGenerator : MonoBehaviour
         
     }
 
-
-    void FlattenCentralArea(){
-        int resolution = terrainData.heightmapResolution;
-        float[,] heights = terrainData.GetHeights(0, 0, resolution, resolution);
-
-        int centerX = resolution / 2;
-        int centerZ = resolution / 2;
-
-        float centerHeight = heights[centerX, centerZ];
-
-        float flattenRadiusInHeightmapSpace = flattenRadius / terrainData.size.x * resolution;
-
-        float smoothingRadius = flattenRadiusInHeightmapSpace * 0.2f;
-
-        for (int x = 0; x < resolution; x++)
-        {
-            for (int z = 0; z < resolution; z++)
-            {
-                float distance = Mathf.Sqrt((x - centerX) * (x - centerX) + (z - centerZ) * (z - centerZ));
-
-                if (distance < flattenRadiusInHeightmapSpace)
-                {
-                    heights[x, z] = centerHeight;
-                }
-                else if (distance < flattenRadiusInHeightmapSpace + smoothingRadius)
-                {
-                    float t = (distance - flattenRadiusInHeightmapSpace) / smoothingRadius;
-                    t = Mathf.SmoothStep(0, 1, t);  // Suaviza a interpolação
-                    heights[x, z] = Mathf.Lerp(centerHeight, heights[x, z], t);
-                }
-            }
-        }
-
-        terrainData.SetHeights(0, 0, heights);
-    }
-
-
+   //função que retorna a matriz de terrainLayers com base no tipo de terreno especificado
         TerrainLayer[] GetTerrainLayersForType(string terrainType)
         {
             switch (terrainType.ToLower())
@@ -103,7 +73,7 @@ public class TerrainGenerator : MonoBehaviour
                     return new TerrainLayer[] { plainLayer, flatAreaLayer };
             }
     }
-
+    //função "principal" -> recebe o conteúdo do xml e o terrainType e gera o terreno baseando-se nisso
     void GenerateTerrainFromXML(string xmlContent, string terrainType)
     {
         XDocument xmlDoc = XDocument.Parse(xmlContent);
@@ -120,11 +90,17 @@ public class TerrainGenerator : MonoBehaviour
 
         if (terrainElement != null)
         {
+             //elevação máxima do terreno
             float maxElevation = float.Parse(terrainElement.Attribute("maximum_elevation").Value, System.Globalization.CultureInfo.InvariantCulture);
+            //função que gera o terreno com base na maxElevation com Perlin Noise
             GenerateTerrain(maxElevation);
-            PaintTerrain(maxElevation, terrainType);
+            //função que pinta o terrain de acordo com as Layers
+            PaintTerrain();
+            //função que coloca os prefabs de ambiente (house,rock e tree)
             PlaceObjects(terrainElement, maxElevation);
+            //função que planifica a area toda
             FlattenCentralArea();    
+            //função que coloca o main character e os espadachins no terreno
             PlaceAttackerAndDefenderAndChar();
         }else
         {
@@ -132,6 +108,9 @@ public class TerrainGenerator : MonoBehaviour
         }
     }
 
+
+
+    //função que gera o terreno com base na maxElevation com Perlin Noise
     void GenerateTerrain(float maxElevation)
     {
         int resolution = terrainData.heightmapResolution;
@@ -141,17 +120,18 @@ public class TerrainGenerator : MonoBehaviour
         {
             for (int z = 0; z < resolution; z++)
             {
-                float xCoord = (float)x / resolution;
+                float xCoord = (float)x / resolution; //coordenadas normalizadas
                 float zCoord = (float)z / resolution;
-                float noiseValue = Mathf.PerlinNoise(xCoord * 10, zCoord * 10);
-                heights[x, z] = noiseValue * maxElevation / terrainData.size.y;
+                float noiseValue = Mathf.PerlinNoise(xCoord * 10, zCoord * 10); //frequência de 10
+                heights[x, z] = noiseValue * maxElevation / terrainData.size.y; //normalizar a altura
             }
         }
 
         terrainData.SetHeights(0, 0, heights);
     }
 
-    void PaintTerrain(float maxElevation, string terrainType)
+//função que pinta o terreno de acordo com as terrainLayers (default de cada terreno em todo o lado menos no local plano)
+    void PaintTerrain()
 {
     int resolution = terrainData.alphamapResolution;
     float[,,] splatmapData = new float[resolution, resolution, terrainData.terrainLayers.Length];
@@ -167,25 +147,26 @@ public class TerrainGenerator : MonoBehaviour
         {
             float worldX = (float)x / resolution * terrainData.size.x;
             float worldZ = (float)y / resolution * terrainData.size.z;
-            float height = terrain.SampleHeight(new Vector3(worldX, 0, worldZ));
+            float height = terrain.SampleHeight(new Vector3(worldX, 0, worldZ));//altura do ponto
 
-            float[] splatWeights = new float[terrainData.terrainLayers.Length];
+            float[] splatWeights = new float[terrainData.terrainLayers.Length]; 
 
             float distance = Mathf.Sqrt(Mathf.Pow(worldX - centerX, 2) + Mathf.Pow(worldZ - centerZ, 2));
 
             if (distance <= radius)
-            {
+            {//pertence à arena
                 for (int i = 0; i < splatWeights.Length; i++)
                 {
                     splatWeights[i] = 2;
                 }
             }
             else
-            {
-                splatWeights[0] = 1; // Default layer
+            {// Layer Default
+                splatWeights[0] = 1; 
             }
 
             float total = 0;
+             //Os pesos são somados e depois normalizados para que a soma dos pesos em cada ponto seja 1
             for (int i = 0; i < splatWeights.Length; i++)
             {
                 total += splatWeights[i];
@@ -202,7 +183,8 @@ public class TerrainGenerator : MonoBehaviour
     terrainData.SetAlphamaps(0, 0, splatmapData);
 }
 
-
+//função que coloca todos os objetos/prefabs de ambiente (rock,tree e house) de acordo com um Threshold
+//definido pelo grupo de modo a evitar sobrecarregamento
     void PlaceObjects(XElement terrainElement, float maxElevation)
     {
         float lowAltitudeThreshold = 0.2f * maxElevation;
@@ -219,7 +201,7 @@ public class TerrainGenerator : MonoBehaviour
             PlaceObjectOfType(type, densityLowF, densityHighF, lowAltitudeThreshold, highAltitudeThreshold);
         }
     }
-
+//função que coloca um objeto/prefab especifico (tree ou house ou rock) de acordo com a minima distancia entre outros objetos
     void PlaceObjectOfType(string type, float densityLow, float densityHigh, float lowAltitudeThreshold, float highAltitudeThreshold)
     {
         int resolution = terrainData.heightmapResolution;
@@ -270,7 +252,8 @@ public class TerrainGenerator : MonoBehaviour
             }
         }
     }
-
+//função que valida se a posição é valida para uma house (para ser colocada uma casa tem de ter uma distancia de 5 com o objeto
+//mais próximo)
     bool IsPositionValidHouse(Vector3 position)
     {
         foreach (Vector3 objPos in objectPositions)
@@ -282,7 +265,8 @@ public class TerrainGenerator : MonoBehaviour
         }
         return true;
     }
-
+//função que valida se a posição é valida para qualquer outro objeto (sem ser uma house) 
+//(para serem colocados estes tem de ter uma distancia mínima de 3)
     bool IsPositionValid(Vector3 position)
     {
         foreach (Vector3 objPos in objectPositions)
@@ -295,6 +279,50 @@ public class TerrainGenerator : MonoBehaviour
         return true;
     }
 
+    //função que trata de "planificar" a arena (círculo no centro do terrain)
+    void FlattenCentralArea(){
+        int resolution = terrainData.heightmapResolution;
+        float[,] heights = terrainData.GetHeights(0, 0, resolution, resolution);
+
+        int centerX = resolution / 2;//coordenada X do centro
+        int centerZ = resolution / 2;//coordenada Z do centro
+
+        float centerHeight = heights[centerX, centerZ]; //altura do centro
+
+        //Calcula o raio da área que será nivelada, 
+        float flattenRadiusInHeightmapSpace = flattenRadius / terrainData.size.x * resolution;
+
+        //raio de suavização para suavizar a transição entre a área nivelada e o terreno a sua volta
+        float smoothingRadius = flattenRadiusInHeightmapSpace * 0.2f;
+
+
+        for (int x = 0; x < resolution; x++)
+        {
+            for (int z = 0; z < resolution; z++)
+            {
+                //Calcula a distância entre o ponto atual e o centro do terreno
+                float distance = Mathf.Sqrt((x - centerX) * (x - centerX) + (z - centerZ) * (z - centerZ));
+
+                if (distance < flattenRadiusInHeightmapSpace)
+                { //Se o ponto estiver dentro da área a ser nivelada, sua altura é definida como a altura do centro do terreno.
+                    heights[x, z] = centerHeight;
+                }
+                else if (distance < flattenRadiusInHeightmapSpace + smoothingRadius)
+                {//Se o ponto estiver dentro da zona de suavização, a altura do ponto é interpolada entre a 
+                //altura do centro do terreno e sua altura original, usando uma função de suavização 
+                    float t = (distance - flattenRadiusInHeightmapSpace) / smoothingRadius;
+                    t = Mathf.SmoothStep(0, 1, t);  // Suaviza a interpolação
+                    heights[x, z] = Mathf.Lerp(centerHeight, heights[x, z], t);
+                }
+            }
+        }
+
+        terrainData.SetHeights(0, 0, heights);
+    }
+
+
+
+//função que instancia o objeto em si, de acordo com a posição e com uma rotaçao em y aleatória
     GameObject InstantiateObject(string type, Vector3 position){
         string folderPath = "Terrain/" + type + "/";
         GameObject[] prefabs = Resources.LoadAll<GameObject>(folderPath);
@@ -322,7 +350,7 @@ public class TerrainGenerator : MonoBehaviour
         }
     }
 
-    
+    //função que coloca o mainCharacter, o espadachim Attacker e o Defender em cena 
     void PlaceAttackerAndDefenderAndChar()
     {
         Vector3 centerPosition = new Vector3(terrainData.size.x / 2, 0, terrainData.size.z / 2);
