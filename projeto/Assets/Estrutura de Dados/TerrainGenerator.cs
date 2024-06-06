@@ -17,9 +17,6 @@ public class TerrainGenerator : MonoBehaviour
     public float minDistanceHouse = 5f; 
     public float minDistance = 3f; // Distância mínima entre objetos (de modo a evitar sobreposições)
     public float flattenRadius = 50f; // Raio da área central a ser terraplanada
-
-
-
 // Terrain Layers para todos os tipos de terreno e uma para a terraplana    public TerrainLayer desertLayer;
     public TerrainLayer desertLayer;
     public TerrainLayer forestLayer;
@@ -37,7 +34,8 @@ public class TerrainGenerator : MonoBehaviour
         GameObject gameObjectTerrain = GameObject.Find("terrainType");
         string terrainType = gameObjectTerrain.GetComponent<terrainTypeHolder>().terrainType.ToLower();
         terrainData.terrainLayers = GetTerrainLayersForType(terrainType);//Definição das Layers
-        TextAsset[] resources = Resources.LoadAll<TextAsset>("xml"); //busca do ficheiro xml com as elevações e densidade de objetos
+        TextAsset[] resources = Resources.LoadAll<TextAsset>("xml"); //busca do ficheiro xml com as
+        //elevações e densidade de objetos
          if (resources.Length > 0)
         {
             TextAsset firstXml = resources[0] as TextAsset;
@@ -131,15 +129,13 @@ public class TerrainGenerator : MonoBehaviour
     }
 
 //função que pinta o terreno de acordo com as terrainLayers (default de cada terreno em todo o lado menos no local plano)
-    void PaintTerrain()
-{
+    void PaintTerrain(){
     int resolution = terrainData.alphamapResolution;
     float[,,] splatmapData = new float[resolution, resolution, terrainData.terrainLayers.Length];
 
     float centerX = terrainData.size.x / 2;
     float centerZ = terrainData.size.z / 2;
     float radius = 50.0f;
-
 
     for (int y = 0; y < resolution; y++)
     {
@@ -171,7 +167,6 @@ public class TerrainGenerator : MonoBehaviour
             {
                 total += splatWeights[i];
             }
-
             for (int i = 0; i < splatWeights.Length; i++)
             {
                 splatWeights[i] /= total;
@@ -202,14 +197,11 @@ public class TerrainGenerator : MonoBehaviour
         }
     }
 //função que coloca um objeto/prefab especifico (tree ou house ou rock) de acordo com a minima distancia entre outros objetos
-    void PlaceObjectOfType(string type, float densityLow, float densityHigh, float lowAltitudeThreshold, float highAltitudeThreshold)
-    {
+    void PlaceObjectOfType(string type, float densityLow, float densityHigh, float lowAltitudeThreshold, float highAltitudeThreshold){
         int resolution = terrainData.heightmapResolution;
-
         float centerX = terrainData.size.x / 2;
         float centerZ = terrainData.size.z / 2;
         float radius = 50.0f;
-
         for (int x = 0; x < resolution; x++)
         {
             for (int z = 0; z < resolution; z++)
@@ -220,9 +212,7 @@ public class TerrainGenerator : MonoBehaviour
 
                 float density = height < lowAltitudeThreshold ? densityLow :
                                 height > highAltitudeThreshold ? densityHigh : 0f;
-
                 float distance = Mathf.Sqrt(Mathf.Pow(worldX - centerX, 2) + Mathf.Pow(worldZ - centerZ, 2));
-
                 if (distance <= radius){
                     continue;
                 }else{
@@ -288,14 +278,10 @@ public class TerrainGenerator : MonoBehaviour
         int centerZ = resolution / 2;//coordenada Z do centro
 
         float centerHeight = heights[centerX, centerZ]; //altura do centro
-
         //Calcula o raio da área que será nivelada, 
         float flattenRadiusInHeightmapSpace = flattenRadius / terrainData.size.x * resolution;
-
         //raio de suavização para suavizar a transição entre a área nivelada e o terreno a sua volta
         float smoothingRadius = flattenRadiusInHeightmapSpace * 0.2f;
-
-
         for (int x = 0; x < resolution; x++)
         {
             for (int z = 0; z < resolution; z++)
@@ -351,22 +337,16 @@ public class TerrainGenerator : MonoBehaviour
     }
 
     //função que coloca o mainCharacter, o espadachim Attacker e o Defender em cena 
-    void PlaceAttackerAndDefenderAndChar()
-    {
+    void PlaceAttackerAndDefenderAndChar(){
         Vector3 centerPosition = new Vector3(terrainData.size.x / 2, 0, terrainData.size.z / 2);
         centerPosition.y = terrain.SampleHeight(centerPosition);
-
         Vector3 attackerpos = new Vector3(centerPosition.x-1,centerPosition.y,centerPosition.z);
         Vector3 defenderPosition = new Vector3(centerPosition.x+1,centerPosition.y,centerPosition.z);
         Vector3 charpos = new Vector3(centerPosition.x,centerPosition.y,230);
-
-
-
         GameObject attackerPrefab = Resources.Load<GameObject>("Mixamo swordWoman/Attacker");
         GameObject defenderPrefab = Resources.Load<GameObject>("Mixamo swordWoman/Defender");
         GameObject charPrefab = Resources.Load<GameObject>("Mixamo swordWoman/Main char");
-
-
+        
         if (attackerPrefab != null)
         {
             GameObject attacker = Instantiate(attackerPrefab, attackerpos, attackerPrefab.transform.rotation);
