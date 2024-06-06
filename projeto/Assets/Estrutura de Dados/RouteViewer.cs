@@ -2,13 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// Script que trata do rasto percorrido pelo jogador
 public class RouteViewer : MonoBehaviour
 {
     Piece piece;
-    Sprite pointSprite; // Sprite das coisinhas do caminho
     private bool isShowingRoute = false;
-    private List<GameObject> routePoints = new List<GameObject>();
-    private List<GameObject> otherGameObjects = new List<GameObject>();
     private LineRenderer lineRenderer;
 
     public void SetPiece(Piece p)
@@ -20,6 +18,7 @@ public class RouteViewer : MonoBehaviour
     {
         // Adiciona um LineRenderer ao GameObject
         lineRenderer = gameObject.AddComponent<LineRenderer>();
+        //Largura da linha
         lineRenderer.startWidth = 0.1f;
         lineRenderer.endWidth = 0.1f;
         // Aplica o material ao LineRenderer
@@ -27,11 +26,7 @@ public class RouteViewer : MonoBehaviour
         lineRenderer.positionCount = 0;
     }
 
-        //ir buscar as posições que estão guardadas na peça em piece.oldPositions
-        //pôr pontos por cima desses tiles (no meio), e entre cada ponto/posição pôr pontos do mesmo prefab mas mais pequenos
-        //pôr setActive a false dos outros bonecos todos
-        //isto durar X segundos ou então qd se clica no boneco novamente volta a ficar normal
-
+    // Ao pressionar no boneco uma vez, mostra-se o caminho, ao voltar a pressionar ele desaparece
     void OnMouseDown()
     { 
         if (isShowingRoute)
@@ -39,8 +34,7 @@ public class RouteViewer : MonoBehaviour
             RestoreState();
         }
         else
-        {
-            //otherGameObjects = piece.game.getAllObjects();
+        { // se estiver o booleano estiver a false
             ShowRoute();
         }
     }
@@ -50,28 +44,20 @@ public class RouteViewer : MonoBehaviour
         if (piece == null) return;
         isShowingRoute = true;
 
-        /* Desativar outros GameObjects
-        foreach (GameObject go in otherGameObjects)
-        {
-            if (go != this.gameObject && go != piece.getGameO())
-            {
-                go.SetActive(false);
-            }
-        }
-        */
+        //lista para guardar as posições
+        List<Vector3> routePositions = new List<Vector3>();
 
-         List<Vector3> routePositions = new List<Vector3>();
-
-        // Adiciona as posições dos pontos da rota
+        // Adiciona as posições dos pontos da rota, que estão guardados na própria peça
+        // Converte cada posição do tabuleiro para uma posição no espaço do jogo 
         for (int i = 0; i < piece.oldPositions.Count; i++)
         {
             Tile tile = piece.game.board.BoardDisplay[piece.oldPositions[i].Item1 - 1, piece.oldPositions[i].Item2 - 1];
             GameObject gameTile = tile.getGameO();
             Vector3 gameTilePos = gameTile.transform.position;
-            Vector3 position = new Vector3(gameTilePos.x, gameTilePos.y, gameTilePos.z); // Ajustar a altura conforme necessário
+            Vector3 position = new Vector3(gameTilePos.x, gameTilePos.y, gameTilePos.z); 
             routePositions.Add(position);
         }
-        routePositions.Add(piece.getGameO().transform.position);
+        routePositions.Add(piece.getGameO().transform.position); // posição atual da peça
         // Atualiza o LineRenderer com as posições da rota
         lineRenderer.positionCount = routePositions.Count;
         lineRenderer.SetPositions(routePositions.ToArray());
@@ -79,7 +65,7 @@ public class RouteViewer : MonoBehaviour
 
     private void RestoreState()
     {
-        // Reseta o LineRenderer
+        // Remove a linha do tabuleiro
         lineRenderer.positionCount = 0;
         isShowingRoute = false;
     }
